@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factors of Production — Sort &amp; Score | HSE Economics</title>
+<style>
+  :root{
+    --royal:#004AA0;
+    --royal-dark:#003B80;
+    --red:#C8102E;
+    --navy:#1A2230;
+    --skyblue:#4A86E8;
+    --gray:#C6C8CE;
+    --bg:#F3F5F8;
+    --card:#FFFFFF;
+    --ok:#1E8E3E;
+    --okbg:#E6F4EA;
+    --err:#C8102E;
+    --errbg:#FBE7EA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;
+    color:var(--navy);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px 60px;}
+
+  /* ---------- Header ---------- */
+  header{
+    background:linear-gradient(135deg,var(--royal) 0%,var(--royal-dark) 100%);
+    color:#fff;
+    padding:22px 20px 26px;
+    border-bottom:5px solid var(--red);
+  }
+  .header-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .crest{
+    width:46px;height:46px;border-radius:50%;background:#fff;color:var(--royal);
+    display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;
+    font-weight:bold;font-size:14px;flex:none;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  h1{font-family:Georgia,'Times New Roman',serif;font-size:1.55rem;margin:0;line-height:1.15;}
+  .subtitle{font-size:.85rem;opacity:.85;margin-top:3px;}
+  .scoreboard{
+    display:flex;gap:10px;background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:10px 16px;
+  }
+  .score-item{text-align:center;padding:0 10px;}
+  .score-item + .score-item{border-left:1px solid rgba(255,255,255,.3);}
+  .score-num{font-family:Georgia,serif;font-size:1.4rem;font-weight:bold;line-height:1;}
+  .score-label{font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;opacity:.8;margin-top:3px;}
+
+  /* ---------- Controls ---------- */
+  .controls{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    margin:22px 0 18px;
+  }
+  .round-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+  .round-tab{
+    font-family:"Trebuchet MS",sans-serif;font-weight:bold;font-size:.85rem;
+    padding:9px 16px;border-radius:999px;border:2px solid var(--royal);
+    background:#fff;color:var(--royal);cursor:pointer;transition:.15s ease;
+  }
+  .round-tab:hover{background:#EAF1FB;}
+  .round-tab.active{background:var(--royal);color:#fff;}
+  .round-tab.hard.active{background:var(--red);border-color:var(--red);}
+  .round-tab.hard{border-color:var(--red);color:var(--red);}
+  .round-tab.hard:hover{background:#FBEAEC;}
+  .reset-btn{
+    font-family:"Trebuchet MS",sans-serif;font-size:.8rem;font-weight:bold;
+    background:none;border:2px solid var(--gray);color:var(--navy);
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--navy);}
+
+  /* ---------- Drop zones ---------- */
+  .zones{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;
+  }
+  .zone{
+    background:var(--card);border-radius:12px;border:2px dashed #C9D3E4;
+    min-height:180px;display:flex;flex-direction:column;overflow:hidden;
+    transition:.15s ease;
+  }
+  .zone.dragover{border-color:var(--royal);background:#EEF4FC;transform:translateY(-2px);}
+  .zone-head{
+    color:#fff;font-family:Georgia,serif;font-weight:bold;font-size:1rem;
+    padding:10px 12px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .zone[data-factor="Land"] .zone-head{background:var(--royal);}
+  .zone[data-factor="Labor"] .zone-head{background:var(--navy);}
+  .zone[data-factor="Capital"] .zone-head{background:var(--red);}
+  .zone[data-factor="Entrepreneurship"] .zone-head{background:var(--skyblue);}
+  .zone-count{font-family:"Trebuchet MS",sans-serif;font-size:.72rem;font-weight:normal;background:rgba(255,255,255,.25);padding:2px 8px;border-radius:999px;}
+  .zone-body{padding:8px;display:flex;flex-wrap:wrap;gap:6px;flex:1;align-content:flex-start;}
+  .solved-chip{
+    background:var(--okbg);color:var(--ok);border:1px solid #BFE3C9;
+    font-size:.72rem;padding:5px 9px;border-radius:8px;font-weight:bold;
+    max-width:100%;
+  }
+
+  /* ---------- Tray ---------- */
+  .tray-label{font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;color:#5B6472;font-weight:bold;margin:4px 0 10px;}
+  .tray{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;
+    min-height:120px;
+  }
+  .tile{
+    background:var(--card);border-radius:10px;box-shadow:0 1px 4px rgba(20,30,50,.14);
+    overflow:hidden;cursor:grab;user-select:none;touch-action:none;
+    border:2px solid transparent;
+    transition:box-shadow .15s ease, transform .1s ease, border-color .15s ease;
+    display:flex;flex-direction:column;
+  }
+  .tile:hover{box-shadow:0 4px 10px rgba(20,30,50,.22);}
+  .tile.dragging{opacity:.35;}
+  .tile.floating{
+    position:fixed;z-index:999;pointer-events:none;box-shadow:0 10px 24px rgba(20,30,50,.35);
+    transform:scale(1.04) rotate(-1.5deg);
+  }
+  .tile.wrong{animation:shake .4s ease; border-color:var(--err);}
+  .tile-img{width:100%;height:92px;object-fit:cover;background:#DDE3EC;display:block;}
+  .tile-placeholder{
+    width:100%;height:92px;display:flex;align-items:center;justify-content:center;
+    font-size:1.8rem;background:#DDE3EC;color:#8B94A3;
+  }
+  .tile-text{font-size:.74rem;padding:7px 8px;line-height:1.25;flex:1;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-4px);}
+    80%{transform:translateX(4px);}
+  }
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;
+    font-size:.82rem;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;
+    transition:.2s ease;pointer-events:none;max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--red);}
+
+  /* ---------- End screen ---------- */
+  .end-card{
+    background:var(--card);border-radius:14px;padding:34px 28px;text-align:center;
+    box-shadow:0 4px 18px rgba(20,30,50,.12);margin-top:10px;
+  }
+  .end-card h2{font-family:Georgia,serif;color:var(--royal);margin:0 0 6px;}
+  .end-score{font-family:Georgia,serif;font-size:2.6rem;color:var(--red);margin:14px 0;}
+  .play-again{
+    font-family:"Trebuchet MS",sans-serif;font-weight:bold;background:var(--royal);
+    color:#fff;border:none;padding:12px 26px;border-radius:999px;cursor:pointer;font-size:.95rem;
+  }
+  .play-again:hover{background:var(--royal-dark);}
+  .miss-list{text-align:left;max-width:520px;margin:18px auto 0;font-size:.85rem;color:#3A4252;}
+  .miss-list div{padding:5px 0;border-bottom:1px solid #EEF0F4;}
+
+  footer{text-align:center;color:#8B94A3;font-size:.75rem;padding:20px 0 0;}
+
+  @media (max-width:820px){
+    .zones{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:520px){
+    .zones{grid-template-columns:1fr;}
+    h1{font-size:1.25rem;}
+    .header-inner{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="crest">HSE</div>
+      <div>
+        <h1>Factors of Production: Sort &amp; Score</h1>
+        <div class="subtitle">Indiana Economics · Mr. Moon · Drag each example into Land, Labor, Capital, or Entrepreneurship</div>
+      </div>
+    </div>
+    <div class="scoreboard">
+      <div class="score-item"><div class="score-num" id="scoreCorrect">0</div><div class="score-label">Correct</div></div>
+      <div class="score-item"><div class="score-num" id="scoreStreak">0</div><div class="score-label">Streak</div></div>
+      <div class="score-item"><div class="score-num" id="scoreLeft">0</div><div class="score-label">Left</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="round-tabs">
+      <button class="round-tab" data-round="easy">Easy–Medium (20)</button>
+      <button class="round-tab hard" data-round="hard">Hard–Very Difficult (20)</button>
+      <button class="round-tab" data-round="all">All 40</button>
+    </div>
+    <button class="reset-btn" id="resetBtn">Restart round</button>
+  </div>
+
+  <div class="zones" id="zones">
+    <div class="zone" data-factor="Land">
+      <div class="zone-head"><span>Land</span><span class="zone-count" id="count-Land">0</span></div>
+      <div class="zone-body" id="body-Land"></div>
+    </div>
+    <div class="zone" data-factor="Labor">
+      <div class="zone-head"><span>Labor</span><span class="zone-count" id="count-Labor">0</span></div>
+      <div class="zone-body" id="body-Labor"></div>
+    </div>
+    <div class="zone" data-factor="Capital">
+      <div class="zone-head"><span>Capital</span><span class="zone-count" id="count-Capital">0</span></div>
+      <div class="zone-body" id="body-Capital"></div>
+    </div>
+    <div class="zone" data-factor="Entrepreneurship">
+      <div class="zone-head"><span>Entrepreneurship</span><span class="zone-count" id="count-Entrepreneurship">0</span></div>
+      <div class="zone-body" id="body-Entrepreneurship"></div>
+    </div>
+  </div>
+
+  <div class="tray-label" id="trayLabel">Drag an example into the correct category above</div>
+  <div class="tray" id="tray"></div>
+
+  <div class="end-card" id="endCard" style="display:none;">
+    <h2>Round complete!</h2>
+    <div>You sorted every example in this round.</div>
+    <div class="end-score" id="endScore">0 / 0</div>
+    <div id="endMisses"></div>
+    <button class="play-again" id="playAgainBtn">Play this round again</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>HSE Indiana Economics &middot; Photos: Wikimedia Commons (openly licensed) or placeholder icons &mdash; see the Item Bank spreadsheet to swap in more real photos</footer>
+
+<script>
+/* =========================================================================
+   ITEM BANK
+   Each item: id, factor, difficulty ("easy" | "hard"), text, img (URL or null), note
+   Items with img: null show a placeholder icon tile instead of a photo.
+   TO ADD A REAL PHOTO: paste the direct image URL into the "img" field below.
+   ========================================================================= */
+const ICONS = {Land:"🌾", Labor:"🧑‍🔧", Capital:"🏭", Entrepreneurship:"💡"};
+
+const ITEMS = [
+  // ---- LAND ----
+  {factor:"Land", difficulty:"easy", text:"Farmland used to grow corn", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Corn_Fields,_Iowa_Farm_7-13_(15277889101).jpg?width=500"},
+  {factor:"Land", difficulty:"easy", text:"Oil pumped from an underground well", img:"https://commons.wikimedia.org/wiki/Special:FilePath/West_Texas_Pumpjack.JPG?width=500"},
+  {factor:"Land", difficulty:"easy", text:"Fish caught in the ocean", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Small_Fishing_Boat_In_North_Sea.jpg?width=500"},
+  {factor:"Land", difficulty:"easy", text:"A river used to irrigate crops", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Irrigation_canal_near_Prosser_(9573986936).jpg?width=500"},
+  {factor:"Land", difficulty:"easy", text:"Timber logged from a forest", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Vimek_404_harvester.jpg?width=500"},
+  {factor:"Land", difficulty:"hard", text:"Wind blowing across a wind farm", img:"https://commons.wikimedia.org/wiki/Special:FilePath/A_close_shot_of_wind_turbines_wind_farm.jpg?width=500", note:"The wind itself is Land — the turbine is Capital."},
+  {factor:"Land", difficulty:"hard", text:"Sunlight hitting a field of solar panels", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Field_of_Solar_Panels_near_Ogwell.jpg?width=500", note:"The sunlight is Land — the panel is Capital."},
+  {factor:"Land", difficulty:"hard", text:"Iron ore still buried underground, not yet mined", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Aerial_of_Hogarth_Open_Pit.jpg?width=500", note:"Not yet extracted — still a natural resource."},
+  {factor:"Land", difficulty:"hard", text:"A coral reef that supports a local fishing economy", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Coral_Reef,_Red_Sea.jpg?width=500"},
+  {factor:"Land", difficulty:"hard", text:"A standing forest of uncut trees", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Old_growth_forest_scenic.jpg?width=500", note:"Compare to the lumber yard example under Capital."},
+
+  // ---- LABOR ----
+  {factor:"Labor", difficulty:"easy", text:"A cashier scanning groceries", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Checkout_line_for_grocery_store.jpg?width=500"},
+  {factor:"Labor", difficulty:"easy", text:"A construction worker framing a house", img:"https://commons.wikimedia.org/wiki/Special:FilePath/House_Frame_Under_the_Stars_(21499785914).jpg?width=500"},
+  {factor:"Labor", difficulty:"easy", text:"A doctor performing surgery", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Surgeons_in_the_operating_room.jpg?width=500"},
+  {factor:"Labor", difficulty:"easy", text:"A teacher grading papers", img:"https://commons.wikimedia.org/wiki/Special:FilePath/A_public_high_school_teacher_in_a_classroom_in_the_United_States_08.jpg?width=500"},
+  {factor:"Labor", difficulty:"easy", text:"A chef cooking a meal", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Chinese_restaurant_chef.jpg?width=500"},
+  {factor:"Labor", difficulty:"hard", text:"A software engineer writing code for a video game", img:"https://commons.wikimedia.org/wiki/Special:FilePath/ComputerProgrammer.jpg?width=500"},
+  {factor:"Labor", difficulty:"hard", text:"A hired CEO who runs a company but does not own it", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Heading_to_business_meeting_(7645640942).jpg?width=500", note:"No ownership stake or risk — that's what separates Labor from Entrepreneurship."},
+  {factor:"Labor", difficulty:"hard", text:"A rideshare driver giving rides in a car they own", img:null, note:"The driving is Labor — the car itself is Capital."},
+  {factor:"Labor", difficulty:"hard", text:"A freelance graphic designer working from home", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Font_selection_for_logo_design.jpg?width=500"},
+  {factor:"Labor", difficulty:"hard", text:"An unpaid intern shadowing a surgeon", img:null, note:"Still Labor even though unpaid — effort is the resource, not the wage."},
+
+  // ---- CAPITAL ----
+  {factor:"Capital", difficulty:"easy", text:"A delivery truck", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Typical_UPS_delivery_truck.JPG?width=500"},
+  {factor:"Capital", difficulty:"easy", text:"A factory building", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Industry-factory-chimneys_(24326571205).jpg?width=500"},
+  {factor:"Capital", difficulty:"easy", text:"An oven at a bakery", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Putting_bread_in_the_oven_(5958998763).jpg?width=500"},
+  {factor:"Capital", difficulty:"easy", text:"A laptop used by a graphic designer", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_on_a_desk_(Unsplash).jpg?width=500"},
+  {factor:"Capital", difficulty:"easy", text:"A tractor on a farm", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Tractor-agricultural-machine-cultivating-field.jpg?width=500"},
+  {factor:"Capital", difficulty:"hard", text:"Lumber cut, milled, and stacked at a lumber yard", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Stacked_wood.JPG?width=500", note:"Compare to the standing forest example under Land."},
+  {factor:"Capital", difficulty:"hard", text:"The cash register machine at a checkout counter", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Cash_register_(24061690099).jpg?width=500", note:"The machine is Capital — the money inside it is not a factor of production at all."},
+  {factor:"Capital", difficulty:"hard", text:"A fleet of forklifts inside a warehouse", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Container_loading_with_forklift_at_warehouse_in_Thailand.jpg?width=500"},
+  {factor:"Capital", difficulty:"hard", text:"Industrial sewing machines inside a clothing factory", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Sewing_machine_operator.JPG?width=500"},
+  {factor:"Capital", difficulty:"hard", text:"Scaffolding rented for building construction", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Building_Under_Construction_02.JPG?width=500"},
+
+  // ---- ENTREPRENEURSHIP ----
+  {factor:"Entrepreneurship", difficulty:"easy", text:"A student starting a lawn mowing business", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Lawn-Mowing.jpg?width=500"},
+  {factor:"Entrepreneurship", difficulty:"easy", text:"Someone opening a food truck", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Food_truck.jpg?width=500"},
+  {factor:"Entrepreneurship", difficulty:"easy", text:"A person starting an Etsy shop", img:null},
+  {factor:"Entrepreneurship", difficulty:"easy", text:"A teenager starting a dog walking service", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Fort_Greene_Brooklyn_NY_assorted_photos_near_Fulton_Street_2_lady_walking_four_dogs.jpg?width=500"},
+  {factor:"Entrepreneurship", difficulty:"easy", text:"Someone opening a small coffee shop", img:"https://commons.wikimedia.org/wiki/Special:FilePath/-2019-11-08_Coffee_barista_inside_Cafe_Main,_Church_Street,_Cromer.JPG?width=500"},
+  {factor:"Entrepreneurship", difficulty:"hard", text:"A franchise owner who buys into an existing brand and risks their own money", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Carvel_Restaurant_Franchise_Canton_Michigan.JPG?width=500", note:"Owns and risks capital, even though the brand isn't original to them."},
+  {factor:"Entrepreneurship", difficulty:"hard", text:"A student who gets classmates to chip in for supplies and organizes the whole operation", img:null, note:"Organizing plus risk-taking is the test, not just working."},
+  {factor:"Entrepreneurship", difficulty:"hard", text:"Someone who quits a job, invests savings, and starts a landscaping company", img:"https://commons.wikimedia.org/wiki/Special:FilePath/Landscaping_Crew.jpg?width=500"},
+  {factor:"Entrepreneurship", difficulty:"hard", text:"A person who develops an app, funds it with a personal loan, and manages the business", img:null},
+  {factor:"Entrepreneurship", difficulty:"hard", text:"A student who designs, prints, and sells custom phone cases online, alone", img:"https://commons.wikimedia.org/wiki/Special:FilePath/3D_printing_in_progress.jpg?width=500", note:"Handles design, production, marketing, and shipping alone — the full entrepreneurial role."},
+];
+ITEMS.forEach((it,i)=> it.id = "item-"+i);
+
+/* ---------------------------- Game state ---------------------------- */
+let deck = [];
+let solved = 0;
+let streak = 0;
+let misses = [];
+
+const trayEl = document.getElementById('tray');
+const toastEl = document.getElementById('toast');
+const FACTORS = ["Land","Labor","Capital","Entrepreneurship"];
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function startRound(kind){
+  document.querySelectorAll('.round-tab').forEach(b=>b.classList.toggle('active', b.dataset.round===kind));
+  let pool;
+  if(kind==="easy") pool = ITEMS.filter(i=>i.difficulty==="easy");
+  else if(kind==="hard") pool = ITEMS.filter(i=>i.difficulty==="hard");
+  else pool = ITEMS.slice();
+  deck = shuffle(pool.slice());
+  solved = 0; streak = 0; misses = [];
+  document.getElementById('endCard').style.display = 'none';
+  document.getElementById('zones').style.display = 'grid';
+  document.getElementById('tray').style.display = 'grid';
+  document.getElementById('trayLabel').style.display = 'block';
+  FACTORS.forEach(f=>{ document.getElementById('body-'+f).innerHTML=''; document.getElementById('count-'+f).textContent='0'; });
+  renderTray();
+  updateScoreboard();
+  localStorage_safe_save(kind);
+}
+let currentRound = "easy";
+function localStorage_safe_save(kind){ currentRound = kind; }
+
+function renderTray(){
+  trayEl.innerHTML = '';
+  deck.forEach(item=>{
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.id = item.id;
+    tile.innerHTML = item.img
+      ? `<img class="tile-img" src="${item.img}" alt="" draggable="false">`
+      : `<div class="tile-placeholder">${ICONS[item.factor]}</div>`;
+    tile.innerHTML += `<div class="tile-text">${item.text}</div>`;
+    trayEl.appendChild(tile);
+    attachDrag(tile, item);
+  });
+}
+
+function updateScoreboard(){
+  document.getElementById('scoreCorrect').textContent = solved;
+  document.getElementById('scoreStreak').textContent = streak;
+  document.getElementById('scoreLeft').textContent = deck.length;
+}
+
+function showToast(msg, isErr){
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show' + (isErr ? ' err':'');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+}
+
+/* ---------------------------- Drag logic (pointer events: mouse + touch) ---------------------------- */
+function attachDrag(tile, item){
+  let floating = null, startX=0, startY=0, offX=0, offY=0, dragging=false;
+
+  tile.addEventListener('pointerdown', (e)=>{
+    if(e.button===2) return;
+    dragging = false;
+    startX = e.clientX; startY = e.clientY;
+    const rect = tile.getBoundingClientRect();
+    offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+    tile.setPointerCapture(e.pointerId);
+
+    function onMove(ev){
+      const dx = ev.clientX-startX, dy = ev.clientY-startY;
+      if(!dragging && Math.hypot(dx,dy) > 6){
+        dragging = true;
+        tile.classList.add('dragging');
+        floating = tile.cloneNode(true);
+        floating.classList.add('floating');
+        floating.style.width = tile.getBoundingClientRect().width+'px';
+        document.body.appendChild(floating);
+      }
+      if(dragging && floating){
+        floating.style.left = (ev.clientX-offX)+'px';
+        floating.style.top = (ev.clientY-offY)+'px';
+        document.querySelectorAll('.zone').forEach(z=>{
+          const r = z.getBoundingClientRect();
+          const over = ev.clientX>=r.left && ev.clientX<=r.right && ev.clientY>=r.top && ev.clientY<=r.bottom;
+          z.classList.toggle('dragover', over);
+        });
+      }
+    }
+    function onUp(ev){
+      tile.releasePointerCapture(e.pointerId);
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      if(dragging){
+        tile.classList.remove('dragging');
+        let dropped = null;
+        document.querySelectorAll('.zone').forEach(z=>{
+          const r = z.getBoundingClientRect();
+          const over = ev.clientX>=r.left && ev.clientX<=r.right && ev.clientY>=r.top && ev.clientY<=r.bottom;
+          z.classList.remove('dragover');
+          if(over) dropped = z.dataset.factor;
+        });
+        if(floating){ floating.remove(); floating=null; }
+        if(dropped){ handleDrop(item, tile, dropped); }
+      }
+    }
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+}
+
+function handleDrop(item, tile, droppedFactor){
+  if(droppedFactor === item.factor){
+    solved++; streak++;
+    deck = deck.filter(d=>d.id!==item.id);
+    tile.remove();
+    const chip = document.createElement('div');
+    chip.className = 'solved-chip';
+    chip.textContent = item.text;
+    document.getElementById('body-'+item.factor).appendChild(chip);
+    document.getElementById('count-'+item.factor).textContent =
+      document.getElementById('body-'+item.factor).children.length;
+    showToast('Correct — '+item.text, false);
+    updateScoreboard();
+    if(deck.length===0) finishRound();
+  } else {
+    streak = 0;
+    misses.push(item);
+    tile.classList.add('wrong');
+    setTimeout(()=>tile.classList.remove('wrong'), 420);
+    const msg = item.note ? item.note : ('Not quite — that one is '+item.factor+'.');
+    showToast(msg, true);
+    updateScoreboard();
+  }
+}
+
+function finishRound(){
+  document.getElementById('zones').style.display = 'none';
+  document.getElementById('tray').style.display = 'none';
+  document.getElementById('trayLabel').style.display = 'none';
+  const endCard = document.getElementById('endCard');
+  endCard.style.display = 'block';
+  const total = solved + new Set(misses.map(m=>m.id)).size;
+  document.getElementById('endScore').textContent = solved + ' correct';
+  const missEl = document.getElementById('endMisses');
+  if(misses.length){
+    const uniqueMisses = [...new Map(misses.map(m=>[m.id,m])).values()];
+    missEl.innerHTML = '<div class="miss-list"><strong>Worth a second look:</strong>' +
+      uniqueMisses.map(m=>`<div>${m.text} &rarr; <strong>${m.factor}</strong></div>`).join('') +
+      '</div>';
+  } else {
+    missEl.innerHTML = '<div style="color:#1E8E3E;font-weight:bold;margin-top:8px;">Perfect round — zero misses!</div>';
+  }
+}
+
+document.querySelectorAll('.round-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=> startRound(btn.dataset.round));
+});
+document.getElementById('resetBtn').addEventListener('click', ()=> startRound(currentRound));
+document.getElementById('playAgainBtn').addEventListener('click', ()=> startRound(currentRound));
+
+startRound('easy');
+</script>
+</body>
+</html>

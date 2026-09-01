@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSE Economics Vocabulary Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14181c;
+    --paper:#fafaf8;
+    --panel:#ffffff;
+    --line:#e4e4e0;
+    --line-strong:#c9c9c3;
+    --muted:#6b6f76;
+    --accent:#004a9f;       /* HSE Indiana Economics royal blue */
+    --accent-dark:#0a3a78;
+    --accent-soft:#e8f0fb;
+    --wrong:#cd0d32;        /* HSE red divider stripe */
+    --wrong-soft:#fbe9ec;
+    --gold:#cd0d32;
+    --gold-soft:#fbe9ec;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(20,24,28,0.04), 0 6px 20px rgba(20,24,28,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+
+  /* ---------- Header (HSE banner: blue block + red stripe) ---------- */
+  header.app-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+    background:var(--accent);
+    color:#fff;
+    padding:26px 28px 24px;
+    border-radius:14px;
+    margin-bottom:30px;
+    box-shadow:var(--shadow);
+    position:relative;
+    flex-wrap:wrap;
+  }
+  header.app-head::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-4px;
+    height:4px;
+    background:var(--wrong);
+    border-radius:0 0 14px 14px;
+  }
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.8);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.1;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+    color:#fff;
+  }
+  .subtitle{
+    color:rgba(255,255,255,0.85);
+    font-size:14.5px;
+    max-width:46ch;
+  }
+  .streak-box{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 18px;
+    text-align:right;
+    min-width:150px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.14);
+  }
+  .streak-label{
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .streak-value{
+    font-size:26px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+
+  /* ---------- Tabs ---------- */
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    appearance:none;
+    border:none;
+    background:transparent;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--muted);
+    padding:10px 4px;
+    margin-right:22px;
+    cursor:pointer;
+    position:relative;
+    top:1px;
+  }
+  .tab-btn .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--line-strong);
+    margin-right:7px;
+  }
+  .tab-btn.active{color:var(--ink);}
+  .tab-btn.active .num{color:var(--accent);}
+  .tab-btn::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-1px;
+    height:2px;
+    background:transparent;
+  }
+  .tab-btn.active::after{background:var(--accent);}
+  .tab-btn:hover{color:var(--ink);}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  .panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .panel-title{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    font-weight:600;
+  }
+  .panel-desc{
+    color:var(--muted);
+    font-size:13.5px;
+    margin-top:2px;
+  }
+
+  button.ghost-btn{
+    appearance:none;
+    background:var(--panel);
+    border:1px solid var(--line-strong);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    padding:8px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  button.ghost-btn:hover{border-color:var(--accent); background:var(--accent-soft);}
+
+  button.solid-btn{
+    appearance:none;
+    background:var(--accent);
+    border:1px solid var(--accent);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 18px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  button.solid-btn:hover{background:var(--accent-dark);}
+  button.solid-btn:disabled{opacity:0.45; cursor:not-allowed;}
+
+  button.reset-btn{
+    appearance:none;
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--wrong);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    padding:7px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  button.reset-btn:hover{background:var(--wrong-soft); border-color:var(--wrong);}
+
+  .score-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    background:var(--accent-soft);
+    color:var(--accent-dark);
+    border:1px solid #c3d7f0;
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:600;
+  }
+
+  /* ========== MATCHING GAME ========== */
+  .match-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:10px;
+  }
+  .match-card{
+    min-height:110px;
+    border:1px solid var(--line-strong);
+    border-radius:10px;
+    background:var(--panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:10px;
+    font-size:13px;
+    line-height:1.35;
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .12s ease, background .12s ease, transform .1s ease;
+    box-shadow:var(--shadow);
+  }
+  .match-card.term{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--accent-dark);
+  }
+  .match-card:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .match-card.selected{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+  }
+  .match-card.correct{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent-dark);
+    opacity:0.55;
+    cursor:default;
+    pointer-events:none;
+  }
+  .match-card.wrong{
+    background:var(--wrong-soft);
+    border-color:var(--wrong);
+    animation:shake .32s;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+  .match-win{
+    text-align:center;
+    padding:40px 20px;
+  }
+  .match-win h3{
+    font-family:'Fraunces',serif;
+    font-size:24px;
+    margin-bottom:6px;
+  }
+
+  /* ========== FLASHCARDS ========== */
+  .flash-stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  .flash-counter{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.05em;
+  }
+  .flashcard{
+    width:100%;
+    max-width:520px;
+    min-height:260px;
+    perspective:1200px;
+    cursor:pointer;
+  }
+  .flashcard-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    min-height:260px;
+    transition:transform .5s cubic-bezier(.2,.9,.3,1);
+    transform-style:preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .flash-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:16px;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:34px 30px;
+  }
+  .flash-face.front{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(24px,4vw,32px);
+    color:var(--ink);
+  }
+  .flash-face.back{
+    transform:rotateY(180deg);
+    background:var(--accent);
+    color:#fff;
+    font-size:16px;
+    line-height:1.5;
+  }
+  .flash-hint{
+    position:absolute;
+    bottom:14px;
+    left:0;right:0;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--line-strong);
+  }
+  .flash-face.back .flash-hint{color:rgba(255,255,255,0.6);}
+
+  .flash-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .flash-know-row{
+    display:flex;
+    gap:10px;
+  }
+  button.know-btn, button.review-btn{
+    appearance:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:9px;
+    cursor:pointer;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+  }
+  button.know-btn:hover{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-dark);}
+  button.review-btn:hover{border-color:var(--wrong); background:var(--wrong-soft); color:var(--wrong);}
+
+  /* ========== FILL IN THE BLANK ========== */
+  .fib-card{
+    background:var(--panel);
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:32px;
+    box-shadow:var(--shadow);
+    max-width:640px;
+    margin:0 auto;
+  }
+  .fib-progress{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:0.05em;
+    margin-bottom:16px;
+  }
+  .fib-prompt{
+    font-size:17px;
+    line-height:1.55;
+    margin-bottom:22px;
+  }
+  .fib-prompt .blank{
+    display:inline-block;
+    min-width:120px;
+    border-bottom:2px solid var(--accent);
+    color:var(--accent-dark);
+    font-weight:700;
+    font-family:'JetBrains Mono',monospace;
+    text-align:center;
+  }
+  .fib-input-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  input.fib-input{
+    flex:1;
+    min-width:180px;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:11px 14px;
+    border-radius:9px;
+    border:1px solid var(--line-strong);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  input.fib-input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  input.fib-input.correct-input{border-color:var(--accent); background:var(--accent-soft);}
+  input.fib-input.wrong-input{border-color:var(--wrong); background:var(--wrong-soft);}
+
+  .fib-feedback{
+    margin-top:14px;
+    font-size:13.5px;
+    font-weight:600;
+    min-height:20px;
+  }
+  .fib-feedback.correct{color:var(--accent-dark);}
+  .fib-feedback.wrong{color:var(--wrong);}
+
+  .fib-done{
+    text-align:center;
+    padding:20px;
+  }
+
+  footer.note{
+    text-align:center;
+    color:var(--line-strong);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    margin-top:50px;
+    letter-spacing:0.04em;
+  }
+
+  @media (max-width:560px){
+    .streak-box{min-width:0;}
+    .fib-card{padding:22px;}
+  }
+
+  /* focus visibility for a11y */
+  button:focus-visible, .match-card:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .flashcard-inner{transition:none;}
+    .match-card{transition:none;}
+    @keyframes shake{0%,100%{transform:none;}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app-head">
+    <div>
+      <div class="brand-eyebrow">HSE Indiana Economics · Unit 1</div>
+      <h1>Vocabulary Review: Scarcity, Choice &amp; Factors of Production</h1>
+      <div class="subtitle">20 terms, three ways to practice. Play a round, flip some cards, or fill in the blanks.</div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-label">Best streak</div>
+      <div class="streak-value" id="bestStreak">0</div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-panel="match"><span class="num">01</span>Matching</button>
+    <button class="tab-btn" data-panel="flash"><span class="num">02</span>Flashcards</button>
+    <button class="tab-btn" data-panel="fib"><span class="num">03</span>Fill in the Blank</button>
+  </nav>
+
+  <!-- ================= MATCHING ================= -->
+  <section class="panel active" id="panel-match">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Match the term to its definition</div>
+        <div class="panel-desc">Click a term, then click its matching definition. All 20 terms are in play.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="matchScore">Matched 0 / 20</span>
+        <button class="reset-btn" id="matchReset">RESET</button>
+      </div>
+    </div>
+    <div id="matchArea"></div>
+  </section>
+
+  <!-- ================= FLASHCARDS ================= -->
+  <section class="panel" id="panel-flash">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Flashcards</div>
+        <div class="panel-desc">Tap the card to flip it. Mark whether you knew it to track your progress.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="flashScore">Known 0 / 20</span>
+        <button class="reset-btn" id="flashReset">RESET</button>
+      </div>
+    </div>
+    <div class="flash-stage">
+      <div class="flash-counter" id="flashCounter">Card 1 of 20</div>
+      <div class="flashcard" id="flashcard">
+        <div class="flashcard-inner">
+          <div class="flash-face front" id="flashFront">
+            Term
+            <div class="flash-hint">Tap to reveal definition</div>
+          </div>
+          <div class="flash-face back" id="flashBack">
+            Definition
+            <div class="flash-hint">Tap to flip back</div>
+          </div>
+        </div>
+      </div>
+      <div class="flash-controls">
+        <button class="ghost-btn" id="flashPrev">&larr; Previous</button>
+        <button class="ghost-btn" id="flashShuffle">Shuffle</button>
+        <button class="ghost-btn" id="flashNext">Next &rarr;</button>
+      </div>
+      <div class="flash-know-row">
+        <button class="review-btn" id="flashReview">Still learning</button>
+        <button class="know-btn" id="flashKnow">I know this ✓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FILL IN THE BLANK ================= -->
+  <section class="panel" id="panel-fib">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Fill in the Blank</div>
+        <div class="panel-desc">Read the definition, type the vocabulary term it describes.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="fibScore">Score 0 / 20</span>
+        <button class="reset-btn" id="fibReset">RESET</button>
+      </div>
+    </div>
+
+    <div class="fib-card" id="fibCard">
+      <div class="fib-progress" id="fibProgress">Question 1 of 20</div>
+      <div class="fib-prompt" id="fibPrompt"></div>
+      <div class="fib-input-row">
+        <input type="text" class="fib-input" id="fibInput" placeholder="Type the term..." autocomplete="off" spellcheck="false">
+        <button class="solid-btn" id="fibCheck">Check</button>
+      </div>
+      <div class="fib-feedback" id="fibFeedback"></div>
+    </div>
+  </section>
+
+  <footer class="note">RESET clears progress for that game only</footer>
+</div>
+
+<script>
+/* ============ VOCAB DATA ============ */
+const VOCAB = [
+  { term: "Want", def: "Something a person desires but does not need in order to survive, like the newest phone or a video game." },
+  { term: "Need", def: "Something required for survival, such as food, water, clothing, and shelter." },
+  { term: "Good", def: "A physical, tangible item that can be bought, sold, or traded to satisfy a want or need." },
+  { term: "Service", def: "An action or activity performed by one person or business for another that has value, like a haircut or a doctor's visit." },
+  { term: "Scarcity", def: "The basic economic problem that resources are limited while people's wants are unlimited." },
+  { term: "Economics", def: "The social science that studies how people make choices to satisfy unlimited wants with limited resources." },
+  { term: "Entrepreneur", def: "A person who starts and runs a business, taking on risk in hopes of earning a profit." },
+  { term: "Factors of Production", def: "The four resources used to produce goods and services: land, labor, capital, and entrepreneurship." },
+  { term: "Land", def: "The natural resources used to produce goods and services, such as soil, water, minerals, and forests." },
+  { term: "Labor", def: "The physical and mental effort people put into producing goods and services." },
+  { term: "Capital", def: "Human-made resources used to produce other goods and services, including tools, machines, and money invested in a business." },
+  { term: "Physical Capital", def: "The tangible, human-made tools and equipment used in production, such as machinery, buildings, and tools." },
+  { term: "Human Capital", def: "The skills, knowledge, and experience a worker gains through education and training that make them more productive." },
+  { term: "Trade-off", def: "Giving up one option in order to choose another, since resources are limited." },
+  { term: "Opportunity Cost", def: "The value of the next best alternative you give up when you make a choice." },
+  { term: "Marginal Thinking", def: "Making decisions by weighing the extra cost and extra benefit of one more unit of something, instead of looking at totals." },
+  { term: "Marginal Cost", def: "The extra cost of producing or doing one more unit of something." },
+  { term: "Marginal Benefit", def: "The extra benefit or satisfaction gained from one more unit of something." },
+  { term: "Market", def: "A place, system, or process where buyers and sellers come together to exchange goods and services." },
+  { term: "Inflation", def: "A general rise in prices across the economy over time, which reduces the purchasing power of money." }
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let bestStreak = 0;
+function updateBestStreak(n){
+  if(n > bestStreak){ bestStreak = n; document.getElementById('bestStreak').textContent = bestStreak; }
+}
+
+/* ============ TAB SWITCHING ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+/* ================= MATCHING GAME ================= */
+const matchArea = document.getElementById('matchArea');
+const matchScoreEl = document.getElementById('matchScore');
+let matchState = {};
+
+function initMatch(){
+  const terms = VOCAB.map((v,i)=>({ id:i, type:'term', text:v.term }));
+  const defs  = VOCAB.map((v,i)=>({ id:i, type:'def', text:v.def }));
+  const cards = shuffle(terms.concat(defs));
+  matchState = { cards, selected: [], matched: new Set(), lock:false };
+  renderMatch();
+}
+
+function renderMatch(){
+  matchArea.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+  matchState.cards.forEach((c, idx)=>{
+    const el = document.createElement('div');
+    el.className = 'match-card ' + (c.type==='term' ? 'term' : 'def');
+    el.textContent = c.text;
+    el.dataset.idx = idx;
+    if(matchState.matched.has(c.id)){
+      el.classList.add('correct');
+    }
+    if(matchState.selected.some(s=>s.idx===idx)){
+      el.classList.add('selected');
+    }
+    el.addEventListener('click', ()=>onMatchCardClick(idx));
+    grid.appendChild(el);
+  });
+  matchArea.appendChild(grid);
+  matchScoreEl.textContent = `Matched ${matchState.matched.size} / ${VOCAB.length}`;
+
+  if(matchState.matched.size === VOCAB.length){
+    const win = document.createElement('div');
+    win.className = 'match-win';
+    win.innerHTML = `<h3>All 20 matched 🎉</h3><p style="color:var(--muted)">Nice work. Hit reset to shuffle a new round.</p>`;
+    matchArea.appendChild(win);
+    updateBestStreak(VOCAB.length);
+  }
+}
+
+function onMatchCardClick(idx){
+  if(matchState.lock) return;
+  const card = matchState.cards[idx];
+  if(matchState.matched.has(card.id)) return;
+  if(matchState.selected.some(s=>s.idx===idx)) return;
+  if(matchState.selected.length === 1 && matchState.selected[0].card.type === card.type) return; // must pick term+def
+
+  matchState.selected.push({ idx, card });
+  renderMatch();
+
+  if(matchState.selected.length === 2){
+    matchState.lock = true;
+    const [a,b] = matchState.selected;
+    if(a.card.id === b.card.id){
+      setTimeout(()=>{
+        matchState.matched.add(a.card.id);
+        matchState.selected = [];
+        matchState.lock = false;
+        renderMatch();
+      }, 260);
+    } else {
+      const elA = matchArea.querySelector(`[data-idx="${a.idx}"]`);
+      const elB = matchArea.querySelector(`[data-idx="${b.idx}"]`);
+      if(elA) elA.classList.add('wrong');
+      if(elB) elB.classList.add('wrong');
+      setTimeout(()=>{
+        matchState.selected = [];
+        matchState.lock = false;
+        renderMatch();
+      }, 500);
+    }
+  }
+}
+
+document.getElementById('matchReset').addEventListener('click', initMatch);
+initMatch();
+
+/* ================= FLASHCARDS ================= */
+let flashOrder = shuffle(VOCAB.map((_,i)=>i));
+let flashIdx = 0;
+let flashKnown = new Set();
+let flashFlipped = false;
+
+const flashcardEl = document.getElementById('flashcard');
+const flashFront = document.getElementById('flashFront');
+const flashBack = document.getElementById('flashBack');
+const flashCounter = document.getElementById('flashCounter');
+const flashScoreEl = document.getElementById('flashScore');
+
+function renderFlash(){
+  const v = VOCAB[flashOrder[flashIdx]];
+  flashFront.innerHTML = v.term + '<div class="flash-hint">Tap to reveal definition</div>';
+  flashBack.innerHTML = v.def + '<div class="flash-hint">Tap to flip back</div>';
+  flashCounter.textContent = `Card ${flashIdx+1} of ${VOCAB.length}`;
+  flashScoreEl.textContent = `Known ${flashKnown.size} / ${VOCAB.length}`;
+  flashFlipped = false;
+  flashcardEl.classList.remove('flipped');
+}
+
+flashcardEl.addEventListener('click', ()=>{
+  flashFlipped = !flashFlipped;
+  flashcardEl.classList.toggle('flipped', flashFlipped);
+});
+
+document.getElementById('flashNext').addEventListener('click', ()=>{
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashPrev').addEventListener('click', ()=>{
+  flashIdx = (flashIdx-1 + VOCAB.length) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashShuffle').addEventListener('click', ()=>{
+  flashOrder = shuffle(VOCAB.map((_,i)=>i));
+  flashIdx = 0;
+  renderFlash();
+});
+document.getElementById('flashKnow').addEventListener('click', ()=>{
+  flashKnown.add(flashOrder[flashIdx]);
+  updateBestStreak(flashKnown.size);
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashReview').addEventListener('click', ()=>{
+  flashKnown.delete(flashOrder[flashIdx]);
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashReset').addEventListener('click', ()=>{
+  flashOrder = shuffle(VOCAB.map((_,i)=>i));
+  flashIdx = 0;
+  flashKnown = new Set();
+  renderFlash();
+});
+renderFlash();
+
+/* ================= FILL IN THE BLANK ================= */
+let fibOrder = shuffle(VOCAB.map((_,i)=>i));
+let fibIdx = 0;
+let fibScore = 0;
+let fibAttempts = 0;       // attempts used on the current question
+let fibSettled = false;    // true once this question is scored (correct, or 2 misses) — click advances instead of checking
+let fibPracticing = false; // true after a 2nd miss, while student re-types the answer for practice
+
+const fibScoreEl = document.getElementById('fibScore');
+const fibCard = document.getElementById('fibCard');
+const FIB_CARD_HTML = fibCard.innerHTML;
+
+// live references, re-queried every render since the card's innerHTML
+// gets swapped out for the "round complete" screen and back again
+let fibProgress, fibPrompt, fibInput, fibFeedback, fibCheckBtn;
+
+function bindFibRefs(){
+  fibProgress = document.getElementById('fibProgress');
+  fibPrompt = document.getElementById('fibPrompt');
+  fibInput = document.getElementById('fibInput');
+  fibFeedback = document.getElementById('fibFeedback');
+  fibCheckBtn = document.getElementById('fibCheck');
+  fibCheckBtn.addEventListener('click', checkFib);
+  fibInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') checkFib(); });
+  fibInput.addEventListener('input', onFibTyping);
+}
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/[-\s]+/g,' ');
+}
+
+// Levenshtein edit distance between two strings
+function editDistance(a, b){
+  const m = a.length, n = b.length;
+  const d = Array.from({length:m+1}, ()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) d[i][0] = i;
+  for(let j=0;j<=n;j++) d[0][j] = j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      d[i][j] = Math.min(
+        d[i-1][j] + 1,      // deletion
+        d[i][j-1] + 1,      // insertion
+        d[i-1][j-1] + cost  // substitution
+      );
+    }
+  }
+  return d[m][n];
+}
+
+// Counts as correct if the guess is at least 65% letter-accurate to the answer
+// so small misspellings still pass, but loose guesses don't.
+function isCloseEnough(guess, answer){
+  if(!guess) return false;
+  if(guess === answer) return true;
+  const dist = editDistance(guess, answer);
+  const maxLen = Math.max(answer.length, guess.length);
+  const similarity = 1 - (dist / maxLen);
+  return similarity >= 0.65;
+}
+
+function renderFib(){
+  if(fibIdx >= VOCAB.length){
+    fibCard.innerHTML = `<div class="fib-done"><div style="font-family:'Fraunces',serif; font-size:22px; font-weight:600; margin-bottom:8px;">Round complete</div><div style="color:var(--muted); margin-bottom:18px;">You scored ${fibScore} out of ${VOCAB.length}.</div><button class="solid-btn" id="fibPlayAgain">Play again</button></div>`;
+    document.getElementById('fibPlayAgain').addEventListener('click', resetFib);
+    updateBestStreak(fibScore);
+    return;
+  }
+  const v = VOCAB[fibOrder[fibIdx]];
+  fibProgress.textContent = `Question ${fibIdx+1} of ${VOCAB.length}`;
+  fibPrompt.innerHTML = v.def + ' &mdash; the term is: <span class="blank">______</span>';
+  fibInput.value = '';
+  fibInput.classList.remove('correct-input','wrong-input');
+  fibFeedback.textContent = '';
+  fibFeedback.className = 'fib-feedback';
+  fibAttempts = 0;
+  fibSettled = false;
+  fibPracticing = false;
+  fibInput.disabled = false;
+  fibInput.placeholder = 'Type the term...';
+  fibCheckBtn.textContent = 'Check';
+  fibInput.focus();
+}
+
+// While practicing (after the answer's been revealed), give live feedback
+// as the student re-types the correct term — helps it stick.
+function onFibTyping(){
+  if(!fibPracticing) return;
+  const v = VOCAB[fibOrder[fibIdx]];
+  const guess = normalize(fibInput.value);
+  const answer = normalize(v.term);
+  fibInput.classList.remove('correct-input','wrong-input');
+  if(guess.length === 0) return;
+  if(guess === answer){
+    fibInput.classList.add('correct-input');
+    fibFeedback.textContent = `Nice — that's it. ${v.term}`;
+    fibFeedback.className = 'fib-feedback correct';
+  }
+}
+
+function checkFib(){
+  if(fibSettled){
+    fibIdx++;
+    renderFib();
+    return;
+  }
+
+  const v = VOCAB[fibOrder[fibIdx]];
+  const guess = normalize(fibInput.value);
+  const answer = normalize(v.term);
+  const correct = isCloseEnough(guess, answer);
+
+  if(correct){
+    fibScore++;
+    fibSettled = true;
+    fibInput.disabled = true;
+    fibInput.classList.add('correct-input');
+    fibFeedback.textContent = 'Correct! ' + v.term;
+    fibFeedback.className = 'fib-feedback correct';
+    fibCheckBtn.textContent = fibIdx+1 < VOCAB.length ? 'Next →' : 'Finish';
+    fibScoreEl.textContent = `Score ${fibScore} / ${VOCAB.length}`;
+    return;
+  }
+
+  fibAttempts++;
+  fibInput.classList.add('wrong-input');
+
+  if(fibAttempts === 1){
+    // first miss — one more chance
+    fibFeedback.textContent = 'Not quite — give it one more try.';
+    fibFeedback.className = 'fib-feedback wrong';
+    fibInput.value = '';
+    fibInput.focus();
+  } else {
+    // second miss — reveal the answer, clear the box, let them practice typing it
+    fibSettled = true;
+    fibPracticing = true;
+    fibFeedback.textContent = `The term is: ${v.term} — type it below to help it stick.`;
+    fibFeedback.className = 'fib-feedback wrong';
+    fibInput.value = '';
+    fibInput.classList.remove('wrong-input');
+    fibInput.placeholder = v.term;
+    fibInput.focus();
+    fibCheckBtn.textContent = fibIdx+1 < VOCAB.length ? 'Next →' : 'Finish';
+    fibScoreEl.textContent = `Score ${fibScore} / ${VOCAB.length}`;
+  }
+}
+
+function resetFib(){
+  fibOrder = shuffle(VOCAB.map((_,i)=>i));
+  fibIdx = 0;
+  fibScore = 0;
+  fibScoreEl.textContent = `Score 0 / ${VOCAB.length}`;
+  fibCard.innerHTML = FIB_CARD_HTML;
+  bindFibRefs();
+  renderFib();
+}
+
+document.getElementById('fibReset').addEventListener('click', resetFib);
+
+bindFibRefs();
+renderFib();
+</script>
+</body>
+</html>

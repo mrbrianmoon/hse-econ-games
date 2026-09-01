@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSE Economics Review Games</title>
+<style>
+  :root{
+    --royal:#004AA0;
+    --royal-dark:#003B80;
+    --red:#C8102E;
+    --navy:#1A2230;
+    --gray:#C6C8CE;
+    --bg:#F3F5F8;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;
+    color:var(--navy);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .wrap{max-width:640px;width:100%;}
+  header{
+    background:linear-gradient(135deg,var(--royal) 0%,var(--royal-dark) 100%);
+    color:#fff;
+    padding:26px 28px;
+    border-radius:14px;
+    border-bottom:5px solid var(--red);
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:1.5rem;
+    margin:0 0 6px;
+  }
+  .subtitle{font-size:.9rem;opacity:.85;}
+  .card{
+    display:block;
+    background:var(--card);
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:14px;
+    text-decoration:none;
+    color:var(--navy);
+    box-shadow:0 1px 4px rgba(20,30,50,.12);
+    border-left:5px solid var(--royal);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(20,30,50,.18);}
+  .card h2{
+    font-family:Georgia,serif;
+    font-size:1.15rem;
+    margin:0 0 6px;
+    color:var(--royal-dark);
+  }
+  .card p{margin:0;font-size:.88rem;color:#5B6472;}
+  footer{text-align:center;color:#8B94A3;font-size:.75rem;margin-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>HSE Economics Review Games</h1>
+    <div class="subtitle">Mr. Moon &middot; Indiana Economics</div>
+  </header>
+
+  <a class="card" href="vocab-review.html">
+    <h2>Unit 1 Vocabulary Review</h2>
+    <p>Matching, flashcards, and fill in the blank for all 20 Unit 1 terms.</p>
+  </a>
+
+  <a class="card" href="factors-game.html">
+    <h2>Factors of Production: Sort &amp; Score</h2>
+    <p>Drag each example into Land, Labor, Capital, or Entrepreneurship.</p>
+  </a>
+
+  <a class="card" href="unit3-vocab-review.html">
+    <h2>Unit 3 Vocabulary Review</h2>
+    <p>Matching, flashcards, fill in the blank, define it yourself, and sentence building for all 24 Unit 3 terms.</p>
+  </a>
+
+  <footer>HSE Indiana Economics</footer>
+</div>
+</body>
+</html>
