@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Market Quest: Townsfolk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --royal:#004AA0;
+    --royal-dark:#003B80;
+    --red:#C8102E;
+    --navy:#1A2230;
+    --gray:#C6C8CE;
+    --bg:#F3F5F8;
+    --card:#FFFFFF;
+    --muted:#6b6f76;
+    --line:#e4e4e0;
+    --line-strong:#c9c9c3;
+    --ok:#1E8E3E;
+    --arcade-bg:#0B0F17;
+    --arcade-panel:#141B29;
+    --arcade-line:#26314A;
+    --shadow: 0 1px 2px rgba(20,24,28,0.06), 0 6px 20px rgba(20,24,28,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--navy);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:20px 16px 60px;}
+
+  header.app-head{
+    background:linear-gradient(135deg,var(--royal) 0%,var(--royal-dark) 100%);
+    color:#fff;
+    padding:22px 24px 20px;
+    border-radius:14px;
+    border-bottom:5px solid var(--red);
+    margin-bottom:20px;
+    box-shadow:var(--shadow);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    opacity:.8;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(13px,3vw,20px);
+    line-height:1.4;
+    margin:0 0 4px;
+  }
+  .subtitle{font-size:13.5px;opacity:.85;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  button{
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  .btn{
+    appearance:none;background:var(--royal);border:1px solid var(--royal);color:#fff;
+    font-weight:700;font-size:14px;padding:11px 22px;border-radius:10px;
+    transition:background .15s ease;
+  }
+  .btn:hover{background:var(--royal-dark);}
+  .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line-strong);}
+  .btn.ghost:hover{border-color:var(--royal);background:#EEF4FC;}
+  .btn.danger{background:var(--red);border-color:var(--red);}
+  .btn.danger:hover{background:#a30d24;}
+  .btn.small{padding:7px 14px;font-size:12.5px;}
+
+  /* ================= CHARACTER CREATOR ================= */
+  .creator-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:28px;
+    background:var(--card);border-radius:14px;padding:26px;box-shadow:var(--shadow);
+  }
+  @media (max-width:680px){ .creator-grid{grid-template-columns:1fr;} }
+  .preview-col{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .preview-frame{background:var(--arcade-bg);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:center;}
+  .field-label{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin:16px 0 8px;
+  }
+  .field-label:first-child{margin-top:0;}
+  input.name-input{
+    width:100%;font-size:15px;padding:11px 14px;border-radius:9px;
+    border:1px solid var(--line-strong);background:#fafaf8;color:var(--navy);
+    -webkit-touch-callout:default;
+    -webkit-user-select:text;
+    user-select:text;
+  }
+  input.name-input:focus{outline:2px solid var(--royal);outline-offset:1px;border-color:var(--royal);}
+  .swatch-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .swatch{width:36px;height:36px;border-radius:8px;border:3px solid transparent;cursor:pointer;transition:transform .1s ease, border-color .1s ease;}
+  .swatch:hover{transform:translateY(-2px);}
+  .swatch.selected{border-color:var(--navy);}
+  .toggle-row{display:flex;gap:8px;}
+  .toggle-btn{flex:1;padding:10px;border-radius:9px;border:1px solid var(--line-strong);background:#fff;font-weight:600;font-size:13.5px;}
+  .toggle-btn.selected{background:var(--royal);color:#fff;border-color:var(--royal);}
+  .creator-error{color:var(--red);font-size:12.5px;font-weight:600;min-height:16px;margin-top:6px;}
+  .creator-actions{margin-top:18px;}
+
+  /* ================= WORLD SCREEN ================= */
+  .game-hud{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+    background:var(--arcade-panel);color:#fff;border-radius:12px 12px 0 0;padding:12px 18px;
+  }
+  .hud-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+  .hud-quests{color:#8fc0ff;}
+  .xp-bar-track{background:#26314A;border-radius:999px;height:8px;width:140px;overflow:hidden;}
+  .xp-bar-fill{background:linear-gradient(90deg,var(--royal),var(--red));height:100%;border-radius:999px;transition:width .3s ease;}
+
+  .world-wrap{
+    position:relative;background:var(--arcade-bg);border-radius:0 0 12px 12px;padding:14px;display:flex;justify-content:center;
+    -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+  }
+  #worldCanvas{background:#0F1522;border-radius:8px;border:1px solid var(--arcade-line);max-width:100%;height:auto;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;-webkit-tap-highlight-color:transparent;}
+
+  .dpad{
+    position:absolute;bottom:26px;left:26px;
+    display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;opacity:.85;
+  }
+  .dpad button{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:8px;color:#fff;font-size:16px;user-select:none;}
+  .dpad button:active{background:rgba(255,255,255,0.32);}
+  .dpad .up{grid-column:2;grid-row:1;}
+  .dpad .left{grid-column:1;grid-row:2;}
+  .dpad .right{grid-column:3;grid-row:2;}
+  .dpad .down{grid-column:2;grid-row:3;}
+
+  .talk-btn{
+    position:absolute;bottom:34px;right:26px;
+    display:none;
+    background:var(--red);color:#fff;border:none;border-radius:999px;
+    padding:14px 22px;font-weight:800;font-size:14px;box-shadow:0 6px 16px rgba(0,0,0,.4);
+  }
+  .talk-btn.show{display:block;}
+
+  .menu-btn{
+    position:absolute;top:22px;right:22px;
+    background:rgba(20,27,41,0.85);color:#fff;border:1px solid var(--arcade-line);
+    border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;
+  }
+
+  .overlay{
+    display:none;position:absolute;inset:0;background:rgba(11,15,23,0.92);border-radius:8px;
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .overlay-card{
+    background:var(--arcade-panel);border:1px solid var(--arcade-line);border-radius:14px;
+    padding:26px 28px;text-align:center;color:#fff;max-width:420px;
+  }
+  .overlay-role{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8fc0ff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+  .overlay-line{font-size:14.5px;line-height:1.55;margin-bottom:18px;color:#e2e6f0;}
+  .overlay-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .choice-btn{
+    background:#1B2436;border:1px solid #3A4A6E;color:#fff;padding:11px 14px;border-radius:9px;
+    font-size:13.5px;text-align:left;font-weight:600;
+  }
+  .choice-btn:hover{border-color:var(--royal);background:#22304C;}
+  .choice-btn.correct{background:#173B25;border-color:var(--ok);}
+  .choice-btn.wrong{background:#3B1720;border-color:var(--red);}
+  .overlay-feedback{font-size:13px;font-weight:700;min-height:18px;margin-bottom:10px;}
+  .overlay-feedback.correct{color:#6fd68f;}
+  .overlay-feedback.wrong{color:#ff8b8b;}
+  .overlay-ach{font-size:12px;color:#ffd97a;margin-bottom:10px;font-weight:600;}
+  .overlay-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+
+  .pause-list{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+
+  /* ================= ACHIEVEMENTS ================= */
+  .menu-top{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--card);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:20px;justify-content:space-between;}
+  .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .ach-card{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow);border:1px solid var(--line-strong);display:flex;gap:12px;align-items:flex-start;}
+  .ach-card.locked{opacity:.45;}
+  .ach-icon{font-size:26px;line-height:1;}
+  .ach-name{font-weight:700;font-size:14px;margin-bottom:3px;}
+  .ach-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--navy);color:#fff;padding:11px 20px;border-radius:999px;font-size:13px;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0;transition:.2s ease;pointer-events:none;max-width:90vw;text-align:center;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .hud-area{color:#8fc0ff;}
+
+  /* ================= BATTLE ================= */
+  .battle-hud{
+    background:var(--arcade-panel);color:#fff;border-radius:12px 12px 0 0;padding:14px 18px;text-align:center;
+  }
+  .battle-boss-name{font-weight:700;font-size:14px;margin-bottom:10px;}
+  .hp-track{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;}
+  .hp-pip{width:20px;height:14px;border-radius:3px;background:#C8102E;transition:background .15s ease;}
+  .hp-pip.empty{background:#3A2028;}
+
+  .battle-stage{
+    position:relative;background:var(--arcade-bg);padding:20px;
+    display:flex;justify-content:center;align-items:center;min-height:300px;
+  }
+  #battleCanvas{background:#0F1522;border-radius:8px;border:1px solid var(--arcade-line);max-width:100%;height:auto;}
+
+  .throw-btn{
+    display:block;width:calc(100% - 28px);margin:14px auto;background:var(--red);border-color:var(--red);
+    border-radius:0 0 12px 12px;font-size:15px;padding:13px;
+  }
+  .throw-btn:hover{background:#a30d24;}
+  .throw-btn:disabled{opacity:.5;}
+
+  .collect-wrap, .collected-wrap{
+    display:none;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:10px;
+  }
+  .blink-arrow{
+    font-size:30px;color:#ffd97a;
+    animation:arrowBlink 1s ease-in-out infinite;
+  }
+  @keyframes arrowBlink{
+    0%,100%{opacity:1; transform:translateY(0);}
+    50%{opacity:.3; transform:translateY(8px);}
+  }
+  .word-card{
+    background:var(--arcade-panel);border:2px solid #ffd97a;color:#fff;
+    font-family:'Inter',sans-serif;font-weight:800;font-size:18px;
+    padding:18px 30px;border-radius:12px;max-width:320px;
+  }
+  .word-card:hover{border-color:#fff;}
+  .collected-msg{
+    font-family:'Press Start 2P',monospace;font-size:13px;color:#6fd68f;line-height:1.7;
+  }
+  .retreat-msg{
+    font-family:'Press Start 2P',monospace;font-size:13px;color:#ff8b8b;line-height:1.7;
+  }
+
+  footer.note{text-align:center;color:var(--line-strong);font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app-head">
+    <div class="eyebrow">HSE Indiana Economics &middot; Unit 3</div>
+    <h1>MARKET QUEST: TOWNSFOLK</h1>
+    <div class="subtitle">Walk the town. Twenty-four townsfolk need help remembering a term. Find them all.</div>
+  </header>
+
+  <!-- ================= CHARACTER CREATOR ================= -->
+  <section class="screen active" id="screen-creator">
+    <div class="creator-grid">
+      <div class="preview-col">
+        <div class="field-label">Preview</div>
+        <div class="preview-frame"><canvas id="previewCanvas" width="135" height="171"></canvas></div>
+      </div>
+      <div>
+        <div class="field-label">Trader Name</div>
+        <input type="text" id="nameInput" class="name-input" maxlength="18" placeholder="Type your name...">
+        <div class="field-label">Armor Color</div>
+        <div class="swatch-row" id="armorColorRow"></div>
+        <div class="field-label">Armor Length</div>
+        <div class="toggle-row">
+          <button class="toggle-btn" data-length="short">Short</button>
+          <button class="toggle-btn" data-length="long">Long</button>
+        </div>
+        <div class="field-label">Clothing Color</div>
+        <div class="swatch-row" id="clothingRow"></div>
+        <div class="creator-error" id="creatorError"></div>
+        <div class="creator-actions"><button class="btn" id="creatorSaveBtn">Save &amp; Enter Town</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORLD ================= -->
+  <section class="screen" id="screen-world">
+    <div class="game-hud">
+      <div class="hud-left">
+        <span class="hud-quests" id="hudQuests">Quests: 0 / 24</span>
+        <span class="hud-area" id="hudArea">Town Square</span>
+        <span id="hudTitleTier">Rookie Trader</span>
+        <div class="xp-bar-track"><div class="xp-bar-fill" id="xpBarFill" style="width:4%;"></div></div>
+      </div>
+      <button class="btn ghost small" id="pauseBtn">Menu</button>
+    </div>
+    <div class="world-wrap">
+      <canvas id="worldCanvas" width="600" height="480"></canvas>
+      <div class="dpad">
+        <button class="up" data-dir="up">&#9650;</button>
+        <button class="left" data-dir="left">&#9664;</button>
+        <button class="right" data-dir="right">&#9654;</button>
+        <button class="down" data-dir="down">&#9660;</button>
+      </div>
+      <button class="talk-btn" id="talkBtn">Talk</button>
+
+      <div class="overlay" id="dialogueOverlay">
+        <div class="overlay-card">
+          <div class="overlay-role" id="dialogueRole">Market Vendor</div>
+          <div class="overlay-line" id="dialogueLine"></div>
+          <div class="overlay-choices" id="dialogueChoices"></div>
+          <div class="overlay-feedback" id="dialogueFeedback"></div>
+          <div class="overlay-ach" id="dialogueAch" style="display:none;"></div>
+          <div class="overlay-actions" id="dialogueActions"></div>
+        </div>
+      </div>
+
+      <div class="overlay" id="pauseOverlay">
+        <div class="overlay-card">
+          <div class="overlay-role">Paused</div>
+          <div class="pause-list">
+            <button class="btn ghost" id="pauseAchBtn">Achievements</button>
+            <button class="btn ghost" id="pauseEditBtn">Edit Character</button>
+            <button class="btn danger" id="pauseResetBtn">Reset Progress</button>
+            <button class="btn" id="pauseResumeBtn">Resume</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BATTLE ================= -->
+  <section class="screen" id="screen-battle">
+    <div class="battle-hud">
+      <div class="battle-boss-name" id="battleBossName">A wild creature appears!</div>
+      <div class="hp-track" id="hpTrack"></div>
+    </div>
+    <div class="battle-stage">
+      <canvas id="battleCanvas" width="600" height="480"></canvas>
+      <div class="dpad">
+        <button class="up" data-dir="up">&#9650;</button>
+        <button class="left" data-dir="left">&#9664;</button>
+        <button class="right" data-dir="right">&#9654;</button>
+        <button class="down" data-dir="down">&#9660;</button>
+      </div>
+      <div class="collected-wrap" id="collectedWrap">
+        <div class="collected-msg" id="collectedMsg">YOU COLLECTED Demand!</div>
+        <div class="overlay-ach" id="collectedAch" style="display:none;"></div>
+        <button class="btn" id="collectedContinueBtn">Continue Exploring</button>
+      </div>
+      <div class="collected-wrap" id="retreatWrap">
+        <div class="retreat-msg" id="retreatMsg">Overwhelmed! Retreating to the village.</div>
+        <button class="btn danger" id="retreatContinueBtn">Return to Village</button>
+      </div>
+    </div>
+    <button class="btn throw-btn" id="throwBtn">Throw Coin &#129689;</button>
+  </section>
+
+  <!-- ================= ACHIEVEMENTS ================= -->
+  <section class="screen" id="screen-achievements">
+    <div class="menu-top">
+      <div style="font-weight:800;font-size:18px;">Achievements</div>
+      <button class="btn ghost small" id="achBackBtn">&larr; Back to Town</button>
+    </div>
+    <div class="ach-grid" id="achGrid"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+  <footer class="note">Progress saves on this device only, in this browser. Separate save from the arcade version.</footer>
+</div>
+
+<script>
+/* ============================================================
+   TOUCH SAFETY: belt-and-suspenders backstop for iOS long-press
+   behavior (context menu, selection, callout) across the whole
+   page. CSS alone doesn't always catch canvas elements reliably.
+   Name input is explicitly excluded so typing/selecting still works.
+   ============================================================ */
+document.addEventListener("contextmenu", (e)=> e.preventDefault());
+document.addEventListener("selectstart", (e)=>{
+  if(e.target.tagName !== "INPUT") e.preventDefault();
+});
+document.addEventListener("touchstart", (e)=>{
+  if(e.target.tagName !== "INPUT" && e.touches.length > 1){
+    e.preventDefault(); // block pinch-style multi-touch on the game area
+  }
+}, { passive:false });
+
+/* ============================================================
+   DATA
+   ============================================================ */
+const VOCAB = [
+  { term: "Demand", def: "The amount of a good buyers are willing and able to purchase at each possible price." },
+  { term: "Law of Demand", def: "As the price of a good falls, the quantity demanded rises. As the price rises, the quantity demanded falls, all else held constant." },
+  { term: "Demand Schedule", def: "A table listing the exact quantity of a good buyers will purchase at a range of possible prices." },
+  { term: "Demand Curve", def: "A downward sloping graph that plots a demand schedule, showing the quantity demanded at every price." },
+  { term: "Diminishing Marginal Utility", def: "The satisfaction gained from each additional unit of a good gets smaller as a person consumes more of it." },
+  { term: "Change in Demand", def: "A shift of the entire demand curve, caused by something other than the good's own price, like income or tastes." },
+  { term: "Change in Quantity Demanded", def: "A movement along an existing demand curve, caused only by a change in the good's own price." },
+  { term: "Substitute Goods", def: "Two goods that can replace each other, so a price increase in one raises demand for the other." },
+  { term: "Complementary Goods", def: "Two goods that are used together, so a price increase in one lowers demand for the other." },
+  { term: "Normal Goods", def: "Goods that people buy more of as their income rises." },
+  { term: "Inferior Goods", def: "Goods that people buy less of as their income rises." },
+  { term: "Price Elasticity of Demand", def: "A measure of how much quantity demanded responds to a change in price." },
+  { term: "Elastic", def: "Describes demand where quantity demanded changes by a large amount when price changes." },
+  { term: "Inelastic", def: "Describes demand where quantity demanded changes by only a small amount when price changes." },
+  { term: "Supply", def: "The amount of a good producers are willing and able to sell at each possible price." },
+  { term: "Law of Supply", def: "As the price of a good rises, the quantity supplied rises. As the price falls, the quantity supplied falls, all else held constant." },
+  { term: "Supply Schedule", def: "A table listing the exact quantity of a good sellers will offer at a range of possible prices." },
+  { term: "Supply Curve", def: "An upward sloping graph that plots a supply schedule, showing the quantity supplied at every price." },
+  { term: "Change in Supply", def: "A shift of the entire supply curve, caused by something other than the good's own price, like costs or technology." },
+  { term: "Equilibrium", def: "The price and quantity where the amount buyers want to buy exactly equals the amount sellers want to sell." },
+  { term: "Surplus", def: "A situation where quantity supplied is greater than quantity demanded because the price is set above equilibrium." },
+  { term: "Shortage", def: "A situation where quantity demanded is greater than quantity supplied because the price is set below equilibrium." },
+  { term: "Price Ceiling", def: "A legal maximum price set below equilibrium, which can cause a shortage." },
+  { term: "Price Floor", def: "A legal minimum price set above equilibrium, which can cause a surplus." }
+];
+
+const NPC_ROLES = ["Market Vendor","Town Banker","Shop Owner","Toll Keeper","Guild Trader","Harvest Farmer","Dockworker","Auctioneer","Ledger Clerk","Coin Changer"];
+
+const ARMOR_COLORS = [
+  { name:"Obsidian", hex:"#1A2230" },
+  { name:"Steel Gray", hex:"#8B8D8F" },
+  { name:"Bronze", hex:"#A67C3D" },
+  { name:"Gold", hex:"#E8C158" },
+  { name:"Copper", hex:"#B87333" },
+  { name:"Silver", hex:"#C6C8CE" },
+  { name:"Royal Blue", hex:"#004AA0" },
+  { name:"Crimson", hex:"#C8102E" },
+  { name:"Forest Green", hex:"#1E8E3E" },
+  { name:"Violet", hex:"#7C4DFF" }
+];
+const CLOTHING_COLORS = [
+  { name:"Royal Blue", hex:"#004AA0" },
+  { name:"Crimson", hex:"#C8102E" },
+  { name:"Forest Green", hex:"#1E8E3E" },
+  { name:"Sunshine Gold", hex:"#E8C158" },
+  { name:"Slate Gray", hex:"#5B6472" },
+  { name:"Violet", hex:"#7C4DFF" }
+];
+const SKIN = "#E8B888";
+const PANTS = "#2B3446";
+const BOOTS = "#14181C";
+const EYE = "#14181C";
+
+const ACHIEVEMENTS = [
+  { id:"first_quest", icon:"\u{1F3AF}", name:"First Quest", desc:"Help your first townsperson." },
+  { id:"town_helper", icon:"\u{1F4C8}", name:"Town Helper", desc:"Complete 5 quests." },
+  { id:"vocab_hero", icon:"\u{1F3C6}", name:"Vocab Hero", desc:"Complete all 24 quests." },
+  { id:"no_mistakes", icon:"\u{1F6E1}\uFE0F", name:"Sharp Mind", desc:"Answer a quest correctly on your first try." },
+  { id:"persistent_scholar", icon:"\u{1F4AA}", name:"Persistent Scholar", desc:"Get a quest wrong twice, then finally get it right." },
+  { id:"quick_wit", icon:"\u26A1", name:"Quick Wit", desc:"Answer a quest correctly in under 10 seconds." },
+  { id:"quest_streak", icon:"\u{1F525}", name:"Quest Streak", desc:"Get 5 quests right on the first try in a row." },
+  { id:"master_scholar", icon:"\u2B50", name:"Master Scholar", desc:"Complete all 24 quests, every one on the first try." }
+];
+
+const TITLE_TIERS = [
+  { min:0, name:"Rookie Trader" },
+  { min:200, name:"Junior Economist" },
+  { min:600, name:"Market Analyst" },
+  { min:1200, name:"Senior Economist" },
+  { min:2200, name:"Market Master" }
+];
+
+/* ============================================================
+   SAVE / LOAD
+   ============================================================ */
+const SAVE_KEY = "hseEconMarketQuestRPG_v1";
+
+function defaultState(){
+  return {
+    character: { name:"", armorColor: ARMOR_COLORS[0].hex, armorLength:"short", clothing: CLOTHING_COLORS[0].hex },
+    progress: { completed:{}, xpTotal:0, currentStreak:0 },
+    achievements: {}
+  };
+}
+
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed, {
+      character: Object.assign(defaultState().character, parsed.character || {}),
+      progress: Object.assign(defaultState().progress, parsed.progress || {}),
+      achievements: parsed.achievements || {}
+    });
+  } catch(e){
+    return defaultState();
+  }
+}
+function saveState(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e){ /* storage unavailable this session */ }
+}
+
+/* ============================================================
+   SHARED RENDERING POLISH: outlined + shaded blocks (all sprites),
+   deterministic tile texture (all ground), atmosphere background
+   ============================================================ */
+function shadeColor(hex, amount){
+  amount = amount || 0.28;
+  const num = parseInt(hex.replace("#",""), 16);
+  let r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+  r = Math.max(0, Math.round(r*(1-amount)));
+  g = Math.max(0, Math.round(g*(1-amount)));
+  b = Math.max(0, Math.round(b*(1-amount)));
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+// Fills a rect, darkens its right edge to suggest one light source from
+// the upper-left, then outlines it -- used for every block in every
+// sprite (player, NPCs, all 6 bosses) so they share one visual language.
+function drawShadedRect(ctx, x, y, w, h, color){
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+  const shadeW = Math.max(1, w*0.35);
+  ctx.fillStyle = shadeColor(color);
+  ctx.fillRect(x+w-shadeW, y, shadeW, h);
+  ctx.strokeStyle = "#14181C";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x+0.5, y+0.5, Math.max(0,w-1), Math.max(0,h-1));
+}
+function drawShadedTri(ctx, points, color){
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for(let i=1;i<points.length;i++) ctx.lineTo(points[i][0], points[i][1]);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = "#14181C";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+// Deterministic pseudo-random in [0,1) seeded by tile position, so
+// texture speckles stay put frame to frame instead of flickering.
+function tileHash(r,c,n){
+  const x = Math.sin(r*12.9898 + c*78.233 + n*37.719) * 43758.5453;
+  return x - Math.floor(x);
+}
+const TILE_TEXTURE_COLOR = { grass:"#3A4F28", arena:"#4A2226" };
+function drawGroundTile(ctx, p, baseColor, type, r, c, halfW, halfH){
+  ctx.fillStyle = baseColor;
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y - halfH);
+  ctx.lineTo(p.x + halfW, p.y);
+  ctx.lineTo(p.x, p.y + halfH);
+  ctx.lineTo(p.x - halfW, p.y);
+  ctx.closePath();
+  ctx.fill();
+
+  const tex = TILE_TEXTURE_COLOR[type];
+  if(tex){
+    ctx.strokeStyle = tex;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(p.x - halfW, p.y);
+    ctx.lineTo(p.x, p.y - halfH);
+    ctx.stroke();
+    ctx.fillStyle = tex;
+    for(let i=0;i<4;i++){
+      const rx = (tileHash(r,c,i) - 0.5) * halfW * 1.2;
+      const ry = (tileHash(r,c,i+10) - 0.5) * halfH * 1.2;
+      ctx.beginPath();
+      ctx.arc(p.x+rx, p.y+ry, 1.4, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+}
+// Soft glow, a few stars, and a fog gradient along the bottom edge --
+// drawn once beneath the tile grid so it only shows through the dark
+// margins around the diamond play area.
+const ATMOSPHERE_STARS = [[0.18,0.12],[0.75,0.08],[0.9,0.22],[0.1,0.3],[0.35,0.06],[0.95,0.4],[0.6,0.15],[0.25,0.35]];
+function drawAtmosphere(ctx, w, h){
+  ctx.globalAlpha = 0.07;
+  ctx.fillStyle = "#8FC0FF";
+  ctx.beginPath(); ctx.arc(w*0.5, h*0.35, 90, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 0.12;
+  ctx.beginPath(); ctx.arc(w*0.5, h*0.35, 50, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#FFFFFF";
+  ATMOSPHERE_STARS.forEach(([fx,fy])=>{
+    ctx.beginPath();
+    ctx.arc(w*fx, h*fy, 1.5, 0, Math.PI*2);
+    ctx.fill();
+  });
+  const grad = ctx.createLinearGradient(0, h*0.75, 0, h);
+  grad.addColorStop(0, "rgba(58,74,110,0)");
+  grad.addColorStop(1, "rgba(58,74,110,0.45)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, h*0.75, w, h*0.25);
+}
+
+/* ============================================================
+   CHARACTER RENDERING (blocky pixel avatar, 15x19 unit grid)
+   ============================================================ */
+function drawCharacter(ctx, originX, originY, scale, opts, facing, walking, walkPhase){
+  facing = facing || "down";
+  function block(ux,uy,uw,uh,color){
+    drawShadedRect(ctx, originX + ux*scale, originY + uy*scale, uw*scale, uh*scale, color);
+  }
+
+  const liftLeft = walking && walkPhase === 0;
+  const liftRight = walking && walkPhase === 1;
+
+  // armor back layer (heavy/long only), drawn first so head sits on top
+  if(opts.armorLength === "long"){
+    block(4,2,1,7, opts.armorColor);
+    block(11,2,1,7, opts.armorColor);
+  }
+
+  // legs + boots -- walking lifts one leg at a time (shorter, higher)
+  block(5, liftLeft?12:13, 3, liftLeft?4:5, PANTS);
+  block(8, liftRight?12:13, 3, liftRight?4:5, PANTS);
+  block(5, liftLeft?16:18, 3, 1, BOOTS);
+  block(8, liftRight?16:18, 3, 1, BOOTS);
+
+  // arms + hands -- the far arm hides behind the body in side views
+  if(facing !== "left"){
+    block(13,7,2,6, opts.clothing);
+    block(13,12,2,1, SKIN);
+  }
+  if(facing !== "right"){
+    block(1,7,2,6, opts.clothing);
+    block(1,12,2,1, SKIN);
+  }
+
+  // torso
+  block(3,7,10,6, opts.clothing);
+
+  // head
+  block(5,1,6,6, SKIN);
+
+  // eyes -- both from the front, one from a side view, none from behind
+  if(facing === "down"){
+    block(6,4,1,1, EYE);
+    block(9,4,1,1, EYE);
+  } else if(facing === "left"){
+    block(6,4,1,1, EYE);
+  } else if(facing === "right"){
+    block(9,4,1,1, EYE);
+  }
+
+  // armor cap/helm (front layer, on top of the head)
+  block(4,0,8,3, opts.armorColor);
+
+  // facing away: armor covers the back of the head/shoulders, no face visible
+  if(facing === "up"){
+    block(5,6,6,1, opts.armorColor);
+    if(opts.armorLength === "long"){
+      block(5,7,6,2, opts.armorColor);
+    }
+  }
+}
+
+/* ============================================================
+   SCREEN NAV / TOAST
+   ============================================================ */
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-" + id).classList.add("active");
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> t.classList.remove("show"), 2600);
+}
+
+/* ============================================================
+   CHARACTER CREATOR
+   ============================================================ */
+let draftCharacter = { name:"", armorColor: ARMOR_COLORS[0].hex, armorLength:"short", clothing: CLOTHING_COLORS[0].hex };
+
+function buildSwatchRow(containerId, colors, key){
+  const row = document.getElementById(containerId);
+  row.innerHTML = "";
+  colors.forEach(c=>{
+    const el = document.createElement("div");
+    el.className = "swatch";
+    el.style.background = c.hex;
+    el.title = c.name;
+    el.dataset.hex = c.hex;
+    el.addEventListener("click", ()=>{
+      draftCharacter[key] = c.hex;
+      row.querySelectorAll(".swatch").forEach(s=>s.classList.remove("selected"));
+      el.classList.add("selected");
+      renderPreview();
+    });
+    row.appendChild(el);
+  });
+}
+function syncSwatchSelection(containerId, hex){
+  document.getElementById(containerId).querySelectorAll(".swatch").forEach(el=>{
+    el.classList.toggle("selected", el.dataset.hex === hex);
+  });
+}
+function renderPreview(){
+  const canvas = document.getElementById("previewCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawCharacter(ctx, 8, 8, 8, draftCharacter);
+}
+function initCreator(prefill){
+  draftCharacter = prefill ? Object.assign({}, prefill) : { name:"", armorColor: ARMOR_COLORS[0].hex, armorLength:"short", clothing: CLOTHING_COLORS[0].hex };
+  document.getElementById("nameInput").value = draftCharacter.name || "";
+  document.getElementById("creatorError").textContent = "";
+  buildSwatchRow("armorColorRow", ARMOR_COLORS, "armorColor");
+  buildSwatchRow("clothingRow", CLOTHING_COLORS, "clothing");
+  syncSwatchSelection("armorColorRow", draftCharacter.armorColor);
+  syncSwatchSelection("clothingRow", draftCharacter.clothing);
+  document.querySelectorAll(".toggle-btn").forEach(btn=>{
+    btn.classList.toggle("selected", btn.dataset.length === draftCharacter.armorLength);
+    btn.onclick = ()=>{
+      draftCharacter.armorLength = btn.dataset.length;
+      document.querySelectorAll(".toggle-btn").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      renderPreview();
+    };
+  });
+  renderPreview();
+}
+document.getElementById("creatorSaveBtn").addEventListener("click", ()=>{
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name){
+    document.getElementById("creatorError").textContent = "Enter a trader name to continue.";
+    return;
+  }
+  draftCharacter.name = name;
+  state.character = Object.assign({}, draftCharacter);
+  saveState();
+  enterWorld();
+});
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+function renderAchievements(){
+  const grid = document.getElementById("achGrid");
+  grid.innerHTML = "";
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked = !!state.achievements[a.id];
+    const card = document.createElement("div");
+    card.className = "ach-card" + (unlocked ? "" : " locked");
+    card.innerHTML = `<div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>`;
+    grid.appendChild(card);
+  });
+}
+function checkAchievements(runInfo){
+  const completedCount = Object.keys(state.progress.completed).length;
+  const newlyUnlocked = [];
+  function unlock(id){
+    if(!state.achievements[id]){
+      state.achievements[id] = true;
+      newlyUnlocked.push(ACHIEVEMENTS.find(a=>a.id===id).name);
+    }
+  }
+  if(completedCount >= 1) unlock("first_quest");
+  if(completedCount >= 5) unlock("town_helper");
+  if(completedCount >= 24) unlock("vocab_hero");
+  if(runInfo.firstTry) unlock("no_mistakes");
+  if(runInfo.wrongAttempts >= 2) unlock("persistent_scholar");
+  if(runInfo.timeSec < 10) unlock("quick_wit");
+  if(state.progress.currentStreak >= 5) unlock("quest_streak");
+  if(completedCount >= 24){
+    const allFirstTry = Object.values(state.progress.completed).every(c=>c.firstTry);
+    if(allFirstTry) unlock("master_scholar");
+  }
+  return newlyUnlocked;
+}
+document.getElementById("achBackBtn").addEventListener("click", ()=>{
+  showScreen("world");
+});
+
+/* ============================================================
+   WORLD / MAP DATA (generated per-area, not hand-typed)
+   ============================================================ */
+const AREA_SIZE = 14;
+const HALF_W = 32, HALF_H = 16;
+const SPAWN = { col: 7, row: 4 };
+
+const ROOMS = [
+  { key:"room0", name:"Demand Basics",       termIndices:[0,1,2,3] },
+  { key:"room1", name:"Demand Shifters",     termIndices:[4,5,6,7] },
+  { key:"room2", name:"Goods & Income",      termIndices:[8,9,10,11] },
+  { key:"room3", name:"Elasticity & Supply", termIndices:[12,13,14,15] },
+  { key:"room4", name:"Supply & Balance",    termIndices:[16,17,18,19] },
+  { key:"room5", name:"Market Outcomes",     termIndices:[20,21,22,23] }
+];
+
+const BOSS_TYPES = ["troll","dragon","goblin","golem","specter","serpent"];
+const BOSS_LABELS = { troll:"Troll", dragon:"Dragon", goblin:"Goblin", golem:"Golem", specter:"Specter", serpent:"Serpent" };
+
+let tileGrid = [];
+let npcs = [];
+let doorways = [];
+let PROPS = [];
+let currentAreaId = null;
+
+function blankGrid(){
+  const grid = [];
+  for(let r=0;r<AREA_SIZE;r++){
+    const row = [];
+    for(let c=0;c<AREA_SIZE;c++){
+      const border = (r===0 || r===AREA_SIZE-1 || c===0 || c===AREA_SIZE-1);
+      row.push(border ? "border" : "grass");
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+function pathPatch(grid, col, row){
+  for(let dr=-1;dr<=1;dr++){
+    for(let dc=-1;dc<=1;dc++){
+      const rr = row+dr, cc = col+dc;
+      if(rr>0 && rr<AREA_SIZE-1 && cc>0 && cc<AREA_SIZE-1) grid[rr][cc] = "path";
+    }
+  }
+}
+// Opens a gap in the boundary wall at a given column on the bottom edge,
+// so the transition reads as a worn path leaving the map rather than a
+// built door structure.
+function openEdgePath(grid, col){
+  grid[AREA_SIZE-1][col] = "path";
+  if(grid[AREA_SIZE-1][col-1] !== undefined) grid[AREA_SIZE-1][col-1] = "path";
+  if(grid[AREA_SIZE-1][col+1] !== undefined) grid[AREA_SIZE-1][col+1] = "path";
+}
+
+const STALL_ACCENTS = ["#C8102E","#004AA0","#1E8E3E","#E8C158","#7C4DFF","#5B6472"];
+
+function buildHub(){
+  const grid = blankGrid();
+  const hubDoorways = ROOMS.map((room,i)=>{
+    const col = 2 + i*2;
+    const row = AREA_SIZE - 2;
+    pathPatch(grid, col, row);
+    openEdgePath(grid, col);
+    return { col, row, kind:"path", label: room.name, target: room.key };
+  });
+  return {
+    tileGrid: grid,
+    npcs: [],
+    doorways: hubDoorways,
+    props: [ { col:2, row:2, kind:"tree" }, { col:11, row:2, kind:"tree" }, { col:7, row:6, kind:"well" } ]
+  };
+}
+
+function buildRoom(roomIdx){
+  const room = ROOMS[roomIdx];
+  const grid = blankGrid();
+  const positions = [ {col:5,row:7}, {col:9,row:7}, {col:5,row:10}, {col:9,row:10} ];
+  const roomNpcs = room.termIndices.map((termIdx, i)=>{
+    const pos = positions[i];
+    pathPatch(grid, pos.col, pos.row);
+    return {
+      idx: termIdx,
+      col: pos.col, row: pos.row,
+      role: NPC_ROLES[termIdx % NPC_ROLES.length],
+      armorColor: ARMOR_COLORS[termIdx % ARMOR_COLORS.length].hex,
+      clothing: CLOTHING_COLORS[(termIdx+2) % CLOTHING_COLORS.length].hex,
+      armorLength: (termIdx % 2 === 0) ? "short" : "long",
+      stallAccent: STALL_ACCENTS[termIdx % STALL_ACCENTS.length]
+    };
+  });
+  pathPatch(grid, 7, AREA_SIZE-2);
+  openEdgePath(grid, 7);
+  return {
+    tileGrid: grid,
+    npcs: roomNpcs,
+    doorways: [ { col:7, row:AREA_SIZE-2, kind:"path", label:"Back to Town Square", target:"hub" } ],
+    props: [ { col:2, row:2, kind:"tree" }, { col:11, row:2, kind:"tree" } ]
+  };
+}
+
+function loadArea(areaId){
+  let built;
+  if(areaId === "hub"){
+    built = buildHub();
+  } else {
+    built = buildRoom(ROOMS.findIndex(r=>r.key===areaId));
+  }
+  currentAreaId = areaId;
+  tileGrid = built.tileGrid;
+  npcs = built.npcs;
+  doorways = built.doorways;
+  PROPS = built.props;
+  player.col = SPAWN.col;
+  player.row = SPAWN.row;
+  player.facing = "down";
+  nearestNpc = null;
+  document.getElementById("talkBtn").classList.remove("show");
+  updateAreaHud();
+}
+
+function updateAreaHud(){
+  const label = currentAreaId === "hub" ? "Town Square" : ROOMS.find(r=>r.key===currentAreaId).name;
+  const el = document.getElementById("hudArea");
+  if(el) el.textContent = label;
+}
+
+/* ============================================================
+   WORLD ENGINE
+   ============================================================ */
+const canvas = document.getElementById("worldCanvas");
+const wctx = canvas.getContext("2d");
+const CW = canvas.width, CH = canvas.height;
+
+const player = { col: SPAWN.col, row: SPAWN.row, facing: "down", moving: false, walkTimer: 0, aimDir: { dCol: 0.7071, dRow: 0.7071 } };
+// Tuned so true-vertical, true-horizontal, and diagonal-combo movement all
+// cover ~3px of screen distance per frame, despite HALF_W being 2x HALF_H.
+const MOVE_SPEED_VERTICAL = 0.0658;
+const MOVE_SPEED_HORIZONTAL = 0.0329;
+const MOVE_SPEED_DIAGONAL = 0.0588;
+const keysDown = new Set();
+const touchDir = { up:false, down:false, left:false, right:false };
+let nearestNpc = null;
+let worldRafId = null;
+let questTimerStart = 0;
+let activeNpc = null;
+let activeAttempts = 0;
+
+window.addEventListener("keydown", (e)=>{
+  const activeTag = document.activeElement && document.activeElement.tagName;
+  if(activeTag === "INPUT" || activeTag === "TEXTAREA") return; // let normal typing through
+  const k = e.key.toLowerCase();
+  if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)){ keysDown.add(k); e.preventDefault(); }
+  if((k==="e" || k==="enter") && nearestNpc && !document.getElementById("dialogueOverlay").classList.contains("show")){
+    openDialogue(nearestNpc);
+  }
+  if(k===" " && battle && battle.phase === "fight"){
+    throwCoin();
+    e.preventDefault();
+  }
+});
+window.addEventListener("keyup", (e)=> keysDown.delete(e.key.toLowerCase()));
+
+document.querySelectorAll(".dpad button").forEach(btn=>{
+  const dir = btn.dataset.dir;
+  const on = (e)=>{ e.preventDefault(); touchDir[dir] = true; };
+  const off = (e)=>{ e.preventDefault(); touchDir[dir] = false; };
+  btn.addEventListener("pointerdown", on);
+  btn.addEventListener("pointerup", off);
+  btn.addEventListener("pointerleave", off);
+  btn.addEventListener("pointercancel", off);
+});
+document.getElementById("talkBtn").addEventListener("click", ()=>{
+  if(nearestNpc) openDialogue(nearestNpc);
+});
+
+function worldToScreen(col, row){
+  const relCol = col - player.col;
+  const relRow = row - player.row;
+  return {
+    x: CW/2 + (relCol - relRow) * HALF_W,
+    y: CH/2 + (relCol + relRow) * HALF_H
+  };
+}
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+function updateWorld(){
+  let dCol=0, dRow=0;
+  const up = keysDown.has("arrowup")||keysDown.has("w")||touchDir.up;
+  const down = keysDown.has("arrowdown")||keysDown.has("s")||touchDir.down;
+  const left = keysDown.has("arrowleft")||keysDown.has("a")||touchDir.left;
+  const right = keysDown.has("arrowright")||keysDown.has("d")||touchDir.right;
+
+  // Each key alone moves the character in its true on-screen direction
+  // (up/down/left/right as it visually looks), since the isometric view
+  // means a true screen direction is actually a diagonal move in grid
+  // space. Holding two adjacent arrows cancels one grid axis, producing
+  // movement parallel to a single isometric grid line instead. Each of
+  // the three movement patterns gets its own tuned speed so none of them
+  // feels faster or slower than the others on screen.
+  if(up && right && !down && !left){
+    dRow -= MOVE_SPEED_DIAGONAL;
+    player.facing = "right";
+  } else if(up && left && !down && !right){
+    dCol -= MOVE_SPEED_DIAGONAL;
+    player.facing = "left";
+  } else if(down && right && !up && !left){
+    dCol += MOVE_SPEED_DIAGONAL;
+    player.facing = "right";
+  } else if(down && left && !up && !right){
+    dRow += MOVE_SPEED_DIAGONAL;
+    player.facing = "left";
+  } else if(up && !down){
+    dCol -= MOVE_SPEED_VERTICAL; dRow -= MOVE_SPEED_VERTICAL;
+    player.facing = "up";
+  } else if(down && !up){
+    dCol += MOVE_SPEED_VERTICAL; dRow += MOVE_SPEED_VERTICAL;
+    player.facing = "down";
+  } else if(left && !right){
+    dCol -= MOVE_SPEED_HORIZONTAL; dRow += MOVE_SPEED_HORIZONTAL;
+    player.facing = "left";
+  } else if(right && !left){
+    dCol += MOVE_SPEED_HORIZONTAL; dRow -= MOVE_SPEED_HORIZONTAL;
+    player.facing = "right";
+  }
+
+  player.moving = (dCol !== 0 || dRow !== 0);
+  player.walkTimer = player.moving ? player.walkTimer + 1 : 0;
+
+  player.col = clamp(player.col + dCol, 1.2, AREA_SIZE - 2.2);
+  player.row = clamp(player.row + dRow, 1.2, AREA_SIZE - 2.2);
+
+  let closest = null, closestDist = 1.15;
+  npcs.forEach(n=>{
+    if(state.progress.completed[n.idx]) return; // they've already left their stall
+    const d = Math.hypot(n.col - player.col, n.row - player.row);
+    if(d < closestDist){ closest = n; closestDist = d; }
+  });
+  nearestNpc = closest;
+  document.getElementById("talkBtn").classList.toggle("show", !!nearestNpc);
+
+  let closestDoor = null, closestDoorDist = 0.7;
+  doorways.forEach(dw=>{
+    const d = Math.hypot(dw.col - player.col, dw.row - player.row);
+    if(d < closestDoorDist){ closestDoor = dw; closestDoorDist = d; }
+  });
+  if(closestDoor && !document.getElementById("dialogueOverlay").classList.contains("show")){
+    loadArea(closestDoor.target);
+  }
+}
+
+function tileColor(type){
+  if(type === "border") return "#1E2A20";
+  if(type === "path") return "#3A4A6E";
+  return "#22331F";
+}
+
+function renderWorld(){
+  wctx.clearRect(0,0,CW,CH);
+  drawAtmosphere(wctx, CW, CH);
+
+  // ground layer
+  for(let r=0;r<AREA_SIZE;r++){
+    for(let c=0;c<AREA_SIZE;c++){
+      const p = worldToScreen(c, r);
+      if(p.x < -HALF_W*2 || p.x > CW+HALF_W*2 || p.y < -HALF_H*4 || p.y > CH+HALF_H*4) continue;
+      drawGroundTile(wctx, p, tileColor(tileGrid[r][c]), tileGrid[r][c], r, c, HALF_W, HALF_H);
+    }
+  }
+
+  // vertical entities: props, stalls, doorway labels, npcs, player -- depth sorted
+  const entities = [];
+  PROPS.forEach(pr=> entities.push({ col:pr.col, row:pr.row, type:"prop", data:pr }));
+  doorways.forEach(dw=> entities.push({ col:dw.col, row:dw.row, type:"pathlabel", data:dw }));
+  npcs.forEach(n=>{
+    entities.push({ col:n.col, row:n.row-0.32, type:"stallback", data:n });
+    entities.push({ col:n.col, row:n.row, type:"npc", data:n });
+    entities.push({ col:n.col, row:n.row+0.32, type:"stallfront", data:n });
+  });
+  entities.push({ col:player.col, row:player.row, type:"player" });
+  entities.sort((a,b)=> (a.col+a.row) - (b.col+b.row));
+
+  entities.forEach(e=>{
+    const p = worldToScreen(e.col, e.row);
+    if(e.type === "prop"){
+      drawProp(p.x, p.y, e.data.kind);
+    } else if(e.type === "pathlabel"){
+      wctx.fillStyle = "rgba(255,255,255,0.85)";
+      wctx.font = "bold 10px Inter, sans-serif";
+      wctx.textAlign = "center";
+      wctx.fillText(e.data.label, p.x, p.y - 8);
+    } else if(e.type === "stallback"){
+      drawStallAwning(p.x, p.y, e.data.stallAccent);
+    } else if(e.type === "stallfront"){
+      drawStallCounter(p.x, p.y, e.data.stallAccent);
+    } else if(e.type === "npc"){
+      const done = !!state.progress.completed[e.data.idx];
+      if(done){
+        // shop worker has taken the word and left -- stall stands empty
+        wctx.fillStyle = "#1E8E3E";
+        wctx.font = "bold 14px Inter, sans-serif";
+        wctx.textAlign = "center";
+        wctx.fillText("\u2713", p.x, p.y - 22);
+      } else {
+        const scale = 2.2;
+        drawCharacter(wctx, p.x - (15*scale)/2, p.y - 19*scale, scale, e.data);
+        if(nearestNpc === e.data){
+          wctx.fillStyle = "#fff";
+          wctx.font = "10px Inter, sans-serif";
+          wctx.textAlign = "center";
+          wctx.fillText(e.data.role, p.x, p.y - 19*scale - 6);
+        }
+      }
+    } else {
+      const scale = 2.4;
+      const walkPhase = Math.floor(player.walkTimer / 10) % 2;
+      drawCharacter(wctx, p.x - (15*scale)/2, p.y - 19*scale, scale, state.character, player.facing, player.moving, walkPhase);
+    }
+  });
+}
+
+function drawProp(cx, cy, kind){
+  if(kind === "tree"){
+    wctx.fillStyle = "#5B3A22";
+    wctx.fillRect(cx-4, cy-20, 8, 22);
+    wctx.fillStyle = "#2D5A3A";
+    wctx.beginPath();
+    wctx.arc(cx, cy-28, 20, 0, Math.PI*2);
+    wctx.fill();
+  } else if(kind === "well"){
+    wctx.fillStyle = "#5B6472";
+    wctx.beginPath();
+    wctx.ellipse(cx, cy-4, 22, 12, 0, 0, Math.PI*2);
+    wctx.fill();
+    wctx.fillStyle = "#3A4A6E";
+    wctx.beginPath();
+    wctx.ellipse(cx, cy-6, 16, 8, 0, 0, Math.PI*2);
+    wctx.fill();
+  }
+}
+
+// A market stall drawn in two layers so the NPC stands framed between
+// them: a canopy behind (drawn first, further back) and a counter in
+// front (drawn last, closer to the viewer).
+function drawStallAwning(cx, cy, accent){
+  wctx.fillStyle = accent;
+  wctx.beginPath();
+  wctx.moveTo(cx-34, cy-58);
+  wctx.lineTo(cx+34, cy-58);
+  wctx.lineTo(cx+40, cy-44);
+  wctx.lineTo(cx-40, cy-44);
+  wctx.closePath();
+  wctx.fill();
+  wctx.fillStyle = "#3A2414";
+  wctx.fillRect(cx-30, cy-58, 4, 20);
+  wctx.fillRect(cx+26, cy-58, 4, 20);
+}
+function drawStallCounter(cx, cy, accent){
+  wctx.fillStyle = "#8B5A2B";
+  wctx.fillRect(cx-30, cy-16, 60, 18);
+  wctx.fillStyle = accent;
+  wctx.fillRect(cx-30, cy-16, 60, 5);
+  wctx.fillStyle = "#3A2414";
+  wctx.fillRect(cx-30, cy-16, 4, 18);
+  wctx.fillRect(cx+26, cy-16, 4, 18);
+}
+
+function worldLoop(){
+  updateWorld();
+  renderWorld();
+  updateHud();
+  worldRafId = requestAnimationFrame(worldLoop);
+}
+
+function updateHud(){
+  const completedCount = Object.keys(state.progress.completed).length;
+  document.getElementById("hudQuests").textContent = `Quests: ${completedCount} / ${VOCAB.length}`;
+  const xp = state.progress.xpTotal;
+  document.getElementById("hudTitleTier").textContent = titleForXp(xp);
+  document.getElementById("xpBarFill").style.width = xpProgressPercent(xp) + "%";
+}
+
+function titleForXp(xp){
+  let t = TITLE_TIERS[0].name;
+  for(const tier of TITLE_TIERS){ if(xp >= tier.min) t = tier.name; }
+  return t;
+}
+function xpProgressPercent(xp){
+  let lower = TITLE_TIERS[0].min, upper = TITLE_TIERS[TITLE_TIERS.length-1].min + 1000;
+  for(let i=0;i<TITLE_TIERS.length;i++){
+    if(xp >= TITLE_TIERS[i].min){
+      lower = TITLE_TIERS[i].min;
+      upper = (i+1 < TITLE_TIERS.length) ? TITLE_TIERS[i+1].min : TITLE_TIERS[i].min + 1000;
+    }
+  }
+  const pct = ((xp - lower) / (upper - lower)) * 100;
+  return Math.max(4, Math.min(100, pct));
+}
+
+/* ============================================================
+   DIALOGUE / QUEST FLOW
+   ============================================================ */
+function pickChoiceTerms(levelIdx){
+  const others = VOCAB.map((_,i)=>i).filter(i=>i!==levelIdx);
+  for(let i=others.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [others[i],others[j]] = [others[j],others[i]];
+  }
+  const distractors = others.slice(0,3);
+  const choices = [levelIdx, ...distractors].map(i=>({ idx:i, term:VOCAB[i].term }));
+  for(let i=choices.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [choices[i],choices[j]] = [choices[j],choices[i]];
+  }
+  return choices;
+}
+
+const RIDDLE_TEMPLATES = [
+  def => `Oh, thank goodness you stopped by! I can never remember this one: ${def} What do you call that?`,
+  def => `Hold on, before you go, can you settle something for me? ${def} What's the word for that?`,
+  def => `You look sharp. Quick question: ${def} Do you know the term?`,
+  def => `I've been racking my brain all day over this: ${def} What am I thinking of?`,
+  def => `Funny you should walk by. Customers keep asking me about this: ${def} What's it called again?`,
+  def => `Here's one that's been bugging me all week: ${def} Can you name it?`
+];
+
+function openDialogue(npc){
+  activeNpc = npc;
+  activeAttempts = 0;
+  questTimerStart = performance.now();
+  const already = !!state.progress.completed[npc.idx];
+
+  document.getElementById("dialogueRole").textContent = npc.role;
+  document.getElementById("dialogueFeedback").textContent = "";
+  document.getElementById("dialogueFeedback").className = "overlay-feedback";
+  document.getElementById("dialogueAch").style.display = "none";
+  document.getElementById("dialogueActions").innerHTML = "";
+
+  if(already){
+    document.getElementById("dialogueLine").textContent =
+      `${npc.role} says: "Thanks again for your help with ${VOCAB[npc.idx].term}!"`;
+    document.getElementById("dialogueChoices").innerHTML = "";
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "btn";
+    closeBtn.textContent = "Close";
+    closeBtn.addEventListener("click", closeDialogue);
+    document.getElementById("dialogueActions").appendChild(closeBtn);
+  } else {
+    const riddle = RIDDLE_TEMPLATES[npc.idx % RIDDLE_TEMPLATES.length](VOCAB[npc.idx].def);
+    document.getElementById("dialogueLine").textContent = `${npc.role} says: "${riddle}"`;
+    const choices = pickChoiceTerms(npc.idx);
+    const choicesEl = document.getElementById("dialogueChoices");
+    choicesEl.innerHTML = "";
+    choices.forEach(ch=>{
+      const btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.textContent = ch.term;
+      btn.addEventListener("click", ()=> handleChoice(ch, btn));
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  document.getElementById("dialogueOverlay").classList.add("show");
+}
+
+function closeDialogue(){
+  document.getElementById("dialogueOverlay").classList.remove("show");
+  activeNpc = null;
+}
+
+function handleChoice(choice, btnEl){
+  if(!activeNpc) return;
+  const correct = choice.idx === activeNpc.idx;
+
+  if(correct){
+    btnEl.classList.add("correct");
+    document.querySelectorAll(".choice-btn").forEach(b=> b.disabled = true);
+    const timeSec = (performance.now() - questTimerStart) / 1000;
+    const firstTry = activeAttempts === 0;
+
+    document.getElementById("dialogueFeedback").className = "overlay-feedback correct";
+    document.getElementById("dialogueFeedback").textContent =
+      `${activeNpc.role} says: "That's it! Now clear the path so I can put it to use!"`;
+
+    const npcIdx = activeNpc.idx;
+    const returnArea = currentAreaId;
+    const wrongAttempts = activeAttempts;
+
+    // Instant transport to the battle room, just a brief beat to register
+    // the correct answer before the screen swaps.
+    setTimeout(()=>{
+      closeDialogue();
+      startBattle(npcIdx, returnArea, { firstTry, wrongAttempts, timeSec });
+    }, 700);
+  } else {
+    activeAttempts += 1;
+    btnEl.classList.add("wrong");
+    btnEl.disabled = true;
+    document.getElementById("dialogueFeedback").className = "overlay-feedback wrong";
+    document.getElementById("dialogueFeedback").textContent = `${activeNpc.role} says: "Hmm, not quite. Give it another thought."`;
+  }
+}
+
+/* ============================================================
+   BATTLE SYSTEM (same isometric grid engine as the town, with
+   a chasing boss, rocks to dodge around, a signature attack per
+   boss type, and a coin thrown in whatever direction the player
+   is currently facing)
+   ============================================================ */
+const bcanvas = document.getElementById("battleCanvas");
+const bctx = bcanvas.getContext("2d");
+const BW = bcanvas.width, BH = bcanvas.height;
+
+const BATTLE_SIZE = 16;
+// Speed is grid-units per frame at 60fps, same units the player moves in.
+const BOSS_SPEED = 0.03;
+const COIN_SPEED = 0.2;
+const HIT_RADIUS = 0.7;
+const ATTACK_RADIUS = 0.75;
+const THROW_COOLDOWN_MS = 400;
+const MAX_PLAYER_HITS = 3;
+const ROCK_RADIUS = 0.6;
+const PLAYER_RADIUS = 0.4;
+const TELEGRAPH_MS = 450;
+const ATTACK_COOLDOWN_MS = 3200;
+const ATTACK_COOLDOWN_LOW_HP_MS = 2200;
+
+// Matches the same true-screen-direction unit vectors used for player
+// movement, so a coin thrown while facing a direction travels the way
+// it visually looks like it should.
+const FACING_VECTORS = {
+  up:    { dCol: -0.7071, dRow: -0.7071 },
+  down:  { dCol:  0.7071, dRow:  0.7071 },
+  left:  { dCol: -0.7071, dRow:  0.7071 },
+  right: { dCol:  0.7071, dRow: -0.7071 }
+};
+
+// Given a raw world-space (dCol,dRow) movement direction, figures out
+// which of the 4 screen-facing directions it visually reads as, using
+// the same isometric projection as everything else -- lets a boss that
+// chases in a straight world-space line still face the "right" way.
+function facingFromVector(dCol, dRow){
+  const sx = (dCol - dRow) * HALF_W;
+  const sy = (dCol + dRow) * HALF_H;
+  if(Math.abs(sx) > Math.abs(sy)){
+    return sx > 0 ? "right" : "left";
+  }
+  return sy > 0 ? "down" : "up";
+}
+
+let battleTileGrid = [];
+let battle = null;
+let battleRafId = null;
+
+function buildBattleArena(){
+  const grid = [];
+  for(let r=0;r<BATTLE_SIZE;r++){
+    const row = [];
+    for(let c=0;c<BATTLE_SIZE;c++){
+      const border = (r===0 || r===BATTLE_SIZE-1 || c===0 || c===BATTLE_SIZE-1);
+      row.push(border ? "border" : "arena");
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+function battleTileColor(type){
+  if(type === "border") return "#2A1216";
+  return "#3A1B1F";
+}
+
+function buildRocks(){
+  return [
+    { col: 5, row: 7, radius: ROCK_RADIUS },
+    { col: 11, row: 7, radius: ROCK_RADIUS },
+    { col: 8, row: 10, radius: ROCK_RADIUS }
+  ];
+}
+
+function startBattle(termIdx, returnArea, runInfo){
+  battleTileGrid = buildBattleArena();
+  battle = {
+    termIdx, returnArea,
+    bossType: BOSS_TYPES[termIdx % BOSS_TYPES.length],
+    boss: { col: 8, row: 3, hp: 10, maxHp: 10, hitFlashUntil: 0, telegraphing:false, facing: "down", walkTimer: 0, hoverPhase: 0, attackAt: null },
+    rocks: [], // rocks disabled for now -- boss pathing was still catching on them; buildRocks() left in place below to re-enable later
+    coins: [],
+    hazards: [],
+    hazardProjectiles: [],
+    explosionParticles: [],
+    pickup: null,
+    throwCooldownUntil: 0,
+    phase: "fight",
+    playerHitsTaken: 0,
+    hitsLanded: 0,
+    firstTry: runInfo.firstTry,
+    wrongAttempts: runInfo.wrongAttempts,
+    timeSec: runInfo.timeSec
+  };
+  player.col = 8;
+  player.row = 13;
+  player.facing = "up";
+  player.aimDir = { dCol: -0.7071, dRow: -0.7071 };
+  player.moving = false;
+  player.walkTimer = 0;
+  player.battleInvincibleUntil = 0;
+
+  document.getElementById("battleBossName").textContent =
+    `A wild ${BOSS_LABELS[battle.bossType]} guards "${VOCAB[termIdx].term}"!`;
+  renderHpTrack();
+  document.getElementById("collectedWrap").style.display = "none";
+  document.getElementById("retreatWrap").style.display = "none";
+  document.getElementById("battleCanvas").style.display = "block";
+  document.getElementById("throwBtn").style.display = "block";
+  document.getElementById("throwBtn").disabled = false;
+  showScreen("battle");
+  if(worldRafId){ cancelAnimationFrame(worldRafId); worldRafId = null; }
+  if(battleRafId) cancelAnimationFrame(battleRafId);
+  battleLoop();
+}
+
+function renderHpTrack(){
+  const track = document.getElementById("hpTrack");
+  track.innerHTML = "";
+  for(let i=0;i<battle.boss.maxHp;i++){
+    const pip = document.createElement("div");
+    pip.className = "hp-pip" + (i < battle.boss.hp ? "" : " empty");
+    track.appendChild(pip);
+  }
+}
+
+document.getElementById("throwBtn").addEventListener("click", throwCoin);
+
+function throwCoin(){
+  if(!battle || battle.phase !== "fight") return;
+  const now = performance.now();
+  if(now < battle.throwCooldownUntil) return;
+  battle.throwCooldownUntil = now + THROW_COOLDOWN_MS;
+  const dir = player.aimDir || FACING_VECTORS[player.facing] || FACING_VECTORS.down;
+  battle.coins.push({ col: player.col, row: player.row, dCol: dir.dCol, dRow: dir.dRow });
+}
+
+function battleLoop(){
+  if(!battle) return;
+  updateBattleArena();
+  renderBattleArena();
+  battleRafId = requestAnimationFrame(battleLoop);
+}
+
+// Rejects a tentative move that would land inside any rock, hard-stopping
+// rather than sliding, to keep the collision simple and predictable.
+function blockedByRock(col, row, radius){
+  return battle.rocks.some(rock => Math.hypot(col-rock.col, row-rock.row) < rock.radius + radius);
+}
+// Tries the full diagonal move first; if that's blocked, tries each axis
+// alone so the mover slides along the rock's edge instead of freezing
+// dead the moment the direct path is obstructed.
+function moveWithRockCollision(col, row, dCol, dRow, radius){
+  if(!blockedByRock(col+dCol, row+dRow, radius)) return { col: col+dCol, row: row+dRow };
+  if(!blockedByRock(col+dCol, row, radius)) return { col: col+dCol, row: row };
+  if(!blockedByRock(col, row+dRow, radius)) return { col: col, row: row+dRow };
+  return { col, row };
+}
+
+// Simple local steering: if a mover is close to a rock and heading toward
+// it, nudge the direction perpendicular to route around it. Not true
+// pathfinding, but reads as "aware" of the obstacle rather than just
+// bumping into it.
+function steerAroundRocks(col, row, dCol, dRow){
+  let adjCol = dCol, adjRow = dRow;
+  const moveLen = Math.hypot(dCol, dRow);
+  if(moveLen < 0.0001) return { dCol, dRow };
+  battle.rocks.forEach(rock=>{
+    const dx = col - rock.col, dy = row - rock.row;
+    const dist = Math.hypot(dx, dy);
+    if(dist > 0.001 && dist < rock.radius + 1.8){
+      const towardCol = dCol/moveLen, towardRow = dRow/moveLen;
+      const awayCol = -dx/dist, awayRow = -dy/dist;
+      const closingIn = towardCol*awayCol + towardRow*awayRow;
+      if(closingIn > 0.1){
+        const perpCol = -dy/dist, perpRow = dx/dist;
+        const strength = closingIn * (1 - (dist-rock.radius)/1.8) * 1.3;
+        adjCol += perpCol*strength;
+        adjRow += perpRow*strength;
+      }
+    }
+  });
+  return { dCol: adjCol, dRow: adjRow };
+}
+// Boss gets faster in two steps as it takes hits -- once at 3 hits
+// landed, again at 6, replacing the old flat 50%-HP speed bump with
+// this same two-stage escalation.
+function bossBattleSpeedMult(){
+  if(!battle) return 1;
+  if(battle.hitsLanded >= 6) return 1.5;
+  if(battle.hitsLanded >= 3) return 1.25;
+  return 1;
+}
+
+function applyPlayerHit(now){
+  const boss = battle.boss;
+  const dx = player.col-boss.col, dy = player.row-boss.row;
+  const len = Math.hypot(dx,dy) || 1;
+  player.col = clamp(player.col + (dx/len)*1.5, 1.2, BATTLE_SIZE - 2.2);
+  player.row = clamp(player.row + (dy/len)*1.5, 1.2, BATTLE_SIZE - 2.2);
+  player.battleInvincibleUntil = now + 1200;
+  battle.playerHitFlashUntil = now + 300;
+  battle.playerHitsTaken += 1;
+  if(battle.playerHitsTaken >= MAX_PLAYER_HITS){
+    battle.phase = "retreat";
+    document.getElementById("throwBtn").style.display = "none";
+    setTimeout(showRetreat, 400);
+  }
+}
+
+function spawnHazard(h){ battle.hazards.push(h); }
+
+// Each boss type gets one signature move on a shared telegraph-then-strike
+// timer: a brief flash/pause tells the player it's coming, then it fires.
+function executeBossAttack(boss, now){
+  const type = battle.bossType;
+  if(type === "troll"){
+    spawnHazard({ col:boss.col, row:boss.row, radius:1.6, spawnTime:now, duration:400, color:"#C8102E" });
+  } else if(type === "dragon"){
+    const fv = FACING_VECTORS[boss.facing] || FACING_VECTORS.down;
+    spawnHazard({ col:boss.col+fv.dCol*1.6, row:boss.row+fv.dRow*1.6, radius:1.3, spawnTime:now, duration:450, color:"#E8843A" });
+  } else if(type === "goblin"){
+    const dx = player.col-boss.col, dy = player.row-boss.row;
+    const len = Math.hypot(dx,dy) || 1;
+    battle.hazardProjectiles.push({ col:boss.col, row:boss.row, dCol:dx/len, dRow:dy/len, speed:0.14, radius:0.5, color:"#7A9B3E" });
+  } else if(type === "golem"){
+    spawnHazard({ col:boss.col, row:boss.row, radius:0.3, maxRadius:2.4, spawnTime:now, duration:550, color:"#8B8D8F" });
+  } else if(type === "specter"){
+    const angle = Math.random()*Math.PI*2;
+    boss.col = clamp(player.col + Math.cos(angle)*1.4, 1.2, BATTLE_SIZE-2.2);
+    boss.row = clamp(player.row + Math.sin(angle)*1.4, 1.2, BATTLE_SIZE-2.2);
+    spawnHazard({ col:boss.col, row:boss.row, radius:1.2, spawnTime:now, duration:350, color:"#D6E4F0" });
+  } else if(type === "serpent"){
+    spawnHazard({ col:boss.col, row:boss.row, radius:1.3, spawnTime:now, duration:350, color:"#5A8F3E" });
+    setTimeout(()=>{
+      if(battle && battle.phase === "fight"){
+        spawnHazard({ col:battle.boss.col, row:battle.boss.row, radius:1.3, spawnTime:performance.now(), duration:350, color:"#5A8F3E" });
+      }
+    }, 260);
+  }
+}
+
+function updateBossAttacks(now){
+  const boss = battle.boss;
+  if(boss.attackAt === null){
+    boss.attackAt = now + ATTACK_COOLDOWN_MS;
+  }
+  const cooldown = boss.hp <= boss.maxHp/2 ? ATTACK_COOLDOWN_LOW_HP_MS : ATTACK_COOLDOWN_MS;
+  boss.telegraphing = now >= boss.attackAt - TELEGRAPH_MS && now < boss.attackAt;
+  if(now >= boss.attackAt){
+    executeBossAttack(boss, now);
+    boss.attackAt = now + cooldown + Math.random()*600;
+  }
+}
+
+function updateHazards(now){
+  battle.hazards = battle.hazards.filter(h=>{
+    const age = now - h.spawnTime;
+    if(age > h.duration) return false;
+    let r = h.radius;
+    if(h.maxRadius){
+      r = h.radius + (h.maxRadius - h.radius) * Math.min(1, age/h.duration);
+    }
+    h.currentRadius = r;
+    if(now > (player.battleInvincibleUntil||0)){
+      const d = Math.hypot(player.col-h.col, player.row-h.row);
+      if(d < r) applyPlayerHit(now);
+    }
+    return true;
+  });
+
+  battle.hazardProjectiles = battle.hazardProjectiles.filter(p=>{
+    p.col += p.dCol*p.speed;
+    p.row += p.dRow*p.speed;
+    if(p.col<0 || p.col>BATTLE_SIZE || p.row<0 || p.row>BATTLE_SIZE) return false;
+    if(blockedByRock(p.col, p.row, p.radius)) return false;
+    if(now > (player.battleInvincibleUntil||0)){
+      const d = Math.hypot(player.col-p.col, player.row-p.row);
+      if(d < p.radius+PLAYER_RADIUS){ applyPlayerHit(now); return false; }
+    }
+    return true;
+  });
+}
+
+function triggerExplosion(now){
+  const boss = battle.boss;
+  battle.phase = "exploding";
+  battle.explosionAt = now;
+  battle.explosionParticles = [];
+  for(let i=0;i<14;i++){
+    const angle = (Math.PI*2*i)/14;
+    battle.explosionParticles.push({
+      col: boss.col, row: boss.row,
+      dCol: Math.cos(angle)*0.05, dRow: Math.sin(angle)*0.05,
+      life: 1
+    });
+  }
+  battle.pickup = { col: boss.col, row: boss.row };
+  document.getElementById("throwBtn").style.display = "none";
+}
+
+function updateBattleArena(){
+  if(!battle) return;
+  const now = performance.now();
+
+  // player movement is active any time they're still in control of their
+  // character (fighting, or walking through the aftermath to the pickup)
+  if(battle.phase === "fight" || battle.phase === "exploding" || battle.phase === "collect"){
+    let dCol=0, dRow=0;
+    const up = keysDown.has("arrowup")||keysDown.has("w")||touchDir.up;
+    const down = keysDown.has("arrowdown")||keysDown.has("s")||touchDir.down;
+    const left = keysDown.has("arrowleft")||keysDown.has("a")||touchDir.left;
+    const right = keysDown.has("arrowright")||keysDown.has("d")||touchDir.right;
+
+    if(up && right && !down && !left){ dRow -= MOVE_SPEED_DIAGONAL; player.facing = "right"; }
+    else if(up && left && !down && !right){ dCol -= MOVE_SPEED_DIAGONAL; player.facing = "left"; }
+    else if(down && right && !up && !left){ dCol += MOVE_SPEED_DIAGONAL; player.facing = "right"; }
+    else if(down && left && !up && !right){ dRow += MOVE_SPEED_DIAGONAL; player.facing = "left"; }
+    else if(up && !down){ dCol -= MOVE_SPEED_VERTICAL; dRow -= MOVE_SPEED_VERTICAL; player.facing = "up"; }
+    else if(down && !up){ dCol += MOVE_SPEED_VERTICAL; dRow += MOVE_SPEED_VERTICAL; player.facing = "down"; }
+    else if(left && !right){ dCol -= MOVE_SPEED_HORIZONTAL; dRow += MOVE_SPEED_HORIZONTAL; player.facing = "left"; }
+    else if(right && !left){ dCol += MOVE_SPEED_HORIZONTAL; dRow -= MOVE_SPEED_HORIZONTAL; player.facing = "right"; }
+
+    player.moving = (dCol !== 0 || dRow !== 0);
+    player.walkTimer = player.moving ? player.walkTimer + 1 : 0;
+    if(player.moving){
+      const mag = Math.hypot(dCol, dRow);
+      player.aimDir = { dCol: dCol/mag, dRow: dRow/mag };
+    }
+    const rawCol = clamp(player.col + dCol, 1.2, BATTLE_SIZE - 2.2);
+    const rawRow = clamp(player.row + dRow, 1.2, BATTLE_SIZE - 2.2);
+    const resolved = moveWithRockCollision(player.col, player.row, rawCol-player.col, rawRow-player.row, PLAYER_RADIUS);
+    player.col = clamp(resolved.col, 1.2, BATTLE_SIZE - 2.2);
+    player.row = clamp(resolved.row, 1.2, BATTLE_SIZE - 2.2);
+  }
+
+  if(battle.phase === "fight"){
+    const boss = battle.boss;
+
+    if(!boss.telegraphing){
+      const bdx = player.col - boss.col, bdy = player.row - boss.row;
+      const blen = Math.hypot(bdx, bdy) || 1;
+      let dir = { dCol: bdx/blen, dRow: bdy/blen };
+      dir = steerAroundRocks(boss.col, boss.row, dir.dCol, dir.dRow);
+      const dirLen = Math.hypot(dir.dCol, dir.dRow) || 1;
+      const speedMult = bossBattleSpeedMult();
+      const rawDCol = (dir.dCol/dirLen)*BOSS_SPEED*speedMult;
+      const rawDRow = (dir.dRow/dirLen)*BOSS_SPEED*speedMult;
+      const resolved = moveWithRockCollision(boss.col, boss.row, rawDCol, rawDRow, 0.5);
+      boss.col = clamp(resolved.col, 1.2, BATTLE_SIZE - 2.2);
+      boss.row = clamp(resolved.row, 1.2, BATTLE_SIZE - 2.2);
+      boss.facing = facingFromVector(bdx, bdy);
+      boss.walkTimer += 1;
+    }
+    if(battle.bossType === "dragon") boss.hoverPhase += 1;
+
+    updateBossAttacks(now);
+    updateHazards(now);
+
+    if(now > (player.battleInvincibleUntil||0)){
+      const pd = Math.hypot(player.col-boss.col, player.row-boss.row);
+      if(pd < ATTACK_RADIUS) applyPlayerHit(now);
+    }
+
+    battle.coins = battle.coins.filter(coin=>{
+      coin.col += coin.dCol * COIN_SPEED;
+      coin.row += coin.dRow * COIN_SPEED;
+      if(coin.col < 0 || coin.col > BATTLE_SIZE || coin.row < 0 || coin.row > BATTLE_SIZE) return false;
+      if(blockedByRock(coin.col, coin.row, 0.15)) return false;
+      const hd = Math.hypot(coin.col-boss.col, coin.row-boss.row);
+      if(hd < HIT_RADIUS){
+        boss.hp -= 1;
+        battle.hitsLanded += 1;
+        boss.hitFlashUntil = performance.now() + 220;
+        renderHpTrack();
+        if(boss.hp <= 0) triggerExplosion(performance.now());
+        return false;
+      }
+      return true;
+    });
+  } else if(battle.phase === "exploding"){
+    battle.explosionParticles.forEach(p=>{ p.col += p.dCol; p.row += p.dRow; p.life -= 0.035; });
+    battle.explosionParticles = battle.explosionParticles.filter(p=> p.life > 0);
+    if(now - battle.explosionAt > 550){
+      battle.phase = "collect";
+    }
+  } else if(battle.phase === "collect"){
+    const d = Math.hypot(player.col-battle.pickup.col, player.row-battle.pickup.row);
+    if(d < 0.8) collectWord();
+  }
+}
+
+function battleWorldToScreen(col, row){
+  const relCol = col - player.col;
+  const relRow = row - player.row;
+  return {
+    x: BW/2 + (relCol - relRow) * HALF_W,
+    y: BH/2 + (relCol + relRow) * HALF_H
+  };
+}
+
+function renderBattleArena(){
+  bctx.clearRect(0,0,BW,BH);
+  drawAtmosphere(bctx, BW, BH);
+  const now = performance.now();
+
+  for(let r=0;r<BATTLE_SIZE;r++){
+    for(let c=0;c<BATTLE_SIZE;c++){
+      const p = battleWorldToScreen(c, r);
+      if(p.x < -HALF_W*2 || p.x > BW+HALF_W*2 || p.y < -HALF_H*4 || p.y > BH+HALF_H*4) continue;
+      drawGroundTile(bctx, p, battleTileColor(battleTileGrid[r][c]), battleTileGrid[r][c], r, c, HALF_W, HALF_H);
+    }
+  }
+
+  // hazards render as ground-level pulsing danger zones, under everything else
+  battle.hazards.forEach(h=>{
+    const p = battleWorldToScreen(h.col, h.row);
+    const r = (h.currentRadius||h.radius) * HALF_W;
+    bctx.fillStyle = h.color;
+    bctx.globalAlpha = 0.35;
+    bctx.beginPath();
+    bctx.ellipse(p.x, p.y, r, r*0.5, 0, 0, Math.PI*2);
+    bctx.fill();
+    bctx.globalAlpha = 1;
+    bctx.strokeStyle = h.color;
+    bctx.lineWidth = 2;
+    bctx.beginPath();
+    bctx.ellipse(p.x, p.y, r, r*0.5, 0, 0, Math.PI*2);
+    bctx.stroke();
+  });
+
+  const entities = [{ col: player.col, row: player.row, type:"player" }];
+  battle.rocks.forEach(rk=> entities.push({ col:rk.col, row:rk.row, type:"rock" }));
+  if(battle.phase === "fight"){
+    if(battle.bossType === "dragon"){
+      entities.push({ col: battle.boss.col, row: battle.boss.row, type:"shadow" });
+    }
+    entities.push({ col: battle.boss.col, row: battle.boss.row, type:"boss" });
+  }
+  battle.coins.forEach(c=> entities.push({ col:c.col, row:c.row, type:"coin" }));
+  battle.hazardProjectiles.forEach(p=> entities.push({ col:p.col, row:p.row, type:"hazardProjectile", data:p }));
+  if(battle.phase === "collect" && battle.pickup){
+    entities.push({ col: battle.pickup.col, row: battle.pickup.row, type:"pickup" });
+  }
+  entities.sort((a,b)=> (a.col+a.row) - (b.col+b.row));
+
+  entities.forEach(e=>{
+    const p = battleWorldToScreen(e.col, e.row);
+    if(e.type === "rock"){
+      drawRock(bctx, p.x, p.y);
+    } else if(e.type === "shadow"){
+      bctx.fillStyle = "rgba(0,0,0,0.35)";
+      bctx.beginPath();
+      bctx.ellipse(p.x, p.y, 26, 12, 0, 0, Math.PI*2);
+      bctx.fill();
+    } else if(e.type === "boss"){
+      const boss = battle.boss;
+      const flashing = boss.telegraphing ? "telegraph" : (now < boss.hitFlashUntil ? "hit" : null);
+      if(battle.bossType === "dragon"){
+        const hover = Math.sin(boss.hoverPhase/12) * 8;
+        drawBoss(bctx, p.x - 40, p.y - 76 + hover, 4, "dragon", flashing, boss.facing, null);
+      } else {
+        const walkPhase = Math.floor(boss.walkTimer / 10) % 2;
+        drawBoss(bctx, p.x - 40, p.y - 76, 4, battle.bossType, flashing, boss.facing, walkPhase);
+      }
+    } else if(e.type === "coin"){
+      bctx.fillStyle = "#E8C158";
+      bctx.beginPath();
+      bctx.arc(p.x, p.y - 10, 6, 0, Math.PI*2);
+      bctx.fill();
+      bctx.strokeStyle = "#8B6F1F";
+      bctx.lineWidth = 1.5;
+      bctx.stroke();
+    } else if(e.type === "hazardProjectile"){
+      bctx.fillStyle = e.data.color;
+      bctx.beginPath();
+      bctx.arc(p.x, p.y - 8, 7, 0, Math.PI*2);
+      bctx.fill();
+    } else if(e.type === "pickup"){
+      drawPickup(bctx, p.x, p.y, now);
+    } else {
+      const scale = 2.4;
+      const walkPhase = Math.floor(player.walkTimer / 10) % 2;
+      const hitFlash = now < (battle.playerHitFlashUntil||0);
+      bctx.globalAlpha = hitFlash ? 0.5 : 1;
+      drawCharacter(bctx, p.x - (15*scale)/2, p.y - 19*scale, scale, state.character, player.facing, player.moving, walkPhase);
+      bctx.globalAlpha = 1;
+    }
+  });
+
+  // explosion particles render on top of everything
+  battle.explosionParticles.forEach(part=>{
+    const p = battleWorldToScreen(part.col, part.row);
+    bctx.globalAlpha = Math.max(0, part.life);
+    bctx.fillStyle = "#ffd97a";
+    bctx.beginPath();
+    bctx.arc(p.x, p.y-10, 5, 0, Math.PI*2);
+    bctx.fill();
+  });
+  bctx.globalAlpha = 1;
+}
+
+function drawRock(ctx, cx, cy){
+  ctx.fillStyle = "#6B6D6F";
+  ctx.beginPath();
+  const pts = [[-18,-4],[-10,-16],[6,-18],[18,-6],[14,8],[-4,12],[-16,6]];
+  pts.forEach(([dx,dy],i)=>{
+    const x = cx+dx, y = cy+dy;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#57585A";
+  ctx.beginPath();
+  ctx.ellipse(cx-4, cy-2, 10, 6, 0, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function drawPickup(ctx, cx, cy, now){
+  const pulse = 1 + Math.sin(now/200)*0.15;
+  ctx.fillStyle = "#ffd97a";
+  ctx.beginPath();
+  ctx.arc(cx, cy-10, 12*pulse, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  const blink = (Math.sin(now/300) + 1) / 2;
+  ctx.globalAlpha = 0.4 + blink*0.6;
+  ctx.fillStyle = "#ffd97a";
+  ctx.beginPath();
+  ctx.moveTo(cx, cy-28);
+  ctx.lineTo(cx-8, cy-40);
+  ctx.lineTo(cx+8, cy-40);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function showRetreat(){
+  if(battleRafId){ cancelAnimationFrame(battleRafId); battleRafId = null; }
+  document.getElementById("battleCanvas").style.display = "none";
+  document.getElementById("retreatMsg").textContent =
+    `The ${BOSS_LABELS[battle.bossType]} overwhelmed you! Retreat to the village and try again.`;
+  document.getElementById("retreatWrap").style.display = "flex";
+}
+
+document.getElementById("retreatContinueBtn").addEventListener("click", ()=>{
+  const returnArea = battle.returnArea;
+  battle = null;
+  loadArea(returnArea);
+  showScreen("world");
+  if(worldRafId) cancelAnimationFrame(worldRafId);
+  worldLoop();
+});
+
+function collectWord(){
+  if(!battle) return;
+  if(battleRafId){ cancelAnimationFrame(battleRafId); battleRafId = null; }
+  const idx = battle.termIdx;
+  let xp = 100;
+  if(battle.firstTry) xp += 25;
+  if(battle.timeSec < 10) xp += 25;
+
+  state.progress.completed[idx] = { xpEarned: xp, firstTry: battle.firstTry, timeSec: battle.timeSec };
+  state.progress.xpTotal += xp;
+  state.progress.currentStreak = battle.firstTry ? state.progress.currentStreak + 1 : 0;
+
+  const runInfo = { firstTry: battle.firstTry, wrongAttempts: battle.wrongAttempts, timeSec: battle.timeSec };
+  const newlyUnlocked = checkAchievements(runInfo);
+  saveState();
+
+  document.getElementById("battleCanvas").style.display = "none";
+  document.getElementById("collectedMsg").textContent = `YOU COLLECTED ${VOCAB[idx].term}!`;
+  const achLine = document.getElementById("collectedAch");
+  if(newlyUnlocked.length){
+    achLine.style.display = "block";
+    achLine.textContent = "Achievement unlocked: " + newlyUnlocked.join(", ");
+    showToast("Achievement unlocked: " + newlyUnlocked.join(", "));
+  } else {
+    achLine.style.display = "none";
+  }
+  document.getElementById("collectedWrap").style.display = "flex";
+  battle.phase = "collected";
+}
+
+document.getElementById("collectedContinueBtn").addEventListener("click", ()=>{
+  const returnArea = battle.returnArea;
+  battle = null;
+  loadArea(returnArea);
+  showScreen("world");
+  if(worldRafId) cancelAnimationFrame(worldRafId);
+  worldLoop();
+});
+
+function drawBoss(ctx, originX, originY, scale, type, flashing, facing, walkPhase){
+  facing = facing || "down";
+  const walking = walkPhase === 0 || walkPhase === 1;
+  const liftLeft = walking && walkPhase === 0;
+  const liftRight = walking && walkPhase === 1;
+  const bob = walking ? (walkPhase === 0 ? -1 : 1) : 0;
+  const flashColor = flashing === "telegraph" ? "#fff59d" : (flashing === "hit" ? "#ff5c5c" : null);
+
+  function block(ux,uy,uw,uh,color){
+    drawShadedRect(ctx, originX+ux*scale, originY+uy*scale, uw*scale, uh*scale, flashColor || color);
+  }
+  function tri(points, color){
+    const px = points.map(([px0,py0])=> [originX+px0*scale, originY+py0*scale]);
+    drawShadedTri(ctx, px, flashColor || color);
+  }
+  function eyes(leftX, rightX, y, color){
+    if(facing === "down"){ block(leftX,y,1,1,color); block(rightX,y,1,1,color); }
+    else if(facing === "left"){ block(leftX,y,1,1,color); }
+    else if(facing === "right"){ block(rightX,y,1,1,color); }
+  }
+
+  if(type === "troll"){
+    block(6, liftLeft?14:15, 3, liftLeft?3:4, "#3A5233");
+    block(11, liftRight?14:15, 3, liftRight?3:4, "#3A5233");
+    block(3,6,14,9,"#4A6741");
+    if(facing !== "left") block(17,6,3,8,"#4A6741");
+    if(facing !== "right") block(0,6,3,8,"#4A6741");
+    block(6,0,8,6,"#6B8F52");
+    eyes(7,11,3,"#14181C");
+  } else if(type === "dragon"){
+    // wings flap on a faster cycle than a walk-cycle, since the dragon
+    // never touches the ground -- it hovers, so no legs are drawn at all
+    const flapPhase = Math.floor(performance.now()/140) % 2;
+    const spread = flapPhase === 0 ? 1 : 0.55;
+    if(facing !== "right") tri([[5,9],[0,4-3*spread],[5,13]], "#8A1E30");
+    if(facing !== "left") tri([[15,9],[20,4-3*spread],[15,13]], "#8A1E30");
+    block(5,7,10,9,"#A62639");
+    block(7,1,6,7,"#8A1E30");
+    tri([[8,1],[9,-2],[10,1]], "#8A1E30");
+    tri([[11,1],[12,-2],[13,1]], "#8A1E30");
+    eyes(8,11,4,"#E8C158");
+  } else if(type === "goblin"){
+    block(7,9,6,7,"#7A9B3E");
+    block(7,3,6,6,"#8FB350");
+    if(facing !== "right") tri([[7,4],[3,2],[7,7]], "#8FB350");
+    if(facing !== "left") tri([[13,4],[17,2],[13,7]], "#8FB350");
+    eyes(8,11,5,"#C8102E");
+    block(6, liftLeft?15:16, 2, liftLeft?2:3, "#5A7A2E");
+    block(12, liftRight?15:16, 2, liftRight?2:3, "#5A7A2E");
+  } else if(type === "golem"){
+    block(4,5,12,11,"#8B8D8F");
+    block(7,0,6,5,"#9A9C9E");
+    ctx.strokeStyle = flashColor || "#5B5D5F";
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(originX+6*scale,originY+8*scale); ctx.lineTo(originX+9*scale,originY+11*scale); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(originX+13*scale,originY+7*scale); ctx.lineTo(originX+11*scale,originY+10*scale); ctx.stroke();
+    eyes(8,11,2,"#E8843A");
+    block(5, liftLeft?15:16, 3, liftLeft?2:3, "#7B7D7F");
+    block(12, liftRight?15:16, 3, liftRight?2:3, "#7B7D7F");
+  } else if(type === "specter"){
+    const oy = originY + bob;
+    ctx.globalAlpha = flashColor ? 1 : 0.78;
+    ctx.fillStyle = flashColor || "#D6E4F0";
+    ctx.beginPath();
+    ctx.arc(originX+10*scale, oy+8*scale, 6*scale, Math.PI, 0);
+    ctx.fill();
+    ctx.strokeStyle = "#14181C";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    function striO(points, color){
+      const px = points.map(([px0,py0])=> [originX+px0*scale, oy+py0*scale]);
+      drawShadedTri(ctx, px, flashColor || color);
+    }
+    striO([[4,8],[6,19],[8,8]], "#D6E4F0");
+    striO([[8,8],[10,19],[12,8]], "#D6E4F0");
+    striO([[12,8],[14,19],[16,8]], "#D6E4F0");
+    if(facing === "down"){ ctx.fillStyle="#14181C"; ctx.fillRect(originX+8*scale,oy+6*scale,scale,scale); ctx.fillRect(originX+11*scale,oy+6*scale,scale,scale); }
+    else if(facing === "left"){ ctx.fillStyle="#14181C"; ctx.fillRect(originX+8*scale,oy+6*scale,scale,scale); }
+    else if(facing === "right"){ ctx.fillStyle="#14181C"; ctx.fillRect(originX+11*scale,oy+6*scale,scale,scale); }
+  } else if(type === "serpent"){
+    const oy = originY + bob;
+    for(let i=0;i<6;i++){
+      const w = 8 - Math.abs(i-2)*0.6;
+      const segColor = i%2===0 ? "#5A8F3E" : "#4A7B32";
+      drawShadedRect(ctx, originX+(10-w/2)*scale, oy+(3+i*2.6)*scale, w*scale, 3*scale, flashColor || segColor);
+    }
+    drawShadedTri(ctx, [
+      [originX+7*scale, oy+1*scale],
+      [originX+13*scale, oy+1*scale],
+      [originX+10*scale, oy-3*scale]
+    ], flashColor || "#5A8F3E");
+    if(facing === "down"){ ctx.fillStyle="#E8C158"; ctx.fillRect(originX+9*scale,oy-1*scale,scale,scale); ctx.fillRect(originX+11*scale,oy-1*scale,scale,scale); }
+    else if(facing === "left"){ ctx.fillStyle="#E8C158"; ctx.fillRect(originX+9*scale,oy-1*scale,scale,scale); }
+    else if(facing === "right"){ ctx.fillStyle="#E8C158"; ctx.fillRect(originX+11*scale,oy-1*scale,scale,scale); }
+  }
+}
+
+/* ============================================================
+   PAUSE MENU
+   ============================================================ */
+document.getElementById("pauseBtn").addEventListener("click", ()=>{
+  document.getElementById("pauseOverlay").classList.add("show");
+});
+document.getElementById("pauseResumeBtn").addEventListener("click", ()=>{
+  document.getElementById("pauseOverlay").classList.remove("show");
+});
+document.getElementById("pauseAchBtn").addEventListener("click", ()=>{
+  document.getElementById("pauseOverlay").classList.remove("show");
+  renderAchievements();
+  showScreen("achievements");
+});
+document.getElementById("pauseEditBtn").addEventListener("click", ()=>{
+  document.getElementById("pauseOverlay").classList.remove("show");
+  initCreator(state.character);
+  showScreen("creator");
+});
+document.getElementById("pauseResetBtn").addEventListener("click", ()=>{
+  if(confirm("Reset all Market Quest: Townsfolk progress on this device? This clears your character, XP, completed quests, and achievements. This cannot be undone.")){
+    state = defaultState();
+    currentAreaId = null;
+    saveState();
+    document.getElementById("pauseOverlay").classList.remove("show");
+    initCreator(null);
+    showScreen("creator");
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function enterWorld(){
+  showScreen("world");
+  if(currentAreaId === null){
+    loadArea("hub");
+  }
+  if(worldRafId) cancelAnimationFrame(worldRafId);
+  worldLoop();
+}
+function init(){
+  if(state.character && state.character.name){
+    enterWorld();
+  } else {
+    initCreator(null);
+    showScreen("creator");
+  }
+}
+init();
+</script>
+</body>
+</html>
