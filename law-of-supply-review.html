@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Law of Supply Review — HSE Indiana Economics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14181c;
+    --paper:#fafaf8;
+    --panel:#ffffff;
+    --line:#e4e4e0;
+    --line-strong:#c9c9c3;
+    --muted:#6b6f76;
+    --accent:#004a9f;
+    --accent-dark:#0a3a78;
+    --accent-soft:#e8f0fb;
+    --wrong:#cd0d32;
+    --wrong-soft:#fbe9ec;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(20,24,28,0.04), 0 6px 20px rgba(20,24,28,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 90px;}
+
+  /* ---------- Header ---------- */
+  header.app-head{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+    background:var(--accent);color:#fff;
+    padding:26px 28px 24px;border-radius:14px;margin-bottom:26px;
+    box-shadow:var(--shadow);position:relative;flex-wrap:wrap;
+  }
+  header.app-head::after{
+    content:"";position:absolute;left:0;right:0;bottom:-4px;height:4px;
+    background:var(--wrong);border-radius:0 0 14px 14px;
+  }
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.14em;
+    text-transform:uppercase;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,4vw,34px);
+    line-height:1.1;margin:0 0 6px;letter-spacing:-0.01em;color:#fff;
+  }
+  .subtitle{color:rgba(255,255,255,0.85);font-size:14.5px;max-width:44ch;}
+  .modes-box{
+    font-family:'JetBrains Mono',monospace;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:12px 18px;text-align:right;min-width:160px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.14);
+  }
+  .modes-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+  .modes-value{font-size:13px;font-weight:700;color:var(--accent-dark);line-height:1.5;}
+
+  /* ---------- Tabs ---------- */
+  nav.tabs{display:flex;gap:8px;margin-bottom:22px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .tab-btn{
+    appearance:none;border:none;background:transparent;font-family:'Inter',sans-serif;
+    font-weight:600;font-size:14.5px;color:var(--muted);padding:10px 4px;margin-right:24px;
+    cursor:pointer;position:relative;top:1px;
+  }
+  .tab-btn .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--line-strong);margin-right:7px;}
+  .tab-btn.active{color:var(--ink);}
+  .tab-btn.active .num{color:var(--accent);}
+  .tab-btn::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:transparent;}
+  .tab-btn.active::after{background:var(--accent);}
+  .tab-btn:hover{color:var(--ink);}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+  .panel-title{font-family:'Fraunces',serif;font-size:20px;font-weight:600;}
+  .panel-desc{color:var(--muted);font-size:13.5px;margin-top:3px;max-width:52ch;}
+  .panel-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+
+  button{font-family:inherit;}
+  button.ghost-btn{
+    appearance:none;background:var(--panel);border:1px solid var(--line-strong);color:var(--ink);
+    font-weight:600;font-size:13px;padding:8px 14px;border-radius:9px;cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  button.ghost-btn:hover{border-color:var(--accent);background:var(--accent-soft);}
+  button.solid-btn{
+    appearance:none;background:var(--accent);border:1px solid var(--accent);color:#fff;
+    font-weight:600;font-size:13.5px;padding:9px 18px;border-radius:9px;cursor:pointer;
+    transition:background .15s ease;
+  }
+  button.solid-btn:hover{background:var(--accent-dark);}
+  button.solid-btn:disabled{opacity:0.45;cursor:not-allowed;}
+  button:focus-visible{outline:3px solid #ffb703;outline-offset:2px;}
+
+  .score-chip{
+    font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--accent-soft);
+    color:var(--accent-dark);border:1px solid #c3d7f0;padding:6px 12px;border-radius:20px;font-weight:600;
+    white-space:nowrap;
+  }
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:24px;
+  }
+
+  /* ========== SORTER MODE ========== */
+  .scenario-count{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);
+    letter-spacing:.04em;margin-bottom:10px;}
+  .scenario-text{
+    font-family:'Fraunces',serif;font-size:19px;line-height:1.5;color:var(--ink);margin-bottom:22px;
+  }
+  .sort-choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){.sort-choices{grid-template-columns:1fr;}}
+  .choice-btn{
+    appearance:none;cursor:pointer;border-radius:12px;border:2px solid var(--line-strong);
+    background:#fff;padding:18px 16px;text-align:left;transition:border-color .12s ease, background .12s ease, transform .08s ease;
+  }
+  .choice-btn:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .choice-btn .choice-head{font-weight:700;font-size:15px;margin-bottom:4px;color:var(--ink);}
+  .choice-btn .choice-sub{font-size:12.5px;color:var(--muted);}
+  .choice-btn.pick-correct{border-color:var(--accent);background:var(--accent-soft);}
+  .choice-btn.pick-wrong{border-color:var(--wrong);background:var(--wrong-soft);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn:disabled:hover{transform:none;}
+
+  .feedback-box{
+    margin-top:18px;padding:16px 18px;border-radius:10px;border:1px solid var(--line);
+    background:#f6f7f8;font-size:14px;line-height:1.55;display:none;
+  }
+  .feedback-box.show{display:block;}
+  .feedback-box.good{border-color:#c3d7f0;background:var(--accent-soft);}
+  .feedback-box.bad{border-color:#f2c1cb;background:var(--wrong-soft);}
+  .feedback-verdict{font-weight:700;margin-bottom:4px;}
+  .feedback-verdict.good-text{color:var(--accent-dark);}
+  .feedback-verdict.bad-text{color:var(--wrong);}
+
+  .panel-foot{display:flex;justify-content:flex-end;margin-top:20px;}
+
+  .end-screen{text-align:center;padding:36px 20px;}
+  .end-screen .big-num{font-family:'Fraunces',serif;font-size:46px;font-weight:700;color:var(--accent-dark);}
+  .end-screen .big-label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .missed-list{text-align:left;max-width:600px;margin:22px auto 0;}
+  .missed-item{border-top:1px solid var(--line);padding:12px 2px;font-size:13.5px;line-height:1.5;}
+  .missed-item .m-q{font-weight:600;margin-bottom:3px;}
+  .missed-item .m-a{color:var(--accent-dark);}
+
+  /* ========== GRAPH MODE ========== */
+  .graph-layout{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start;}
+  @media (max-width:760px){.graph-layout{grid-template-columns:1fr;}}
+  .graph-visual{background:#fcfcfb;border:1px solid var(--line);border-radius:10px;padding:10px;}
+  .graph-caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-align:center;margin-top:4px;}
+  .grid-line{stroke:#e9eaea;stroke-width:1;}
+  .axis-line{stroke:#8a9099;stroke-width:1.4;}
+  .axis-tick{font-family:'JetBrains Mono',monospace;font-size:10px;fill:#6b6f76;}
+  .axis-label{font-family:'Inter',sans-serif;font-size:10.5px;fill:#4a4f56;font-weight:600;}
+  .curve-line{fill:none;stroke:var(--accent);stroke-width:2.4;}
+  .curve-line.alt{stroke:var(--wrong);}
+  .curve-dot{fill:var(--accent);stroke:#fff;stroke-width:1.4;}
+  .curve-dot.alt{fill:var(--wrong);}
+  .hl-line{stroke:#f4a300;stroke-width:1.6;stroke-dasharray:4 3;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;}
+  .data-table th,.data-table td{border:1px solid var(--line);padding:6px 8px;text-align:center;}
+  .data-table th{background:#f3f5f7;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.02em;}
+  .dataset-name{font-weight:700;font-size:13.5px;margin-bottom:6px;color:var(--accent-dark);}
+  .graph-prompt{font-family:'Fraunces',serif;font-size:18px;line-height:1.5;margin:18px 0 16px;}
+  .graph-options{display:flex;flex-direction:column;gap:10px;}
+  .opt-btn{
+    appearance:none;cursor:pointer;text-align:left;border-radius:10px;border:2px solid var(--line-strong);
+    background:#fff;padding:12px 14px;font-size:14px;font-weight:600;color:var(--ink);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.pick-correct{border-color:var(--accent);background:var(--accent-soft);}
+  .opt-btn.pick-wrong{border-color:var(--wrong);background:var(--wrong-soft);}
+  .opt-btn:disabled{cursor:default;}
+  .shape-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .shape-btn{padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .shape-btn span{font-size:11.5px;font-weight:600;color:var(--muted);}
+  .dual-graph{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* ========== BLITZ MODE ========== */
+  .blitz-intro{text-align:center;padding:30px 16px;}
+  .blitz-intro p{max-width:52ch;margin:0 auto 22px;color:var(--muted);font-size:14.5px;line-height:1.6;}
+  .blitz-live{display:none;}
+  .blitz-live.show{display:block;}
+  .blitz-bar-track{height:10px;background:#eceef0;border-radius:6px;overflow:hidden;margin-bottom:8px;}
+  .blitz-bar-fill{height:100%;background:var(--accent);width:100%;transition:width .25s linear, background .25s ease;}
+  .blitz-bar-fill.hot{background:var(--wrong);}
+  .blitz-stats{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:20px;flex-wrap:wrap;gap:8px;}
+  .blitz-stats b{color:var(--ink);font-size:15px;}
+  .blitz-clock{font-size:20px;font-weight:700;color:var(--accent-dark);}
+  .blitz-clock.hot{color:var(--wrong);animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+  .blitz-q{font-family:'Fraunces',serif;font-size:20px;line-height:1.45;margin-bottom:18px;min-height:58px;}
+  .blitz-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:560px){.blitz-options{grid-template-columns:1fr;}}
+  .blitz-opt{
+    appearance:none;cursor:pointer;border-radius:10px;border:2px solid var(--line-strong);
+    background:#fff;padding:16px 14px;font-size:15px;font-weight:700;color:var(--ink);
+    transition:transform .06s ease;
+  }
+  .blitz-opt:active{transform:scale(.97);}
+  .blitz-opt.flash-good{border-color:var(--accent);background:var(--accent-soft);}
+  .blitz-opt.flash-bad{border-color:var(--wrong);background:var(--wrong-soft);}
+  .blitz-card{position:relative;}
+  .blitz-card.shake{animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .popup{
+    position:absolute;top:-6px;right:14px;font-family:'JetBrains Mono',monospace;font-weight:700;
+    font-size:15px;color:var(--accent-dark);opacity:0;pointer-events:none;
+  }
+  .popup.pop{animation:popup .7s ease-out;}
+  @keyframes popup{0%{opacity:0;transform:translateY(0);}20%{opacity:1;}100%{opacity:0;transform:translateY(-26px);}}
+  .tier-badge{
+    display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;
+    text-transform:uppercase;font-weight:700;padding:6px 16px;border-radius:20px;margin:10px 0 4px;
+  }
+  .tier-bronze{background:#f3e6d8;color:#8a5a1e;}
+  .tier-silver{background:#e7e9ec;color:#54595f;}
+  .tier-gold{background:#fbead0;color:#96690a;}
+  .tier-platinum{background:var(--accent-soft);color:var(--accent-dark);}
+
+  footer{text-align:center;color:#8B94A3;font-size:12px;margin-top:32px;}
+
+  @media (prefers-reduced-motion: reduce){
+    .blitz-card.shake, .blitz-clock.hot, .popup.pop{animation:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app-head">
+    <div>
+      <div class="brand-eyebrow">HSE Indiana Economics &middot; Day 14</div>
+      <h1>Back on the Floor</h1>
+      <div class="subtitle">A Law of Supply review in three rounds — sort the shifts, read the curves, and survive the Blitz.</div>
+    </div>
+    <div class="modes-box">
+      <div class="modes-label">3 Challenges</div>
+      <div class="modes-value">Sorter<br>Curves<br>Blitz</div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="sort"><span class="num">01</span>Movement or Shift?</button>
+    <button class="tab-btn" data-tab="graph"><span class="num">02</span>Read the Curve</button>
+    <button class="tab-btn" data-tab="blitz"><span class="num">03</span>Blitz</button>
+  </nav>
+
+  <!-- ================= SORTER PANEL ================= -->
+  <section class="panel active" id="panel-sort">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Movement or Shift?</div>
+        <div class="panel-desc">Every scenario changes how much producers offer. Decide: did the good's own price cause it (a movement along the supply curve), or did something else cause it (a shift of the whole curve)?</div>
+      </div>
+      <div class="panel-actions">
+        <span class="score-chip" id="sort-score-chip">0 / 0</span>
+        <button class="ghost-btn" id="sort-restart">Shuffle &amp; Restart</button>
+      </div>
+    </div>
+    <div class="card" id="sort-card"></div>
+  </section>
+
+  <!-- ================= GRAPH PANEL ================= -->
+  <section class="panel" id="panel-graph">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Read the Curve</div>
+        <div class="panel-desc">Three producers, three supply schedules. Read the table and the graph carefully — some questions hinge on a single number.</div>
+      </div>
+      <div class="panel-actions">
+        <span class="score-chip" id="graph-score-chip">0 / 0</span>
+        <button class="ghost-btn" id="graph-restart">Shuffle &amp; Restart</button>
+      </div>
+    </div>
+    <div class="card" id="graph-card"></div>
+  </section>
+
+  <!-- ================= BLITZ PANEL ================= -->
+  <section class="panel" id="panel-blitz">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Blitz</div>
+        <div class="panel-desc">75 seconds. Rapid-fire vocabulary and concept checks. Build a streak to multiply your points — one miss resets the multiplier, not the clock.</div>
+      </div>
+      <div class="panel-actions">
+        <span class="score-chip" id="blitz-best-chip">Best: 0</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="blitz-intro" id="blitz-intro">
+        <p>Answer as many as you can before time runs out. Correct answers build a streak — hit a streak of 5 for 2&times; points, 10 for 3&times;. A miss costs your multiplier, not a life, so keep swinging.</p>
+        <button class="solid-btn" id="blitz-start">Start Blitz — 75 sec</button>
+      </div>
+      <div class="blitz-live" id="blitz-live">
+        <div class="blitz-bar-track"><div class="blitz-bar-fill" id="blitz-bar"></div></div>
+        <div class="blitz-stats">
+          <span>SCORE <b id="blitz-score">0</b></span>
+          <span class="blitz-clock" id="blitz-clock">75</span>
+          <span>STREAK <b id="blitz-streak">0</b> &nbsp;(&times;<span id="blitz-mult">1</span>)</span>
+        </div>
+        <div class="blitz-card" id="blitz-card">
+          <div class="popup" id="blitz-popup"></div>
+          <div class="blitz-q" id="blitz-q"></div>
+          <div class="blitz-options" id="blitz-options"></div>
+        </div>
+      </div>
+      <div class="end-screen" id="blitz-end" style="display:none;"></div>
+    </div>
+  </section>
+
+  <footer>HSE Indiana Economics &middot; Mr. Moon</footer>
+</div>
+
+<script>
+/* ============================================================
+   SHARED HELPERS
+   ============================================================ */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pickRandomDistinct(arr, count, exclude){
+  const pool = arr.filter(x=>x!==exclude);
+  return shuffle(pool).slice(0,count);
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================================================
+   MODE 1 — MOVEMENT OR SHIFT SORTER
+   ============================================================ */
+const SORT_BANK = [
+  {
+    text: "A screen-printing shop raises its t-shirt price from $12 to $18, and starts running its presses two extra hours a day to keep up.",
+    answer: "movement",
+    explain: "The t-shirt's own price changed, and the shop responded by offering more. That's a slide up along the existing supply curve — a change in quantity supplied."
+  },
+  {
+    text: "An orange grove buys a $40,000 automated picker. Now it lists noticeably more oranges for sale than it used to, regardless of where the price lands.",
+    answer: "shift",
+    explain: "Technology changed what the grove can produce, regardless of price. When a change applies across the board instead of reacting to today's price, the entire curve shifts right."
+  },
+  {
+    text: "A hard freeze wipes out a third of Florida's orange trees. Growers list smaller quantities than usual this season.",
+    answer: "shift",
+    explain: "A production disruption changes the whole schedule of what growers can offer — that's a leftward shift, not a response to the price of oranges."
+  },
+  {
+    text: "The price of oranges falls after a bumper harvest elsewhere. Struggling growers scale back their own harvest crews for the rest of the season.",
+    answer: "movement",
+    explain: "It's a drop in the price of oranges itself that caused less to be harvested — a slide down the existing supply curve."
+  },
+  {
+    text: "A city cuts its food-truck permit fee in half. Twelve new trucks show up downtown, all selling tacos at the going rate.",
+    answer: "shift",
+    explain: "A lower cost of doing business plus more sellers entering raises the quantity offered, including at today's price — the curve shifts right."
+  },
+  {
+    text: "Taco prices jump from $3 to $5 during a festival weekend, and the same trucks start serving 40% more tacos an hour.",
+    answer: "movement",
+    explain: "The taco's own price rose and the existing trucks supplied more in response — a movement up the curve."
+  },
+  {
+    text: "A leather shortage pushes tannery prices up. A boot maker raises its own boot prices and still ships fewer pairs than last quarter.",
+    answer: "shift",
+    explain: "Trap alert: the boot's own price did move, but that price hike was a reaction to rising input costs, not the cause of fewer boots. The input cost shifted the whole curve left — the price change just came along for the ride."
+  },
+  {
+    text: "A new machine lets a bakery mix dough in half the time. The bakery now offers noticeably more loaves than it used to.",
+    answer: "shift",
+    explain: "Technology again changes the entire schedule — a rightward shift."
+  },
+  {
+    text: "Flour prices spike. The bakery keeps its bread price exactly the same but quietly bakes fewer loaves each morning.",
+    answer: "shift",
+    explain: "Bread's own price never moved at all, so nothing here can be a movement along the curve. The whole curve shifted left instead."
+  },
+  {
+    text: "Bread prices drop during a slow week. The bakery bakes fewer loaves to match the lower price.",
+    answer: "movement",
+    explain: "Bread's own price fell and the bakery supplied less in response — a slide down the existing curve."
+  },
+  {
+    text: "State lawmakers add a $0.50-per-gallon tax on gasoline, paid by refiners. Refiners list smaller quantities on the market than before.",
+    answer: "shift",
+    explain: "A tax on producers raises their cost of doing business — a leftward shift, not a response to gasoline's own price."
+  },
+  {
+    text: "A subsidy pays wheat farmers $1 extra per bushel no matter the market price. Farmers plant more acres and offer much bigger harvests than before.",
+    answer: "shift",
+    explain: "A subsidy changes what's profitable no matter the price, so the whole curve shifts right."
+  },
+  {
+    text: "Corn prices climb from $4 to $7 a bushel, and farmers switch idle fields over to corn, harvesting a much bigger crop.",
+    answer: "movement",
+    explain: "Corn's own price rose and farmers supplied more in response — a movement up the existing curve."
+  },
+  {
+    text: "Three new barbershops open in town after cosmetology school enrollment doubles. More haircuts are now available around town than before.",
+    answer: "shift",
+    explain: "More sellers in the market changes the total quantity offered — a rightward shift."
+  },
+  {
+    text: "A barbershop raises its haircut price from $18 to $25 during back-to-school week and books extra chairs to handle the rush.",
+    answer: "movement",
+    explain: "The haircut's own price rose and the shop supplied more in response — a movement up the curve."
+  },
+  {
+    text: "A phone-case factory floods and shuts down for two weeks. Nothing about the phone case's price changed, but the factory supplies zero units during the shutdown.",
+    answer: "shift",
+    explain: "Price never moved, so this cannot be a movement along the curve. Some other event knocked the entire curve down to zero for two weeks — a shift."
+  },
+  {
+    text: "A furniture shop's lumber costs spike. The shop raises its own table prices and still finishes fewer tables than last month.",
+    answer: "shift",
+    explain: "Same trap as the boot maker: the shop's own price moved, but only as a reaction to rising input costs. The real cause — pricier lumber — shifted the whole curve left."
+  }
+];
+
+let sortState = { order: [], idx: 0, correct: 0, answered: 0, missed: [] };
+
+function sortInit(){
+  sortState = { order: shuffle(SORT_BANK), idx: 0, correct: 0, answered: 0, missed: [] };
+  sortRender();
+}
+
+function sortUpdateChip(){
+  document.getElementById('sort-score-chip').textContent = sortState.correct + ' / ' + sortState.answered;
+}
+
+function sortRender(){
+  sortUpdateChip();
+  const card = document.getElementById('sort-card');
+  if(sortState.idx >= sortState.order.length){
+    const pct = sortState.order.length ? Math.round(100*sortState.correct/sortState.order.length) : 0;
+    let html = '<div class="end-screen">';
+    html += '<div class="big-label">Round complete</div>';
+    html += '<div class="big-num">' + sortState.correct + ' / ' + sortState.order.length + '</div>';
+    html += '<div style="color:var(--muted);font-size:13.5px;margin-top:4px;">' + pct + '% correct</div>';
+    if(sortState.missed.length){
+      html += '<div class="missed-list"><div style="font-weight:700;margin-bottom:4px;">Review these:</div>';
+      sortState.missed.forEach(m=>{
+        html += '<div class="missed-item"><div class="m-q">' + m.text + '</div><div class="m-a">Answer: ' + (m.answer==='movement' ? 'Movement (change in quantity supplied)' : 'Shift (change in supply)') + ' — ' + m.explain + '</div></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div style="color:var(--accent-dark);font-weight:600;margin-top:14px;">Perfect run — every scenario sorted correctly.</div>';
+    }
+    html += '</div>';
+    card.innerHTML = html;
+    return;
+  }
+  const item = sortState.order[sortState.idx];
+  card.innerHTML =
+    '<div class="scenario-count">SCENARIO ' + (sortState.idx+1) + ' OF ' + sortState.order.length + '</div>' +
+    '<div class="scenario-text">' + item.text + '</div>' +
+    '<div class="sort-choices">' +
+      '<button class="choice-btn" data-pick="movement"><div class="choice-head">&#8596; Movement</div><div class="choice-sub">Change in quantity supplied — caused by the good\'s own price</div></button>' +
+      '<button class="choice-btn" data-pick="shift"><div class="choice-head">&#8645; Shift</div><div class="choice-sub">Change in supply — caused by something other than price</div></button>' +
+    '</div>' +
+    '<div class="feedback-box" id="sort-feedback"></div>' +
+    '<div class="panel-foot"><button class="solid-btn" id="sort-next" disabled>Next &rarr;</button></div>';
+
+  card.querySelectorAll('.choice-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      card.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+      const pick = btn.dataset.pick;
+      const isCorrect = pick === item.answer;
+      sortState.answered++;
+      if(isCorrect){ sortState.correct++; btn.classList.add('pick-correct'); }
+      else {
+        btn.classList.add('pick-wrong');
+        card.querySelector('[data-pick="'+item.answer+'"]').classList.add('pick-correct');
+        sortState.missed.push(item);
+      }
+      const fb = document.getElementById('sort-feedback');
+      fb.classList.add('show', isCorrect ? 'good' : 'bad');
+      fb.innerHTML = '<div class="feedback-verdict ' + (isCorrect?'good-text':'bad-text') + '">' + (isCorrect ? 'Correct.' : 'Not quite.') + '</div>' + item.explain;
+      document.getElementById('sort-next').disabled = false;
+      sortUpdateChip();
+    });
+  });
+  document.getElementById('sort-next').addEventListener('click', ()=>{
+    sortState.idx++;
+    sortRender();
+  });
+}
+document.getElementById('sort-restart').addEventListener('click', sortInit);
+
+/* ============================================================
+   MODE 2 — READ THE CURVE
+   ============================================================ */
+const DATASETS = {
+  shirt: {
+    name: "Local T-Shirt Shop",
+    xLabel: "Price ($ per shirt)", yLabel: "Shirts / week",
+    xMin:6, xMax:20, xTicks:[8,10,12,14,16,18],
+    yMin:0, yMax:100, yTicks:[0,20,40,60,80,100],
+    points: [[8,20],[10,45],[12,65],[14,80],[16,90],[18,95]]
+  },
+  taco: {
+    name: "Downtown Food Truck",
+    xLabel: "Price ($ per taco)", yLabel: "Tacos / day",
+    xMin:1, xMax:7, xTicks:[2,3,4,5,6],
+    yMin:0, yMax:400, yTicks:[0,100,200,300,400],
+    points: [[2,40],[3,90],[4,160],[5,260],[6,380]]
+  },
+  furniture: {
+    name: "Custom Furniture Maker",
+    xLabel: "Price ($ per table)", yLabel: "Tables / month",
+    xMin:150, xMax:750, xTicks:[200,300,400,500,600,700],
+    yMin:0, yMax:15, yTicks:[0,5,10,15],
+    points: [[200,8],[300,10],[400,11],[500,12],[600,12],[700,13]]
+  }
+};
+
+function buildCurveSVG(dsKey, opts){
+  opts = opts || {};
+  const ds = DATASETS[dsKey];
+  const w = opts.w || 440, h = opts.h || 260;
+  const ml = opts.ml || 48, mr = opts.mr || 14, mt = opts.mt || 12, mb = opts.mb || 40;
+  const pw = w-ml-mr, ph = h-mt-mb;
+  const X = p => ml + (p-ds.xMin)/(ds.xMax-ds.xMin)*pw;
+  const Y = q => mt + ph - (q-ds.yMin)/(ds.yMax-ds.yMin)*ph;
+  let s = '<svg viewBox="0 0 '+w+' '+h+'" width="100%" xmlns="http://www.w3.org/2000/svg">';
+  ds.yTicks.forEach(q=>{
+    const y = Y(q);
+    s += '<line x1="'+ml+'" y1="'+y+'" x2="'+(ml+pw)+'" y2="'+y+'" class="grid-line"/>';
+    s += '<text x="'+(ml-8)+'" y="'+(y+4)+'" class="axis-tick" text-anchor="end">'+q+'</text>';
+  });
+  ds.xTicks.forEach(p=>{
+    const x = X(p);
+    s += '<line x1="'+x+'" y1="'+mt+'" x2="'+x+'" y2="'+(mt+ph)+'" class="grid-line"/>';
+    s += '<text x="'+x+'" y="'+(mt+ph+16)+'" class="axis-tick" text-anchor="middle">'+p+'</text>';
+  });
+  s += '<line x1="'+ml+'" y1="'+mt+'" x2="'+ml+'" y2="'+(mt+ph)+'" class="axis-line"/>';
+  s += '<line x1="'+ml+'" y1="'+(mt+ph)+'" x2="'+(ml+pw)+'" y2="'+(mt+ph)+'" class="axis-line"/>';
+  (opts.highlight||[]).forEach(p=>{
+    const x = X(p);
+    s += '<line x1="'+x+'" y1="'+(mt+ph)+'" x2="'+x+'" y2="'+Y(ds.points.find(pt=>pt[0]===p) ? ds.points.find(pt=>pt[0]===p)[1] : ds.yMin)+'" class="hl-line"/>';
+  });
+  const pts = ds.points.map(pt=>X(pt[0])+','+Y(pt[1])).join(' ');
+  s += '<polyline points="'+pts+'" class="curve-line'+(opts.alt?' alt':'')+'"/>';
+  ds.points.forEach(pt=>{
+    s += '<circle cx="'+X(pt[0])+'" cy="'+Y(pt[1])+'" r="4" class="curve-dot'+(opts.alt?' alt':'')+'"/>';
+  });
+  if(!opts.mini){
+    s += '<text x="'+(ml+pw/2)+'" y="'+(h-3)+'" class="axis-label" text-anchor="middle">'+ds.xLabel+'</text>';
+    s += '<text x="11" y="'+(mt+ph/2)+'" class="axis-label" text-anchor="middle" transform="rotate(-90,11,'+(mt+ph/2)+')">'+ds.yLabel+'</text>';
+  }
+  s += '</svg>';
+  return s;
+}
+
+function buildDataTable(dsKey){
+  const ds = DATASETS[dsKey];
+  let s = '<table class="data-table"><tr><th>Price</th>' + ds.points.map(p=>'<th>$'+p[0]+'</th>').join('') + '</tr>';
+  s += '<tr><th>Qty supplied</th>' + ds.points.map(p=>'<td>'+p[1]+'</td>').join('') + '</tr></table>';
+  return s;
+}
+
+function miniShapeSVG(kind, w, h){
+  w = w||130; h = h||90;
+  const ml=16, mr=8, mt=8, mb=8, pw=w-ml-mr, ph=h-mt-mb;
+  let path;
+  if(kind==='up-straight') path = [[ml,mt+ph],[ml+pw,mt]];
+  else if(kind==='up-flatten') path = [[ml,mt+ph],[ml+pw*0.35,mt+ph*0.35],[ml+pw*0.65,mt+ph*0.15],[ml+pw,mt+ph*0.08]];
+  else if(kind==='flat') path = [[ml,mt+ph*0.5],[ml+pw,mt+ph*0.5]];
+  else if(kind==='down') path = [[ml,mt],[ml+pw,mt+ph]];
+  const pts = path.map(p=>p[0]+','+p[1]).join(' ');
+  let s = '<svg viewBox="0 0 '+w+' '+h+'" width="120" height="84" xmlns="http://www.w3.org/2000/svg">';
+  s += '<line x1="'+ml+'" y1="'+mt+'" x2="'+ml+'" y2="'+(mt+ph)+'" class="axis-line"/>';
+  s += '<line x1="'+ml+'" y1="'+(mt+ph)+'" x2="'+(ml+pw)+'" y2="'+(mt+ph)+'" class="axis-line"/>';
+  s += '<polyline points="'+pts+'" class="curve-line" style="stroke-width:2.6"/>';
+  s += '</svg>';
+  return s;
+}
+
+const GRAPH_BANK = [
+  { ds:'shirt', highlight:[12], type:'graph',
+    prompt:"At a price of $12, how many shirts per week will the shop supply?",
+    options:["45","65","80","20"], correct:1,
+    explain:"Reading the table at $12 gives 65 shirts per week." },
+  { ds:'shirt', highlight:[10,14], type:'graph',
+    prompt:"If price rises from $10 to $14, what happens to quantity supplied?",
+    options:["It increases (45 &rarr; 80)","It decreases","It stays the same","Can't tell from a supply curve"], correct:0,
+    explain:"Price and quantity supplied move together — that's the Law of Supply. Quantity rises from 45 to 80." },
+  { ds:'shirt', highlight:[], type:'graph',
+    prompt:"At what price does the shop supply exactly 90 shirts?",
+    options:["$14","$16","$18","$12"], correct:1,
+    explain:"The table shows 90 shirts at a price of $16." },
+  { ds:'shirt', highlight:[], type:'graph',
+    prompt:"Between which two prices does quantity supplied grow the LEAST?",
+    options:["$8 to $10","$12 to $14","$16 to $18","$10 to $12"], correct:2,
+    explain:"$8&rarr;$10 gains 25 shirts, $10&rarr;$12 gains 20, $12&rarr;$14 gains 15, but $16&rarr;$18 gains only 5. The curve is flattening out at the top." },
+  { ds:'shirt', highlight:[], type:'graph',
+    prompt:"True or false: as price rises from $8 to $18, quantity supplied falls.",
+    options:["False — it rises","True — it falls"], correct:0,
+    explain:"Quantity supplied rises from 20 to 95 as price rises. That's the Law of Supply in action." },
+  { ds:'shirt', highlight:[14], type:'graph',
+    prompt:"Two identical shops each follow this exact schedule. At a price of $14, what is the total MARKET quantity supplied?",
+    options:["80","120","160","200"], correct:2,
+    explain:"Market supply is the sum of every producer's quantity supplied at that price: 80 + 80 = 160." },
+
+  { ds:'taco', highlight:[5], type:'graph',
+    prompt:"At a price of $5, how many tacos per day does the truck supply?",
+    options:["160","260","380","90"], correct:1,
+    explain:"The table shows 260 tacos per day at a price of $5." },
+  { ds:'taco', highlight:[3,5], type:'graph',
+    prompt:"If price falls from $5 to $3, what happens to quantity supplied?",
+    options:["It increases","It decreases (260 &rarr; 90)","It stays the same","It depends on demand"], correct:1,
+    explain:"A lower own-price means less is supplied — a slide down the curve from 260 to 90." },
+  { ds:'taco', highlight:[], type:'graph',
+    prompt:"At what price does daily supply first exceed 200 tacos?",
+    options:["$3","$4","$5","$6"], correct:2,
+    explain:"At $4 the truck supplies 160 (under 200). At $5 it supplies 260 — the first price that clears 200." },
+  { ds:'taco', highlight:[], type:'graph',
+    prompt:"Which price increase produces the BIGGEST jump in quantity supplied?",
+    options:["$2 to $3 (+50)","$3 to $4 (+70)","$4 to $5 (+100)","$5 to $6 (+120)"], correct:3,
+    explain:"The jumps get bigger at higher prices: +50, +70, +100, then +120 between $5 and $6 — the biggest single jump." },
+  { ds:'taco', highlight:[3], type:'graph',
+    prompt:"Three trucks each follow this exact schedule. At a price of $3, what is the total market supply?",
+    options:["180","230","270","300"], correct:2,
+    explain:"90 tacos per truck &times; 3 trucks = 270." },
+  { ds:'taco', highlight:[], type:'graph',
+    prompt:"If the price of tacos fell all the way to $1 — below anything on this table — what would the Law of Supply suggest about quantity supplied?",
+    options:["Less than 40, since the curve keeps sloping down toward lower prices","Exactly 40, same as at $2","More than 40, since low prices attract bargain hunters","We can say nothing at all about it"], correct:0,
+    explain:"The Law of Supply's direction holds even outside the data shown: as price keeps falling, quantity supplied should keep falling too — below the 40 tacos seen at $2, even though we can't know the exact number." },
+
+  { ds:'furniture', highlight:[500], type:'graph',
+    prompt:"At a price of $500, how many tables per month does the maker supply?",
+    options:["11","12","13","8"], correct:1,
+    explain:"The table shows 12 tables per month at a price of $500." },
+  { ds:'furniture', highlight:[400,600], type:'graph',
+    prompt:"If price rises from $400 to $600, what happens to quantity supplied?",
+    options:["It increases, from 11 to 12","It stays exactly the same at 11","It decreases","It doubles"], correct:0,
+    explain:"11 at $400 to 12 at $600 is a small but real increase — the Law of Supply still holds, even when the response is weak." },
+  { ds:'furniture', highlight:[500,600], type:'graph',
+    prompt:"Specifically between $500 and $600, does quantity supplied change at all?",
+    options:["No — it stays flat at 12","Yes — it rises to 13","Yes — it falls to 11","Can't tell"], correct:0,
+    explain:"Read the table carefully: both $500 and $600 show 12 tables. That one segment is completely flat, even though the wider $400-to-$600 range isn't." },
+  { ds:'furniture', highlight:[300], type:'graph',
+    prompt:"Two furniture makers each follow this exact schedule. At a price of $300, what is the total market supply?",
+    options:["10","16","20","22"], correct:2,
+    explain:"10 tables per maker &times; 2 makers = 20." },
+  { ds:'furniture', highlight:[], type:'graph', dual:'taco',
+    prompt:"Compare this maker's curve to the food truck's curve. Whose quantity supplied responds MORE strongly to a change in price?",
+    options:["The food truck — its curve climbs sharply","The furniture maker — its curve climbs sharply","Neither, they respond the same amount","Can't compare two different goods"], correct:0,
+    explain:"The food truck's curve climbs fast and keeps accelerating. The furniture maker's barely moves at all. A producer who can ramp up quickly (elastic supply) looks very different on a graph from one who can't (inelastic supply)." },
+  { ds:'furniture', highlight:[], type:'graph',
+    prompt:"A steep, nearly flat supply curve like this one usually means the producer...",
+    options:["Faces real limits on how fast output can rise, even as price rises","Can expand production instantly and cheaply","Has no cost of production at all","Ignores price completely when deciding output"], correct:0,
+    explain:"Custom furniture takes skilled labor and time — the maker can't simply crank out far more tables just because the price jumped. That capacity limit is exactly what an inelastic, nearly-flat curve represents." },
+
+  { type:'shape',
+    prompt:"Which of these CANNOT be a supply curve?",
+    shapeOptions:[
+      {kind:'up-straight', label:'Upward, straight'},
+      {kind:'up-flatten', label:'Upward, flattening'},
+      {kind:'flat', label:'Perfectly flat'},
+      {kind:'down', label:'Downward sloping'}
+    ],
+    correct:3,
+    explain:"The Law of Supply requires quantity supplied to rise (or at worst hold steady) as price rises. A downward-sloping curve describes demand, not supply." }
+];
+
+let graphState = { order: [], idx: 0, correct: 0, answered: 0, missed: [] };
+
+function graphInit(){
+  graphState = { order: shuffle(GRAPH_BANK), idx: 0, correct: 0, answered: 0, missed: [] };
+  graphRender();
+}
+function graphUpdateChip(){
+  document.getElementById('graph-score-chip').textContent = graphState.correct + ' / ' + graphState.answered;
+}
+
+function graphRender(){
+  graphUpdateChip();
+  const card = document.getElementById('graph-card');
+  if(graphState.idx >= graphState.order.length){
+    const pct = graphState.order.length ? Math.round(100*graphState.correct/graphState.order.length) : 0;
+    let html = '<div class="end-screen">';
+    html += '<div class="big-label">Round complete</div>';
+    html += '<div class="big-num">' + graphState.correct + ' / ' + graphState.order.length + '</div>';
+    html += '<div style="color:var(--muted);font-size:13.5px;margin-top:4px;">' + pct + '% correct</div>';
+    if(graphState.missed.length){
+      html += '<div class="missed-list"><div style="font-weight:700;margin-bottom:4px;">Review these:</div>';
+      graphState.missed.forEach(m=>{
+        html += '<div class="missed-item"><div class="m-q">' + m.prompt + '</div><div class="m-a">' + m.explain + '</div></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div style="color:var(--accent-dark);font-weight:600;margin-top:14px;">Perfect run — every question read correctly.</div>';
+    }
+    html += '</div>';
+    card.innerHTML = html;
+    return;
+  }
+  const item = graphState.order[graphState.idx];
+  let visualHtml;
+  if(item.type === 'shape'){
+    visualHtml = '<div class="shape-options" id="shape-visual-only" style="pointer-events:none;">' +
+      item.shapeOptions.map(o=>'<div class="shape-btn" style="border:2px solid var(--line);border-radius:10px;">'+miniShapeSVG(o.kind)+'<span>'+o.label+'</span></div>').join('') +
+      '</div>';
+  } else if(item.dual){
+    visualHtml = '<div class="dual-graph">' +
+      '<div><div class="dataset-name">'+DATASETS[item.ds].name+'</div>'+buildCurveSVG(item.ds,{w:210,h:200,mini:true})+'</div>' +
+      '<div><div class="dataset-name">'+DATASETS[item.dual].name+'</div>'+buildCurveSVG(item.dual,{w:210,h:200,mini:true,alt:true})+'</div>' +
+      '</div>';
+  } else {
+    visualHtml = '<div class="dataset-name">'+DATASETS[item.ds].name+'</div>' +
+      '<div class="graph-visual">' + buildCurveSVG(item.ds,{highlight:item.highlight}) + '</div>' +
+      '<div class="graph-caption">' + DATASETS[item.ds].yLabel + ' vs. ' + DATASETS[item.ds].xLabel + '</div>' +
+      buildDataTable(item.ds);
+  }
+
+  const optionsHtml = item.type === 'shape'
+    ? '' // options ARE the shapes above; handled specially below
+    : '<div class="graph-options">' + item.options.map((o,i)=>'<button class="opt-btn" data-i="'+i+'">'+o+'</button>').join('') + '</div>';
+
+  card.innerHTML =
+    '<div class="scenario-count">QUESTION ' + (graphState.idx+1) + ' OF ' + graphState.order.length + '</div>' +
+    '<div class="graph-layout">' +
+      '<div>' + visualHtml + '</div>' +
+      '<div>' +
+        '<div class="graph-prompt">' + item.prompt + '</div>' +
+        (item.type==='shape'
+          ? '<div class="graph-options" id="shape-answer-btns">' + item.shapeOptions.map((o,i)=>'<button class="opt-btn" data-i="'+i+'">'+o.label+'</button>').join('') + '</div>'
+          : optionsHtml
+        ) +
+        '<div class="feedback-box" id="graph-feedback"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="panel-foot"><button class="solid-btn" id="graph-next" disabled>Next &rarr;</button></div>';
+
+  card.querySelectorAll('.opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      card.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+      const i = parseInt(btn.dataset.i,10);
+      const isCorrect = i === item.correct;
+      graphState.answered++;
+      if(isCorrect){ graphState.correct++; btn.classList.add('pick-correct'); }
+      else {
+        btn.classList.add('pick-wrong');
+        card.querySelectorAll('.opt-btn')[item.correct].classList.add('pick-correct');
+        graphState.missed.push(item);
+      }
+      const fb = document.getElementById('graph-feedback');
+      fb.classList.add('show', isCorrect ? 'good' : 'bad');
+      fb.innerHTML = '<div class="feedback-verdict ' + (isCorrect?'good-text':'bad-text') + '">' + (isCorrect ? 'Correct.' : 'Not quite.') + '</div>' + item.explain;
+      document.getElementById('graph-next').disabled = false;
+      graphUpdateChip();
+    });
+  });
+  document.getElementById('graph-next').addEventListener('click', ()=>{
+    graphState.idx++;
+    graphRender();
+  });
+}
+document.getElementById('graph-restart').addEventListener('click', graphInit);
+
+/* ============================================================
+   MODE 3 — BLITZ
+   ============================================================ */
+const BLITZ_BANK = [
+  {q:"The Law of Supply states that as price rises, quantity supplied...", opts:["Rises","Falls","Stays the same"], correct:0},
+  {q:"True or false: the Law of Supply describes an inverse relationship between price and quantity supplied.", opts:["False — it's direct","True"], correct:0},
+  {q:"A supply curve is normally drawn sloping...", opts:["Upward, left to right","Downward, left to right"], correct:0},
+  {q:"The sum of every individual producer's quantity supplied at each price is called...", opts:["Market supply","Consumer surplus","Aggregate demand","Equilibrium"], correct:0},
+  {q:"As price rises, one reason the Law of Supply holds is that EXISTING firms...", opts:["Produce and sell more, since it's now more profitable","Shut down immediately","Refuse to change output","Lower their prices further"], correct:0},
+  {q:"Another reason the Law of Supply holds: as price rises, ______ firms may enter the market.", opts:["New","No"], correct:0},
+  {q:"A supply curve where quantity barely changes as price changes is called...", opts:["Inelastic supply","Elastic supply"], correct:0},
+  {q:"A supply curve where quantity changes a lot for a small price change is called...", opts:["Elastic supply","Inelastic supply"], correct:0},
+  {q:"A movement ALONG a supply curve is caused only by a change in...", opts:["The price of the good itself","The weather","Consumer taste","The number of sellers"], correct:0},
+  {q:"A shift of an ENTIRE supply curve is caused by...", opts:["A non-price determinant, like cost or technology","The good's own price changing"], correct:0},
+  {q:"True or false: 'supply' and 'quantity supplied' mean exactly the same thing.", opts:["False","True"], correct:0},
+  {q:"In the Trading Floor game, which round had a slow start, then a flood of new sellers as price rose?", opts:["Round 2","Round 1"], correct:0},
+  {q:"In the Trading Floor game, which round filled up fast and barely grew after $2?", opts:["Round 1","Round 2"], correct:0},
+  {q:"True or false: once a seller stood up in the Trading Floor game, they could sit back down at a higher price.", opts:["False","True"], correct:0},
+  {q:"On a standard price/quantity graph, which axis shows price?", opts:["The vertical (y) axis","The horizontal (x) axis"], correct:0},
+  {q:"As the price of a good rises, a producer's profit incentive to sell more of it generally...", opts:["Increases","Decreases","Disappears"], correct:0},
+  {q:"True or false: a supply schedule and a supply curve show the exact same information, just table vs. graph.", opts:["True","False"], correct:0},
+  {q:"A perfectly flat (horizontal) supply curve is considered...", opts:["Perfectly elastic","Perfectly inelastic"], correct:0},
+  {q:"A perfectly vertical supply curve is considered...", opts:["Perfectly inelastic","Perfectly elastic"], correct:0},
+  {q:"The assumption that all other factors are held constant is called...", opts:["Ceteris paribus","Opportunity cost","Marginal analysis"], correct:0},
+  {q:"If gasoline producers face a new per-gallon tax, their supply curve...", opts:["Shifts left (decreases)","Shifts right (increases)","Doesn't move at all"], correct:0},
+  {q:"Time matters for elasticity of supply because producers usually need time to...", opts:["Expand capacity — build, hire, or retool","Change their prices instantly","Advertise more"], correct:0},
+  {q:"True or false: in the short run, supply tends to be MORE elastic than in the long run.", opts:["False — long run tends to be more elastic","True"], correct:0},
+  {q:"A price ceiling set below equilibrium would cause quantity supplied to...", opts:["Fall — less incentive to sell at the lower legal price","Rise sharply","Stay exactly the same"], correct:0}
+];
+
+let blitzState = { pool:[], idx:0, score:0, streak:0, best:0, endTime:0, timerId:null, missed:[] };
+
+function blitzMultiplier(streak){
+  if(streak >= 10) return 3;
+  if(streak >= 5) return 2;
+  return 1;
+}
+
+function blitzNextQuestion(){
+  if(blitzState.pool.length === 0) blitzState.pool = shuffle(BLITZ_BANK);
+  const item = blitzState.pool.pop();
+  blitzState.current = item;
+  const optOrder = item.opts.map((o,i)=>i);
+  const shuffled = shuffle(optOrder);
+  blitzState.currentCorrectPos = shuffled.indexOf(item.correct);
+  document.getElementById('blitz-q').textContent = item.q;
+  const optsDiv = document.getElementById('blitz-options');
+  optsDiv.innerHTML = shuffled.map((origIdx,pos)=>'<button class="blitz-opt" data-pos="'+pos+'">'+item.opts[origIdx]+'</button>').join('');
+  optsDiv.querySelectorAll('.blitz-opt').forEach(btn=>{
+    btn.addEventListener('click', blitzAnswer);
+  });
+}
+
+function blitzAnswer(e){
+  if(blitzState.locked) return;
+  blitzState.locked = true;
+  const pos = parseInt(e.currentTarget.dataset.pos,10);
+  const isCorrect = pos === blitzState.currentCorrectPos;
+  const card = document.getElementById('blitz-card');
+  const popup = document.getElementById('blitz-popup');
+  if(isCorrect){
+    blitzState.streak++;
+    blitzState.best = Math.max(blitzState.best, blitzState.streak);
+    const mult = blitzMultiplier(blitzState.streak);
+    const gain = 10*mult;
+    blitzState.score += gain;
+    e.currentTarget.classList.add('flash-good');
+    popup.textContent = '+'+gain;
+    popup.classList.remove('pop'); void popup.offsetWidth; popup.classList.add('pop');
+  } else {
+    blitzState.streak = 0;
+    e.currentTarget.classList.add('flash-bad');
+    card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    blitzState.missed.push(blitzState.current);
+  }
+  document.getElementById('blitz-score').textContent = blitzState.score;
+  document.getElementById('blitz-streak').textContent = blitzState.streak;
+  document.getElementById('blitz-mult').textContent = blitzMultiplier(blitzState.streak);
+  setTimeout(()=>{
+    if(blitzState.running){
+      blitzState.locked = false;
+      blitzNextQuestion();
+    }
+  }, 280);
+}
+
+function blitzTick(){
+  const remainMs = blitzState.endTime - Date.now();
+  const remain = Math.max(0, Math.ceil(remainMs/1000));
+  document.getElementById('blitz-clock').textContent = remain;
+  const pct = Math.max(0, remainMs / 75000 * 100);
+  document.getElementById('blitz-bar').style.width = pct + '%';
+  const hot = remain <= 15;
+  document.getElementById('blitz-clock').classList.toggle('hot', hot);
+  document.getElementById('blitz-bar').classList.toggle('hot', hot);
+  if(remainMs <= 0){
+    blitzEnd();
+  }
+}
+
+function blitzStart(){
+  blitzState = { pool: shuffle(BLITZ_BANK), idx:0, score:0, streak:0, best:blitzState.best||0, endTime: Date.now()+75000, missed:[], running:true, locked:false };
+  document.getElementById('blitz-intro').style.display = 'none';
+  document.getElementById('blitz-end').style.display = 'none';
+  document.getElementById('blitz-live').classList.add('show');
+  document.getElementById('blitz-score').textContent = '0';
+  document.getElementById('blitz-streak').textContent = '0';
+  document.getElementById('blitz-mult').textContent = '1';
+  blitzNextQuestion();
+  blitzState.timerId = setInterval(blitzTick, 200);
+  blitzTick();
+}
+
+function tierFor(score){
+  if(score >= 300) return {label:'Platinum', cls:'tier-platinum'};
+  if(score >= 200) return {label:'Gold', cls:'tier-gold'};
+  if(score >= 100) return {label:'Silver', cls:'tier-silver'};
+  return {label:'Bronze', cls:'tier-bronze'};
+}
+
+function blitzEnd(){
+  blitzState.running = false;
+  clearInterval(blitzState.timerId);
+  document.getElementById('blitz-live').classList.remove('show');
+  const tier = tierFor(blitzState.score);
+  document.getElementById('blitz-best-chip').textContent = 'Best: ' + Math.max(blitzState.score, parseInt((document.getElementById('blitz-best-chip').textContent.match(/\d+/)||[0])[0],10));
+  let html = '<div class="big-label">Time&apos;s up</div>';
+  html += '<div class="big-num">' + blitzState.score + '</div>';
+  html += '<div class="tier-badge ' + tier.cls + '">' + tier.label + '</div>';
+  html += '<div style="color:var(--muted);font-size:13.5px;margin-top:6px;">Best streak: ' + blitzState.best + '</div>';
+  if(blitzState.missed.length){
+    const seen = new Set();
+    html += '<div class="missed-list"><div style="font-weight:700;margin-bottom:4px;">Missed along the way:</div>';
+    blitzState.missed.forEach(m=>{
+      if(seen.has(m.q)) return;
+      seen.add(m.q);
+      html += '<div class="missed-item"><div class="m-q">' + m.q + '</div><div class="m-a">Answer: ' + m.opts[m.correct] + '</div></div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="color:var(--accent-dark);font-weight:600;margin-top:14px;">Flawless blitz — nothing missed.</div>';
+  }
+  html += '<div style="margin-top:22px;"><button class="solid-btn" id="blitz-again">Play Again</button></div>';
+  const end = document.getElementById('blitz-end');
+  end.innerHTML = html;
+  end.style.display = 'block';
+  document.getElementById('blitz-again').addEventListener('click', blitzStart);
+}
+
+document.getElementById('blitz-start').addEventListener('click', blitzStart);
+
+/* ============================================================
+   INIT
+   ============================================================ */
+sortInit();
+graphInit();
+</script>
+</body>
+</html>
