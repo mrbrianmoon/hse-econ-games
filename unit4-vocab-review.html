@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 4 Vocabulary Review | HSE Economics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14181c;
+    --paper:#fafaf8;
+    --panel:#ffffff;
+    --line:#e4e4e0;
+    --line-strong:#c9c9c3;
+    --muted:#6b6f76;
+    --accent:#004a9f;       /* HSE Indiana Economics royal blue */
+    --accent-dark:#0a3a78;
+    --accent-soft:#e8f0fb;
+    --wrong:#cd0d32;        /* HSE red divider stripe */
+    --wrong-soft:#fbe9ec;
+    --gold:#cd0d32;
+    --gold-soft:#fbe9ec;
+    --radius:14px;
+    --shadow: 0 1px 2px rgba(20,24,28,0.04), 0 6px 20px rgba(20,24,28,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:28px 20px 80px;
+  }
+
+  
+  header.app-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+    background:var(--accent);
+    color:#fff;
+    padding:26px 28px 24px;
+    border-radius:14px;
+    margin-bottom:30px;
+    box-shadow:var(--shadow);
+    position:relative;
+    flex-wrap:wrap;
+  }
+  header.app-head::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-4px;
+    height:4px;
+    background:var(--wrong);
+    border-radius:0 0 14px 14px;
+  }
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.8);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,34px);
+    line-height:1.1;
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+    color:#fff;
+  }
+  .subtitle{
+    color:rgba(255,255,255,0.85);
+    font-size:14.5px;
+    max-width:46ch;
+  }
+  .streak-box{
+    font-family:'JetBrains Mono',monospace;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 18px;
+    text-align:right;
+    min-width:150px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.14);
+  }
+  .streak-label{
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .streak-value{
+    font-size:26px;
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+
+  /* ---------- Tabs ---------- */
+  nav.tabs{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    appearance:none;
+    border:none;
+    background:transparent;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--muted);
+    padding:10px 4px;
+    margin-right:22px;
+    cursor:pointer;
+    position:relative;
+    top:1px;
+  }
+  .tab-btn .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--line-strong);
+    margin-right:7px;
+  }
+  .tab-btn.active{color:var(--ink);}
+  .tab-btn.active .num{color:var(--accent);}
+  .tab-btn::after{
+    content:"";
+    position:absolute;
+    left:0;right:0;bottom:-1px;
+    height:2px;
+    background:transparent;
+  }
+  .tab-btn.active::after{background:var(--accent);}
+  .tab-btn:hover{color:var(--ink);}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  .panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .panel-title{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    font-weight:600;
+  }
+  .panel-desc{
+    color:var(--muted);
+    font-size:13.5px;
+    margin-top:2px;
+  }
+
+  button.ghost-btn{
+    appearance:none;
+    background:var(--panel);
+    border:1px solid var(--line-strong);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    padding:8px 14px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  button.ghost-btn:hover{border-color:var(--accent); background:var(--accent-soft);}
+
+  button.solid-btn{
+    appearance:none;
+    background:var(--accent);
+    border:1px solid var(--accent);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 18px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  button.solid-btn:hover{background:var(--accent-dark);}
+  button.solid-btn:disabled{opacity:0.45; cursor:not-allowed;}
+
+  button.reset-btn{
+    appearance:none;
+    background:transparent;
+    border:1px solid var(--line-strong);
+    color:var(--wrong);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.03em;
+    padding:7px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  button.reset-btn:hover{background:var(--wrong-soft); border-color:var(--wrong);}
+
+  .score-chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    background:var(--accent-soft);
+    color:var(--accent-dark);
+    border:1px solid #c3d7f0;
+    padding:6px 12px;
+    border-radius:20px;
+    font-weight:600;
+  }
+
+  /* ========== MATCHING GAME ========== */
+  .match-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:10px;
+  }
+  .match-card{
+    min-height:110px;
+    border:1px solid var(--line-strong);
+    border-radius:10px;
+    background:var(--panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:10px;
+    font-size:13px;
+    line-height:1.35;
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .12s ease, background .12s ease, transform .1s ease;
+    box-shadow:var(--shadow);
+  }
+  .match-card.term{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+    color:var(--accent-dark);
+  }
+  .match-card:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .match-card.selected{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+  }
+  .match-card.correct{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent-dark);
+    opacity:0.55;
+    cursor:default;
+    pointer-events:none;
+  }
+  .match-card.wrong{
+    background:var(--wrong-soft);
+    border-color:var(--wrong);
+    animation:shake .32s;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+  .match-win{
+    text-align:center;
+    padding:40px 20px;
+  }
+  .match-win h3{
+    font-family:'Fraunces',serif;
+    font-size:24px;
+    margin-bottom:6px;
+  }
+
+  /* ========== FLASHCARDS ========== */
+  .flash-stage{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  .flash-counter{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:0.05em;
+  }
+  .flashcard{
+    width:100%;
+    max-width:520px;
+    min-height:260px;
+    perspective:1200px;
+    cursor:pointer;
+  }
+  .flashcard-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    min-height:260px;
+    transition:transform .5s cubic-bezier(.2,.9,.3,1);
+    transform-style:preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .flash-face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:16px;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+    box-shadow:var(--shadow);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:34px 30px;
+  }
+  .flash-face.front{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(24px,4vw,32px);
+    color:var(--ink);
+  }
+  .flash-face.back{
+    transform:rotateY(180deg);
+    background:var(--accent);
+    color:#fff;
+    font-size:16px;
+    line-height:1.5;
+  }
+  .flash-hint{
+    position:absolute;
+    bottom:14px;
+    left:0;right:0;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--line-strong);
+  }
+  .flash-face.back .flash-hint{color:rgba(255,255,255,0.6);}
+
+  .flash-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .flash-know-row{
+    display:flex;
+    gap:10px;
+  }
+  button.know-btn, button.review-btn{
+    appearance:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:9px;
+    cursor:pointer;
+    border:1px solid var(--line-strong);
+    background:var(--panel);
+  }
+  button.know-btn:hover{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-dark);}
+  button.review-btn:hover{border-color:var(--wrong); background:var(--wrong-soft); color:var(--wrong);}
+
+  /* ========== FILL IN THE BLANK ========== */
+  .fib-card{
+    background:var(--panel);
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:32px;
+    box-shadow:var(--shadow);
+    max-width:640px;
+    margin:0 auto;
+  }
+  .fib-progress{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    letter-spacing:0.05em;
+    margin-bottom:16px;
+  }
+  .fib-prompt{
+    font-size:17px;
+    line-height:1.55;
+    margin-bottom:22px;
+  }
+  .fib-prompt .blank{
+    display:inline-block;
+    min-width:120px;
+    border-bottom:2px solid var(--accent);
+    color:var(--accent-dark);
+    font-weight:700;
+    font-family:'JetBrains Mono',monospace;
+    text-align:center;
+  }
+  .fib-input-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  input.fib-input{
+    flex:1;
+    min-width:180px;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:11px 14px;
+    border-radius:9px;
+    border:1px solid var(--line-strong);
+    background:var(--paper);
+    color:var(--ink);
+  }
+  input.fib-input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  input.fib-input.correct-input{border-color:var(--accent); background:var(--accent-soft);}
+  input.fib-input.wrong-input{border-color:var(--wrong); background:var(--wrong-soft);}
+
+  .fib-feedback{
+    margin-top:14px;
+    font-size:13.5px;
+    font-weight:600;
+    min-height:20px;
+  }
+  .fib-feedback.correct{color:var(--accent-dark);}
+  .fib-feedback.wrong{color:var(--wrong);}
+
+  .fib-done{
+    text-align:center;
+    padding:20px;
+  }
+
+  footer.note{
+    text-align:center;
+    color:var(--line-strong);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    margin-top:50px;
+    letter-spacing:0.04em;
+  }
+
+  @media (max-width:560px){
+    .streak-box{min-width:0;}
+    .fib-card{padding:22px;}
+  }
+
+  /* focus visibility for a11y */
+  button:focus-visible, .match-card:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .flashcard-inner{transition:none;}
+    .match-card{transition:none;}
+    @keyframes shake{0%,100%{transform:none;}}
+  }
+
+  /* ========== DEFINE IT ========== */
+  .def-card, .sent-card{
+    background:var(--panel);
+    border:1px solid var(--line-strong);
+    border-radius:16px;
+    padding:32px;
+    box-shadow:var(--shadow);
+    max-width:640px;
+    margin:0 auto;
+  }
+  .def-term{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(24px,4vw,30px);
+    color:var(--accent-dark);
+    margin-bottom:16px;
+  }
+  textarea.practice-input{
+    width:100%;
+    min-height:96px;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    padding:12px 14px;
+    border-radius:9px;
+    border:1px solid var(--line-strong);
+    background:var(--paper);
+    color:var(--ink);
+    resize:vertical;
+  }
+  textarea.practice-input:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  .reveal-box{
+    display:none;
+    margin-top:16px;
+    background:var(--accent-soft);
+    border-left:4px solid var(--accent);
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:15px;
+    line-height:1.5;
+  }
+  .reveal-box.show{display:block;}
+  .reveal-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--accent-dark);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .practice-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:16px;
+  }
+  .practice-nav{display:flex; gap:10px; flex-wrap:wrap;}
+  .pair-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .pair-chip{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    color:var(--accent-dark);
+    background:var(--accent-soft);
+    border:1px solid #c3d7f0;
+    border-radius:10px;
+    padding:8px 14px;
+  }
+  .pair-plus{font-family:'JetBrains Mono',monospace; color:var(--wrong); font-weight:700;}
+  .sent-help{color:var(--muted); font-size:13.5px; margin-bottom:14px;}
+  .practice-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--muted);
+    border:1px dashed var(--line-strong);
+    padding:6px 12px;
+    border-radius:20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app-head">
+    <div>
+      <div class="brand-eyebrow">HSE Indiana Economics · Unit 4</div>
+      <h1>Vocabulary Review: Market Structures</h1>
+      <div class="subtitle">27 terms from Sections 4.1 to 4.4, five ways to practice. Play a round, flip some cards, fill in the blanks, or put the words to work.</div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-label">Best streak</div>
+      <div class="streak-value" id="bestStreak">0</div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabNav">
+    <button class="tab-btn active" data-panel="match"><span class="num">01</span>Matching</button>
+    <button class="tab-btn" data-panel="flash"><span class="num">02</span>Flashcards</button>
+    <button class="tab-btn" data-panel="fib"><span class="num">03</span>Fill in the Blank</button>
+    <button class="tab-btn" data-panel="define"><span class="num">04</span>Define It</button>
+    <button class="tab-btn" data-panel="sentence"><span class="num">05</span>Sentence Building</button>
+  </nav>
+
+  <!-- ================= MATCHING ================= -->
+  <section class="panel active" id="panel-match">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Match the term to its definition</div>
+        <div class="panel-desc">Click a term, then click its matching definition. All 27 terms are in play.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="matchScore">Matched 0 / 27</span>
+        <button class="reset-btn" id="matchReset">RESET</button>
+      </div>
+    </div>
+    <div id="matchArea"></div>
+  </section>
+
+  <!-- ================= FLASHCARDS ================= -->
+  <section class="panel" id="panel-flash">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Flashcards</div>
+        <div class="panel-desc">Tap the card to flip it. Mark whether you knew it to track your progress.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="flashScore">Known 0 / 27</span>
+        <button class="reset-btn" id="flashReset">RESET</button>
+      </div>
+    </div>
+    <div class="flash-stage">
+      <div class="flash-counter" id="flashCounter">Card 1 of 27</div>
+      <div class="flashcard" id="flashcard">
+        <div class="flashcard-inner">
+          <div class="flash-face front" id="flashFront">Term<div class="flash-hint">Tap to reveal definition</div></div>
+          <div class="flash-face back" id="flashBack">Definition<div class="flash-hint">Tap to flip back</div></div>
+        </div>
+      </div>
+      <div class="flash-controls">
+        <button class="ghost-btn" id="flashPrev">&larr; Previous</button>
+        <button class="ghost-btn" id="flashShuffle">Shuffle</button>
+        <button class="ghost-btn" id="flashNext">Next &rarr;</button>
+      </div>
+      <div class="flash-know-row">
+        <button class="review-btn" id="flashReview">Still learning</button>
+        <button class="know-btn" id="flashKnow">I know this ✓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FILL IN THE BLANK ================= -->
+  <section class="panel" id="panel-fib">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Fill in the Blank</div>
+        <div class="panel-desc">Read the definition, type the vocabulary term it describes.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="score-chip" id="fibScore">Score 0 / 27</span>
+        <button class="reset-btn" id="fibReset">RESET</button>
+      </div>
+    </div>
+    <div class="fib-card" id="fibCard">
+      <div class="fib-progress" id="fibProgress">Question 1 of 27</div>
+      <div class="fib-prompt" id="fibPrompt"></div>
+      <div class="fib-input-row">
+        <input type="text" class="fib-input" id="fibInput" placeholder="Type the term..." autocomplete="off" spellcheck="false">
+        <button class="solid-btn" id="fibCheck">Check</button>
+      </div>
+      <div class="fib-feedback" id="fibFeedback"></div>
+    </div>
+  </section>
+
+  <!-- ================= DEFINE IT ================= -->
+  <section class="panel" id="panel-define">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Define It</div>
+        <div class="panel-desc">See the term, write the definition in your own words, then reveal the definition to check yourself.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="practice-tag">Practice only · not scored</span>
+        <button class="ghost-btn" id="defShuffle">Shuffle</button>
+      </div>
+    </div>
+    <div class="def-card">
+      <div class="fib-progress" id="defProgress">Term 1 of 27</div>
+      <div class="def-term" id="defTerm"></div>
+      <textarea class="practice-input" id="defInput" placeholder="Type your definition here..." spellcheck="true"></textarea>
+      <div class="reveal-box" id="defReveal"><div class="reveal-label">Definition</div><div id="defAnswer"></div></div>
+      <div class="practice-row">
+        <button class="solid-btn" id="defRevealBtn">Reveal definition</button>
+        <div class="practice-nav">
+          <button class="ghost-btn" id="defPrev">&larr; Previous</button>
+          <button class="ghost-btn" id="defNext">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SENTENCE BUILDING ================= -->
+  <section class="panel" id="panel-sentence">
+    <div class="panel-head">
+      <div>
+        <div class="panel-title">Sentence Building</div>
+        <div class="panel-desc">Use both terms in one sentence that shows you understand how they connect.</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="practice-tag">Practice only · not scored</span>
+        <button class="ghost-btn" id="sentShuffle">Shuffle</button>
+      </div>
+    </div>
+    <div class="sent-card">
+      <div class="fib-progress" id="sentProgress">Pair 1 of 15</div>
+      <div class="pair-row" id="sentPair"></div>
+      <div class="sent-help">Your sentence should show what each term means, not just include the words.</div>
+      <textarea class="practice-input" id="sentInput" placeholder="Write your sentence here..." spellcheck="true"></textarea>
+      <div class="reveal-box" id="sentReveal"><div class="reveal-label">One possible sentence</div><div id="sentAnswer"></div></div>
+      <div class="practice-row">
+        <button class="solid-btn" id="sentRevealBtn">Show an example</button>
+        <div class="practice-nav">
+          <button class="ghost-btn" id="sentPrev">&larr; Previous</button>
+          <button class="ghost-btn" id="sentNext">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note">RESET clears progress for that game only</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* Wrapped in an IIFE so no declaration collides with an element id (Safari/iPad SyntaxError). */
+const VOCAB = [
+  {
+    "term": "Pure Competition",
+    "def": "A market with many buyers and sellers, identical products, well-informed participants, and easy entry and exit. No single seller can affect the price."
+  },
+  {
+    "term": "Commodity",
+    "def": "A product that is the same no matter who makes it, such as sugar or notebook paper."
+  },
+  {
+    "term": "Barrier to Entry",
+    "def": "Anything that makes it hard for a new business to enter a market."
+  },
+  {
+    "term": "Imperfect Competition",
+    "def": "Any market structure that does not meet all the conditions of pure competition."
+  },
+  {
+    "term": "Start-Up Costs",
+    "def": "The money a new business must spend before it can begin operating."
+  },
+  {
+    "term": "Monopoly",
+    "def": "A market with only one seller of a product that has no close substitutes."
+  },
+  {
+    "term": "Economies of Scale",
+    "def": "When a firm's average cost per unit goes down as it produces more."
+  },
+  {
+    "term": "Natural Monopoly",
+    "def": "A market that runs most efficiently when one large firm provides all the output, such as a water utility."
+  },
+  {
+    "term": "Government Monopoly",
+    "def": "A monopoly that exists because the government created it or allows only one seller."
+  },
+  {
+    "term": "Patent",
+    "def": "A government grant giving an inventor the sole right to make and sell an invention for a set number of years."
+  },
+  {
+    "term": "Franchise",
+    "def": "The exclusive right to sell a good or service in a certain area."
+  },
+  {
+    "term": "License",
+    "def": "Government permission to own or operate a business."
+  },
+  {
+    "term": "Price Discrimination",
+    "def": "Charging different customers different prices for the same good or service."
+  },
+  {
+    "term": "Monopolistic Competition",
+    "def": "A market with many firms selling similar but not identical products."
+  },
+  {
+    "term": "Differentiation",
+    "def": "Making a product stand out from its competitors in some way."
+  },
+  {
+    "term": "Non-Price Competition",
+    "def": "Competing through ways other than lower prices, such as advertising, location, quality, or service."
+  },
+  {
+    "term": "Oligopoly",
+    "def": "A market controlled by a few large firms."
+  },
+  {
+    "term": "Price War",
+    "def": "A series of price cuts by competing firms trying to take customers from each other."
+  },
+  {
+    "term": "Collusion",
+    "def": "An illegal agreement between firms to set prices or limit how much they produce."
+  },
+  {
+    "term": "Price Fixing",
+    "def": "An agreement among firms to charge the same price or keep prices at a certain level."
+  },
+  {
+    "term": "Cartel",
+    "def": "A formal group of producers that agree to coordinate prices and production."
+  },
+  {
+    "term": "Market Power",
+    "def": "A firm's ability to control prices and total market supply."
+  },
+  {
+    "term": "Predatory Pricing",
+    "def": "Setting prices below cost for a period of time to drive competitors out of the market."
+  },
+  {
+    "term": "Antitrust Laws",
+    "def": "Laws that give the government power to break up monopolies, block harmful mergers, and keep markets competitive."
+  },
+  {
+    "term": "Trust",
+    "def": "A group of firms combined under one board to reduce competition in an industry."
+  },
+  {
+    "term": "Merger",
+    "def": "When two or more companies join to become one company."
+  },
+  {
+    "term": "Deregulation",
+    "def": "Removing government controls, such as price limits or entry rules, from a market."
+  }
+];
+
+const PAIRS = [
+  {
+    "a": "Pure Competition",
+    "b": "Commodity",
+    "example": "The wheat market is close to pure competition because wheat is a commodity, so buyers do not care which farm grew it."
+  },
+  {
+    "a": "Barrier to Entry",
+    "b": "Start-Up Costs",
+    "example": "The huge start-up costs of building a car factory act as a barrier to entry that keeps most new companies out of the auto industry."
+  },
+  {
+    "a": "Imperfect Competition",
+    "b": "Differentiation",
+    "example": "Coffee shops are an example of imperfect competition because differentiation, like a unique drink menu, lets each shop set its own prices."
+  },
+  {
+    "a": "Monopoly",
+    "b": "Patent",
+    "example": "A drug company can hold a monopoly on a new medicine while its patent protects it from competitors."
+  },
+  {
+    "a": "Natural Monopoly",
+    "b": "Economies of Scale",
+    "example": "The local water company is a natural monopoly because economies of scale make one large provider cheaper than several small ones."
+  },
+  {
+    "a": "Government Monopoly",
+    "b": "License",
+    "example": "The city created a government monopoly by granting only one company a license to collect trash."
+  },
+  {
+    "a": "Franchise",
+    "b": "Government Monopoly",
+    "example": "When a city gives one cable company a franchise to serve an area, it creates a kind of government monopoly."
+  },
+  {
+    "a": "Price Discrimination",
+    "b": "Market Power",
+    "example": "A movie theater uses its market power to practice price discrimination by charging students and seniors less for the same ticket."
+  },
+  {
+    "a": "Monopolistic Competition",
+    "b": "Non-Price Competition",
+    "example": "Pizza places are in monopolistic competition, so they rely on non-price competition like faster delivery and better ads to win customers."
+  },
+  {
+    "a": "Oligopoly",
+    "b": "Price War",
+    "example": "In the airline oligopoly, one carrier cutting fares can start a price war that lowers profits for every airline."
+  },
+  {
+    "a": "Collusion",
+    "b": "Price Fixing",
+    "example": "The executives were charged with collusion after they secretly agreed to a price fixing scheme for their products."
+  },
+  {
+    "a": "Cartel",
+    "b": "Oligopoly",
+    "example": "OPEC is a cartel of oil producing nations that acts like an oligopoly by coordinating how much oil each member produces."
+  },
+  {
+    "a": "Predatory Pricing",
+    "b": "Antitrust Laws",
+    "example": "Antitrust laws allow the government to take action when a large firm uses predatory pricing to drive small competitors out of business."
+  },
+  {
+    "a": "Trust",
+    "b": "Merger",
+    "example": "In the late 1800s, a merger of rival oil companies into a single trust gave one board control over most of the industry."
+  },
+  {
+    "a": "Deregulation",
+    "b": "Barrier to Entry",
+    "example": "Deregulation of the trucking industry removed a major barrier to entry, which allowed many new trucking companies to start."
+  }
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let bestStreak = 0;
+function updateBestStreak(n){
+  if(n > bestStreak){ bestStreak = n; document.getElementById('bestStreak').textContent = bestStreak; }
+}
+
+/* ============ TAB SWITCHING ============ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+/* ================= MATCHING GAME ================= */
+const matchArea = document.getElementById('matchArea');
+const matchScoreEl = document.getElementById('matchScore');
+let matchState = {};
+
+function initMatch(){
+  const terms = VOCAB.map((v,i)=>({ id:i, type:'term', text:v.term }));
+  const defs  = VOCAB.map((v,i)=>({ id:i, type:'def', text:v.def }));
+  const cards = shuffle(terms.concat(defs));
+  matchState = { cards, selected: [], matched: new Set(), lock:false };
+  renderMatch();
+}
+
+function renderMatch(){
+  matchArea.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'match-grid';
+  matchState.cards.forEach((c, idx)=>{
+    const el = document.createElement('div');
+    el.className = 'match-card ' + (c.type==='term' ? 'term' : 'def');
+    el.textContent = c.text;
+    el.dataset.idx = idx;
+    if(matchState.matched.has(c.id)){
+      el.classList.add('correct');
+    }
+    if(matchState.selected.some(s=>s.idx===idx)){
+      el.classList.add('selected');
+    }
+    el.addEventListener('click', ()=>onMatchCardClick(idx));
+    grid.appendChild(el);
+  });
+  matchArea.appendChild(grid);
+  matchScoreEl.textContent = `Matched ${matchState.matched.size} / ${VOCAB.length}`;
+
+  if(matchState.matched.size === VOCAB.length){
+    const win = document.createElement('div');
+    win.className = 'match-win';
+    win.innerHTML = `<h3>All ${VOCAB.length} matched 🎉</h3><p style="color:var(--muted)">Nice work. Hit reset to shuffle a new round.</p>`;
+    matchArea.appendChild(win);
+    updateBestStreak(VOCAB.length);
+  }
+}
+
+function onMatchCardClick(idx){
+  if(matchState.lock) return;
+  const card = matchState.cards[idx];
+  if(matchState.matched.has(card.id)) return;
+  if(matchState.selected.some(s=>s.idx===idx)) return;
+  if(matchState.selected.length === 1 && matchState.selected[0].card.type === card.type) return; // must pick term+def
+
+  matchState.selected.push({ idx, card });
+  renderMatch();
+
+  if(matchState.selected.length === 2){
+    matchState.lock = true;
+    const [a,b] = matchState.selected;
+    if(a.card.id === b.card.id){
+      setTimeout(()=>{
+        matchState.matched.add(a.card.id);
+        matchState.selected = [];
+        matchState.lock = false;
+        renderMatch();
+      }, 260);
+    } else {
+      const elA = matchArea.querySelector(`[data-idx="${a.idx}"]`);
+      const elB = matchArea.querySelector(`[data-idx="${b.idx}"]`);
+      if(elA) elA.classList.add('wrong');
+      if(elB) elB.classList.add('wrong');
+      setTimeout(()=>{
+        matchState.selected = [];
+        matchState.lock = false;
+        renderMatch();
+      }, 500);
+    }
+  }
+}
+
+document.getElementById('matchReset').addEventListener('click', initMatch);
+initMatch();
+
+/* ================= FLASHCARDS ================= */
+let flashOrder = shuffle(VOCAB.map((_,i)=>i));
+let flashIdx = 0;
+let flashKnown = new Set();
+let flashFlipped = false;
+
+const flashcardEl = document.getElementById('flashcard');
+const flashFront = document.getElementById('flashFront');
+const flashBack = document.getElementById('flashBack');
+const flashCounter = document.getElementById('flashCounter');
+const flashScoreEl = document.getElementById('flashScore');
+
+function renderFlash(){
+  const v = VOCAB[flashOrder[flashIdx]];
+  flashFront.innerHTML = v.term + '<div class="flash-hint">Tap to reveal definition</div>';
+  flashBack.innerHTML = v.def + '<div class="flash-hint">Tap to flip back</div>';
+  flashCounter.textContent = `Card ${flashIdx+1} of ${VOCAB.length}`;
+  flashScoreEl.textContent = `Known ${flashKnown.size} / ${VOCAB.length}`;
+  flashFlipped = false;
+  flashcardEl.classList.remove('flipped');
+}
+
+flashcardEl.addEventListener('click', ()=>{
+  flashFlipped = !flashFlipped;
+  flashcardEl.classList.toggle('flipped', flashFlipped);
+});
+
+document.getElementById('flashNext').addEventListener('click', ()=>{
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashPrev').addEventListener('click', ()=>{
+  flashIdx = (flashIdx-1 + VOCAB.length) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashShuffle').addEventListener('click', ()=>{
+  flashOrder = shuffle(VOCAB.map((_,i)=>i));
+  flashIdx = 0;
+  renderFlash();
+});
+document.getElementById('flashKnow').addEventListener('click', ()=>{
+  flashKnown.add(flashOrder[flashIdx]);
+  updateBestStreak(flashKnown.size);
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashReview').addEventListener('click', ()=>{
+  flashKnown.delete(flashOrder[flashIdx]);
+  flashIdx = (flashIdx+1) % VOCAB.length;
+  renderFlash();
+});
+document.getElementById('flashReset').addEventListener('click', ()=>{
+  flashOrder = shuffle(VOCAB.map((_,i)=>i));
+  flashIdx = 0;
+  flashKnown = new Set();
+  renderFlash();
+});
+renderFlash();
+
+/* ================= FILL IN THE BLANK ================= */
+let fibOrder = shuffle(VOCAB.map((_,i)=>i));
+let fibIdx = 0;
+let fibScore = 0;
+let fibAttempts = 0;       // attempts used on the current question
+let fibSettled = false;    // true once this question is scored (correct, or 2 misses); click advances instead of checking
+let fibPracticing = false; // true after a 2nd miss, while student re-types the answer for practice
+
+const fibScoreEl = document.getElementById('fibScore');
+const fibCard = document.getElementById('fibCard');
+const FIB_CARD_HTML = fibCard.innerHTML;
+
+// live references, re-queried every render since the card's innerHTML
+// gets swapped out for the "round complete" screen and back again
+let fibProgress, fibPrompt, fibInput, fibFeedback, fibCheckBtn;
+
+function bindFibRefs(){
+  fibProgress = document.getElementById('fibProgress');
+  fibPrompt = document.getElementById('fibPrompt');
+  fibInput = document.getElementById('fibInput');
+  fibFeedback = document.getElementById('fibFeedback');
+  fibCheckBtn = document.getElementById('fibCheck');
+  fibCheckBtn.addEventListener('click', checkFib);
+  fibInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') checkFib(); });
+  fibInput.addEventListener('input', onFibTyping);
+}
+
+function normalize(s){
+  return s.trim().toLowerCase().replace(/[-\s]+/g,' ');
+}
+
+// Levenshtein edit distance between two strings
+function editDistance(a, b){
+  const m = a.length, n = b.length;
+  const d = Array.from({length:m+1}, ()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) d[i][0] = i;
+  for(let j=0;j<=n;j++) d[0][j] = j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      const cost = a[i-1] === b[j-1] ? 0 : 1;
+      d[i][j] = Math.min(
+        d[i-1][j] + 1,      // deletion
+        d[i][j-1] + 1,      // insertion
+        d[i-1][j-1] + cost  // substitution
+      );
+    }
+  }
+  return d[m][n];
+}
+
+// Counts as correct if the guess is at least 65% letter-accurate to the answer
+// so small misspellings still pass, but loose guesses don't.
+function isCloseEnough(guess, answer){
+  if(!guess) return false;
+  if(guess === answer) return true;
+  const dist = editDistance(guess, answer);
+  const maxLen = Math.max(answer.length, guess.length);
+  const similarity = 1 - (dist / maxLen);
+  return similarity >= 0.65;
+}
+
+function renderFib(){
+  if(fibIdx >= VOCAB.length){
+    fibCard.innerHTML = `<div class="fib-done"><div style="font-family:'Fraunces',serif; font-size:22px; font-weight:600; margin-bottom:8px;">Round complete</div><div style="color:var(--muted); margin-bottom:18px;">You scored ${fibScore} out of ${VOCAB.length}.</div><button class="solid-btn" id="fibPlayAgain">Play again</button></div>`;
+    document.getElementById('fibPlayAgain').addEventListener('click', resetFib);
+    updateBestStreak(fibScore);
+    return;
+  }
+  const v = VOCAB[fibOrder[fibIdx]];
+  fibProgress.textContent = `Question ${fibIdx+1} of ${VOCAB.length}`;
+  fibPrompt.innerHTML = v.def + ' The term is: <span class="blank">______</span>';
+  fibInput.value = '';
+  fibInput.classList.remove('correct-input','wrong-input');
+  fibFeedback.textContent = '';
+  fibFeedback.className = 'fib-feedback';
+  fibAttempts = 0;
+  fibSettled = false;
+  fibPracticing = false;
+  fibInput.disabled = false;
+  fibInput.placeholder = 'Type the term...';
+  fibCheckBtn.textContent = 'Check';
+  fibInput.focus();
+}
+
+// While practicing (after the answer's been revealed), give live feedback
+// as the student re-types the correct term to help it stick.
+function onFibTyping(){
+  if(!fibPracticing) return;
+  const v = VOCAB[fibOrder[fibIdx]];
+  const guess = normalize(fibInput.value);
+  const answer = normalize(v.term);
+  fibInput.classList.remove('correct-input','wrong-input');
+  if(guess.length === 0) return;
+  if(guess === answer){
+    fibInput.classList.add('correct-input');
+    fibFeedback.textContent = `Nice, that's it. ${v.term}`;
+    fibFeedback.className = 'fib-feedback correct';
+  }
+}
+
+function checkFib(){
+  if(fibSettled){
+    fibIdx++;
+    renderFib();
+    return;
+  }
+
+  const v = VOCAB[fibOrder[fibIdx]];
+  const guess = normalize(fibInput.value);
+  const answer = normalize(v.term);
+  const correct = isCloseEnough(guess, answer);
+
+  if(correct){
+    fibScore++;
+    fibSettled = true;
+    fibInput.disabled = true;
+    fibInput.classList.add('correct-input');
+    fibFeedback.textContent = 'Correct! ' + v.term;
+    fibFeedback.className = 'fib-feedback correct';
+    fibCheckBtn.textContent = fibIdx+1 < VOCAB.length ? 'Next →' : 'Finish';
+    fibScoreEl.textContent = `Score ${fibScore} / ${VOCAB.length}`;
+    return;
+  }
+
+  fibAttempts++;
+  fibInput.classList.add('wrong-input');
+
+  if(fibAttempts === 1){
+    // first miss: one more chance
+    fibFeedback.textContent = 'Not quite. Give it one more try.';
+    fibFeedback.className = 'fib-feedback wrong';
+    fibInput.value = '';
+    fibInput.focus();
+  } else {
+    // second miss: reveal the answer, clear the box, let them practice typing it
+    fibSettled = true;
+    fibPracticing = true;
+    fibFeedback.textContent = `The term is: ${v.term}. Type it below to help it stick.`;
+    fibFeedback.className = 'fib-feedback wrong';
+    fibInput.value = '';
+    fibInput.classList.remove('wrong-input');
+    fibInput.placeholder = v.term;
+    fibInput.focus();
+    fibCheckBtn.textContent = fibIdx+1 < VOCAB.length ? 'Next →' : 'Finish';
+    fibScoreEl.textContent = `Score ${fibScore} / ${VOCAB.length}`;
+  }
+}
+
+function resetFib(){
+  fibOrder = shuffle(VOCAB.map((_,i)=>i));
+  fibIdx = 0;
+  fibScore = 0;
+  fibScoreEl.textContent = `Score 0 / ${VOCAB.length}`;
+  fibCard.innerHTML = FIB_CARD_HTML;
+  bindFibRefs();
+  renderFib();
+}
+
+document.getElementById('fibReset').addEventListener('click', resetFib);
+
+bindFibRefs();
+renderFib();
+
+/* ================= DEFINE IT (practice only) ================= */
+let defOrder = shuffle(VOCAB.map((_,i)=>i));
+let defIdx = 0;
+const defDrafts = {};
+const defTermEl = document.getElementById('defTerm');
+const defInputEl = document.getElementById('defInput');
+const defRevealEl = document.getElementById('defReveal');
+const defAnswerEl = document.getElementById('defAnswer');
+const defProgressEl = document.getElementById('defProgress');
+const defRevealBtnEl = document.getElementById('defRevealBtn');
+
+function renderDef(){
+  const k = defOrder[defIdx];
+  const v = VOCAB[k];
+  defTermEl.textContent = v.term;
+  defAnswerEl.textContent = v.def;
+  defInputEl.value = defDrafts[k] || '';
+  defRevealEl.classList.remove('show');
+  defRevealBtnEl.textContent = 'Reveal definition';
+  defProgressEl.textContent = `Term ${defIdx+1} of ${VOCAB.length}`;
+}
+defInputEl.addEventListener('input', ()=>{ defDrafts[defOrder[defIdx]] = defInputEl.value; });
+defRevealBtnEl.addEventListener('click', ()=>{
+  const showing = defRevealEl.classList.toggle('show');
+  defRevealBtnEl.textContent = showing ? 'Hide definition' : 'Reveal definition';
+});
+document.getElementById('defNext').addEventListener('click', ()=>{ defIdx = (defIdx+1) % VOCAB.length; renderDef(); defInputEl.focus(); });
+document.getElementById('defPrev').addEventListener('click', ()=>{ defIdx = (defIdx-1+VOCAB.length) % VOCAB.length; renderDef(); });
+document.getElementById('defShuffle').addEventListener('click', ()=>{ defOrder = shuffle(VOCAB.map((_,i)=>i)); defIdx = 0; renderDef(); });
+renderDef();
+
+/* ================= SENTENCE BUILDING (practice only) ================= */
+let sentOrder = shuffle(PAIRS.map((_,i)=>i));
+let sentIdx = 0;
+const sentDrafts = {};
+const sentPairEl = document.getElementById('sentPair');
+const sentInputEl = document.getElementById('sentInput');
+const sentRevealEl = document.getElementById('sentReveal');
+const sentAnswerEl = document.getElementById('sentAnswer');
+const sentProgressEl = document.getElementById('sentProgress');
+const sentRevealBtnEl = document.getElementById('sentRevealBtn');
+
+function renderSent(){
+  const k = sentOrder[sentIdx];
+  const p = PAIRS[k];
+  sentPairEl.innerHTML = '';
+  const a = document.createElement('span'); a.className = 'pair-chip'; a.textContent = p.a;
+  const plus = document.createElement('span'); plus.className = 'pair-plus'; plus.textContent = '+';
+  const b = document.createElement('span'); b.className = 'pair-chip'; b.textContent = p.b;
+  sentPairEl.append(a, plus, b);
+  sentAnswerEl.textContent = p.example;
+  sentInputEl.value = sentDrafts[k] || '';
+  sentRevealEl.classList.remove('show');
+  sentRevealBtnEl.textContent = 'Show an example';
+  sentProgressEl.textContent = `Pair ${sentIdx+1} of ${PAIRS.length}`;
+}
+sentInputEl.addEventListener('input', ()=>{ sentDrafts[sentOrder[sentIdx]] = sentInputEl.value; });
+sentRevealBtnEl.addEventListener('click', ()=>{
+  const showing = sentRevealEl.classList.toggle('show');
+  sentRevealBtnEl.textContent = showing ? 'Hide example' : 'Show an example';
+});
+document.getElementById('sentNext').addEventListener('click', ()=>{ sentIdx = (sentIdx+1) % PAIRS.length; renderSent(); sentInputEl.focus(); });
+document.getElementById('sentPrev').addEventListener('click', ()=>{ sentIdx = (sentIdx-1+PAIRS.length) % PAIRS.length; renderSent(); });
+document.getElementById('sentShuffle').addEventListener('click', ()=>{ sentOrder = shuffle(PAIRS.map((_,i)=>i)); sentIdx = 0; renderSent(); });
+renderSent();
+
+})();
+</script>
+</body>
+</html>
