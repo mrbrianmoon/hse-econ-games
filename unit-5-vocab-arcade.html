@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Unit 5 Vocab Arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#004AA0; --blue-hi:#2a7bff; --navy:#00142e; --navy2:#001f47; --red:#C8102E; --red-hi:#ff3355;
+  --gray:#C6C8CE; --white:#ffffff; --gold:#ffcc33; --good:#22d36b; --bad:#ff3355;
+  --pix:'Press Start 2P','Courier New',monospace; --body:'Trebuchet MS','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--navy);color:var(--white);font-family:var(--body);overflow-x:hidden;
+  background-image:radial-gradient(ellipse at 50% -10%,rgba(42,123,255,.35),transparent 60%),
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;background-attachment:fixed;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer;color:inherit}
+.wrap{max-width:960px;margin:0 auto;padding:16px 16px 40px}
+.screen{display:none;animation:fadeIn .25s ease}
+.screen.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pix{font-family:var(--pix);letter-spacing:.5px}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{font-family:var(--pix);font-size:10px;color:var(--gray);letter-spacing:2px}
+.spacer{flex:1}
+.iconbtn{background:var(--navy2);border:2px solid var(--blue);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:bold}
+.iconbtn:hover{border-color:var(--blue-hi)}
+.iconbtn.on{background:var(--blue)}
+/* title */
+.title-card{text-align:center;padding:40px 16px}
+.logo{font-family:var(--pix);font-size:clamp(22px,5vw,42px);line-height:1.35;text-shadow:0 0 18px var(--blue-hi),4px 4px 0 var(--red)}
+.logo small{display:block;font-size:.38em;color:var(--gold);text-shadow:none;margin-top:14px;letter-spacing:3px}
+.blink{animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+input.name{font-family:var(--body);font-size:20px;padding:12px 16px;border-radius:12px;border:3px solid var(--blue-hi);background:#fff;color:#111;width:min(340px,90%);text-align:center;margin:18px 0 6px;-webkit-user-select:text;user-select:text}
+.big{font-family:var(--pix);font-size:14px;padding:16px 26px;border-radius:14px;border:none;background:var(--red);color:#fff;box-shadow:0 6px 0 #7d0a1c,0 0 24px rgba(200,16,46,.5);transition:transform .08s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #7d0a1c}
+.big.blue{background:var(--blue);box-shadow:0 6px 0 #002a5c,0 0 24px rgba(42,123,255,.45)}
+.big.gray{background:#3a4560;box-shadow:0 6px 0 #1d2335}
+.muted{color:var(--gray);font-size:14px}
+/* player panel */
+.player{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,var(--navy2),#002b63);border:3px solid var(--blue);border-radius:18px;padding:14px 16px;box-shadow:0 0 30px rgba(0,74,160,.45)}
+.badge{width:62px;height:62px;border-radius:14px;background:var(--red);display:grid;place-items:center;font-size:30px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
+.pname{font-weight:bold;font-size:20px}
+.prank{font-family:var(--pix);font-size:10px;color:var(--gold);margin:6px 0 8px}
+.bar{height:14px;background:#0a1630;border:2px solid #33446a;border-radius:8px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-hi),#7fb3ff);width:0;transition:width .8s ease}
+.bar.red>i{background:linear-gradient(90deg,var(--red),var(--red-hi))}
+.bar.gold>i{background:linear-gradient(90deg,#e0a400,var(--gold))}
+.xpnums{font-size:12px;color:var(--gray);margin-top:4px}
+.pstats{text-align:right;font-size:13px;color:var(--gray);line-height:1.7}
+.pstats b{color:#fff;font-size:16px}
+/* map */
+.sectionlabel{font-family:var(--pix);font-size:11px;color:var(--gray);margin:22px 4px 10px;letter-spacing:2px}
+.stages{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stage{position:relative;background:var(--navy2);border:3px solid var(--blue);border-radius:16px;padding:14px 12px 12px;text-align:left;min-height:150px;transition:transform .12s,box-shadow .12s}
+.stage:not(.locked):hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(42,123,255,.35)}
+.stage .num{font-family:var(--pix);font-size:18px;color:var(--red-hi);text-shadow:2px 2px 0 #000}
+.stage .nm{font-weight:bold;font-size:15px;margin:8px 0 6px;min-height:38px}
+.stage .stars{font-size:22px;letter-spacing:2px}
+.stage .best{font-size:12px;color:var(--gray);margin-top:4px}
+.stage .mast{font-size:11px;color:var(--gray);margin-top:6px}
+.stage.locked{opacity:.45;filter:grayscale(.8);cursor:not-allowed}
+.stage.locked::after{content:"LOCKED";position:absolute;right:10px;top:12px;font-family:var(--pix);font-size:8px;color:var(--gray)}
+.star{color:#33446a}.star.on{color:var(--gold);text-shadow:0 0 8px rgba(255,204,51,.7)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mode{background:linear-gradient(160deg,#2a0610,#5a0b1d);border:3px solid var(--red);border-radius:16px;padding:14px;text-align:left;min-height:118px;position:relative}
+.mode.bossm{background:linear-gradient(160deg,#1c1400,#4a3500);border-color:var(--gold)}
+.mode.weak{background:linear-gradient(160deg,#071a3a,#0c2f66);border-color:var(--blue-hi)}
+.mode h3{font-family:var(--pix);font-size:12px;margin:0 0 8px;line-height:1.5}
+.mode p{margin:0;font-size:13px;color:#dfe4ee;line-height:1.35}
+.mode .req{font-size:11px;color:var(--gold);margin-top:8px}
+.mode.locked{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
+.navrow{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.navrow .big{flex:1;min-width:200px;font-size:11px}
+/* play */
+.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:10px}
+.hud .l{font-family:var(--pix);font-size:10px;color:var(--gray);line-height:1.8}
+.hud .c{text-align:center}
+.hud .r{text-align:right}
+.score{font-family:var(--pix);font-size:22px;color:#fff;text-shadow:0 0 10px var(--blue-hi)}
+.mult{display:inline-block;font-family:var(--pix);font-size:12px;padding:6px 8px;border-radius:8px;background:#33446a;margin-top:6px}
+.mult.hot{background:var(--red);animation:pulse .6s ease infinite alternate}
+@keyframes pulse{to{transform:scale(1.12);box-shadow:0 0 16px var(--red-hi)}}
+.lives{font-size:20px;letter-spacing:3px}
+.timer{height:16px;background:#0a1630;border:2px solid #33446a;border-radius:10px;overflow:hidden;margin:6px 0 14px}
+.timer>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--good),#8dffb8);transform-origin:left}
+.timer.warn>i{background:linear-gradient(90deg,#e0a400,var(--gold))}
+.timer.danger>i{background:linear-gradient(90deg,var(--red),var(--red-hi))}
+.combo{height:8px;display:flex;gap:4px;margin:-6px 0 12px}
+.combo span{flex:1;background:#1a2645;border-radius:4px}
+.combo span.on{background:var(--red-hi);box-shadow:0 0 8px var(--red-hi)}
+.prompt{position:relative;background:#fff;color:#0b1a33;border-radius:18px;padding:22px 22px;min-height:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:4px solid var(--blue);box-shadow:0 8px 0 #002a5c,0 0 34px rgba(42,123,255,.4)}
+.prompt .tag{position:absolute;top:-14px;left:18px;font-family:var(--pix);font-size:9px;background:var(--red);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .qn{position:absolute;top:-14px;right:18px;font-family:var(--pix);font-size:9px;background:var(--blue);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .term{font-family:Georgia,serif;font-weight:bold;font-size:clamp(26px,4.4vw,40px);color:var(--blue)}
+.prompt .def{font-size:clamp(18px,2.6vw,23px);line-height:1.4;font-weight:bold}
+.opts{display:grid;gap:12px;margin-top:18px}
+.opts.three{grid-template-columns:1fr}
+.opts.four{grid-template-columns:1fr 1fr}
+.opt{position:relative;background:var(--navy2);border:3px solid var(--blue);border-radius:14px;padding:14px 14px 14px 52px;text-align:left;font-size:17px;line-height:1.35;min-height:62px;font-weight:bold;transition:transform .08s,background .15s,border-color .15s}
+.opts.four .opt{font-size:19px;font-family:Georgia,serif}
+.opt .k{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:8px;background:var(--blue);display:grid;place-items:center;font-family:var(--pix);font-size:10px}
+.opt:hover:not(:disabled){border-color:var(--blue-hi);background:#062a5e}
+.opt:active:not(:disabled){transform:scale(.98)}
+.opt:disabled{cursor:default}
+.opt.right{background:#0f5a32;border-color:var(--good);box-shadow:0 0 18px rgba(34,211,107,.6)}
+.opt.right .k{background:var(--good)}
+.opt.wrong{background:#5a0b1d;border-color:var(--bad)}
+.opt.wrong .k{background:var(--bad)}
+.opt.dim{opacity:.4}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.pop{position:fixed;font-family:var(--pix);font-size:18px;color:var(--gold);text-shadow:2px 2px 0 #000;pointer-events:none;animation:popup .9s ease-out forwards;z-index:50}
+@keyframes popup{from{opacity:1;transform:translate(-50%,0) scale(.8)}to{opacity:0;transform:translate(-50%,-70px) scale(1.25)}}
+.feedback{min-height:28px;margin-top:12px;text-align:center;font-family:var(--pix);font-size:11px}
+.quitrow{text-align:center;margin-top:16px}
+.linkbtn{background:none;border:none;color:var(--gray);text-decoration:underline;font-size:13px}
+/* results */
+.panel{background:var(--navy2);border:3px solid var(--blue);border-radius:18px;padding:20px}
+.res-title{font-family:var(--pix);font-size:clamp(16px,3vw,24px);text-align:center;margin:6px 0 14px;line-height:1.4}
+.bigstars{text-align:center;font-size:56px;letter-spacing:10px;margin:4px 0}
+.bigstars .star{display:inline-block;transform:scale(0)}
+.bigstars .star.show{animation:starIn .45s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes starIn{to{transform:scale(1)}}
+.crit{text-align:center;font-size:12px;color:var(--gray);margin-bottom:14px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.stat{background:#0a1630;border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--pix);font-size:15px;margin-top:8px;color:#fff}
+.stat span{font-size:12px;color:var(--gray)}
+.banner{text-align:center;font-family:var(--pix);font-size:12px;padding:12px;border-radius:12px;margin:10px 0;line-height:1.6}
+.banner.rank{background:var(--red);animation:glow .7s ease infinite alternate}
+@keyframes glow{to{box-shadow:0 0 22px var(--red-hi)}}
+.banner.troph{background:#3d2e00;border:2px solid var(--gold);color:var(--gold)}
+.review h4{font-family:var(--pix);font-size:11px;margin:18px 0 10px;color:var(--red-hi)}
+.rv{background:#0a1630;border-left:5px solid var(--red);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:15px;line-height:1.4}
+.rv b{color:#8fb9ff;font-family:Georgia,serif;font-size:17px}
+.btnrow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+/* trophies */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.troph{background:#0a1630;border:3px solid #33446a;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.troph .ic{font-size:34px;line-height:1;filter:grayscale(1) brightness(.35)}
+.troph.got{border-color:var(--gold);background:linear-gradient(160deg,#241b00,#0a1630)}
+.troph.got .ic{filter:none;text-shadow:0 0 12px rgba(255,204,51,.6)}
+.troph h5{margin:0 0 4px;font-size:15px}
+.troph p{margin:0;font-size:12.5px;color:var(--gray);line-height:1.35}
+.troph .when{font-size:11px;color:var(--gold);margin-top:5px}
+/* report */
+.report{background:#fff;color:#0b1a33;border-radius:16px;overflow:hidden;border:4px solid var(--blue)}
+.report .rh{background:var(--blue);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.report .rh .t{font-family:Georgia,serif;font-size:24px;font-weight:bold}
+.report .rh .u{background:var(--red);font-family:var(--pix);font-size:12px;padding:10px 12px;border-radius:8px}
+.report .rb{padding:16px 20px;font-size:15px;line-height:1.7}
+.report table{width:100%;border-collapse:collapse;margin-top:6px}
+.report td{padding:6px 4px;border-bottom:1px solid #e1e4ea}
+.report td:last-child{text-align:right;font-weight:bold}
+/* toast */
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:linear-gradient(135deg,#3d2e00,#6a5000);border:3px solid var(--gold);border-radius:14px;padding:12px 18px;display:flex;gap:12px;align-items:center;z-index:60;transition:transform .35s cubic-bezier(.2,1.4,.4,1);max-width:92vw}
+.toast.show{transform:translate(-50%,0)}
+.toast .ic{font-size:30px}
+.toast small{display:block;font-family:var(--pix);font-size:8px;color:var(--gold);margin-bottom:5px}
+.toast b{font-size:16px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,10,25,.8);display:none;place-items:center;z-index:70;padding:16px}
+.modal.on{display:grid}
+.modal .panel{max-width:440px;width:100%}
+.confetti{position:fixed;width:10px;height:14px;top:-20px;z-index:55;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.countdown{position:fixed;inset:0;display:none;place-items:center;z-index:65;background:rgba(0,10,25,.75);font-family:var(--pix);font-size:80px;color:#fff;text-shadow:0 0 30px var(--blue-hi),6px 6px 0 var(--red)}
+.countdown.on{display:grid}
+@media (max-width:760px){
+  .stages{grid-template-columns:1fr 1fr}
+  .modes{grid-template-columns:1fr}
+  .statgrid{grid-template-columns:1fr 1fr}
+  .opts.four{grid-template-columns:1fr}
+  .player{grid-template-columns:auto 1fr}
+  .pstats{grid-column:1/-1;text-align:left;display:flex;gap:16px;flex-wrap:wrap}
+  .opt{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">HSE INDIANA ECONOMICS · UNIT 5</div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnRelax" title="Doubles the time on every question">Relaxed Timer: Off</button>
+    <button class="iconbtn" id="btnMute" title="Sound on or off">Sound: On</button>
+  </div>
+
+  <!-- TITLE -->
+  <section class="screen" id="scrTitle">
+    <div class="title-card">
+      <div class="logo">VOCAB<br>ARCADE<small>UNIT 5 · MEASURING THE ECONOMY</small></div>
+      <p class="muted" style="margin-top:28px">Climb from Intern to Fed Chair. Earn stars, unlock rounds, and collect every trophy.</p>
+      <div id="nameBox">
+        <input class="name" id="nameInput" maxlength="24" placeholder="Your first name" autocomplete="off">
+        <p class="muted" style="font-size:12px;margin:4px 0 18px">Your progress saves on this device.</p>
+      </div>
+      <button class="big" id="btnStart"><span class="blink">PRESS START</span></button>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen" id="scrHub">
+    <div class="player">
+      <div class="badge" id="hubBadge">📋</div>
+      <div>
+        <div class="pname" id="hubName">Player</div>
+        <div class="prank" id="hubRank">INTERN</div>
+        <div class="bar"><i id="hubXpBar"></i></div>
+        <div class="xpnums" id="hubXpNums">0 XP</div>
+      </div>
+      <div class="pstats">
+        <div>Terms mastered <b id="hubMastered">0/37</b></div>
+        <div>Stars <b id="hubStars">0/12</b></div>
+        <div>Trophies <b id="hubTroph">0</b></div>
+      </div>
+    </div>
+    <div class="sectionlabel">STAGES · EARN STARS TO UNLOCK THE NEXT</div>
+    <div class="stages" id="stageGrid"></div>
+    <div class="sectionlabel">CHALLENGE MODES</div>
+    <div class="modes" id="modeGrid"></div>
+    <div class="navrow">
+      <button class="big blue" id="btnTrophies">TROPHY CASE</button>
+      <button class="big gray" id="btnReport">PROGRESS REPORT</button>
+    </div>
+    <div class="quitrow"><button class="linkbtn" id="btnHelp">How scoring works</button> · <button class="linkbtn" id="btnReset">Reset my progress</button></div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="scrPlay">
+    <div class="hud">
+      <div class="l"><div id="hudMode">7.1</div><div id="hudProg">1 / 10</div></div>
+      <div class="c"><div class="score" id="hudScore">0</div><div class="mult" id="hudMult">x1</div></div>
+      <div class="r"><div class="lives" id="hudLives"></div><div class="l" id="hudStreak">STREAK 0</div></div>
+    </div>
+    <div class="timer" id="timer"><i id="timerFill"></i></div>
+    <div class="combo" id="combo"><span></span><span></span><span></span></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="opts" id="opts"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="quitrow"><button class="linkbtn" id="btnQuit">Quit round</button></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="scrResults">
+    <div class="panel">
+      <div class="res-title" id="resTitle">ROUND COMPLETE</div>
+      <div class="bigstars" id="resStars"></div>
+      <div class="crit" id="resCrit"></div>
+      <div class="statgrid" id="resStats"></div>
+      <div id="resXp" style="margin:12px 0"></div>
+      <div id="resBanners"></div>
+      <div class="review" id="resReview"></div>
+      <div class="btnrow">
+        <button class="big" id="btnRetry">PLAY AGAIN</button>
+        <button class="big blue" id="btnToHub">BACK TO MAP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TROPHIES -->
+  <section class="screen" id="scrTrophies">
+    <div class="res-title">TROPHY CASE</div>
+    <p class="muted" style="text-align:center;margin-top:-6px" id="trophCount"></p>
+    <div class="tgrid" id="trophGrid"></div>
+    <div class="btnrow"><button class="big blue" data-go="hub">BACK TO MAP</button></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="screen" id="scrReport">
+    <div class="report">
+      <div class="rh"><div><div style="font-size:12px;letter-spacing:2px;opacity:.85">HSE INDIANA ECONOMICS</div><div class="t">Unit 5 Vocab Arcade Progress</div></div><div class="u">UNIT 05</div></div>
+      <div class="rb" id="reportBody"></div>
+    </div>
+    <div class="btnrow"><button class="big blue" data-go="hub">BACK TO MAP</button></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"><div class="ic" id="toastIc">🏆</div><div><small>TROPHY UNLOCKED</small><b id="toastTxt"></b></div></div>
+<div class="countdown" id="countdown"></div>
+<div class="modal" id="modal"><div class="panel" id="modalBody"></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------------- DATA ---------------- */
+var SECTIONS=[
+  {id:'7.1',name:'Gross Domestic Product'},
+  {id:'7.2',name:'Business Cycles'},
+  {id:'7.3',name:'Economic Growth'},
+  {id:'7.4',name:'Unemployment'}
+];
+var TERMS=[
+ ['7.1','Gross Domestic Product (GDP)','The total dollar value of all final goods and services produced inside a country in one year.'],
+ ['7.1','Intermediate Goods','Products used as parts or inputs to make a final good, like tires for a new car.'],
+ ['7.1','Durable Goods','Goods that last a long time, usually three years or more, like cars and refrigerators.'],
+ ['7.1','Nondurable Goods','Goods that are used up or wear out quickly, like food, gasoline, and clothing.'],
+ ['7.1','Nominal GDP','GDP measured in current-year prices, so it can rise just because prices went up.'],
+ ['7.1','Real GDP','GDP adjusted for price changes, showing whether the economy actually produced more.'],
+ ['7.1','Gross National Product (GNP)','The total value of goods and services produced by a country\'s citizens and companies anywhere in the world.'],
+ ['7.1','Depreciation','The loss in value of machines, buildings, and other capital from normal wear and tear.'],
+ ['7.1','Price Level','The average of all prices across the whole economy.'],
+ ['7.1','Aggregate Supply','The total amount of goods and services all producers will offer at each price level.'],
+ ['7.1','Aggregate Demand','The total amount of goods and services everyone in the economy will buy at each price level.'],
+ ['7.2','Business Cycle','The repeating pattern of the economy growing, shrinking, and then growing again.'],
+ ['7.2','Expansion','The phase when real GDP rises, jobs are easier to find, and businesses do well.'],
+ ['7.2','Economic Growth','A steady increase in real GDP over a long period of time.'],
+ ['7.2','Peak','The highest point of an expansion, right before real GDP stops rising.'],
+ ['7.2','Contraction','The phase when real GDP falls and the economy slows down.'],
+ ['7.2','Trough','The lowest point of a contraction, right before the economy starts to recover.'],
+ ['7.2','Recession','A contraction where real GDP falls for at least two quarters in a row.'],
+ ['7.2','Depression','An especially long and severe recession with very high unemployment.'],
+ ['7.2','Stagflation','A slow or shrinking economy combined with rising prices at the same time.'],
+ ['7.2','Business Investment','Money companies spend on capital goods like equipment, buildings, and technology.'],
+ ['7.2','Leading Indicators','Statistics that usually change before the economy does, used to predict the business cycle.'],
+ ['7.3','Real GDP per Capita','Real GDP divided by population; the best single measure of standard of living.'],
+ ['7.3','Capital Deepening','Increasing the amount of capital each worker has, which makes workers more productive.'],
+ ['7.3','Saving','Income that is not spent on consumption right now.'],
+ ['7.3','Savings Rate','The percentage of income that people set aside instead of spending.'],
+ ['7.3','Technological Progress','Producing goods and services more efficiently through new inventions or better methods.'],
+ ['7.3','Capital Formation','Building up a nation\'s stock of capital through saving and investment.'],
+ ['7.4','Frictional Unemployment','Short-term joblessness while people move between jobs or look for their first job.'],
+ ['7.4','Structural Unemployment','Joblessness when workers\' skills no longer match the jobs available, often due to new technology.'],
+ ['7.4','Globalization','Countries becoming more connected through trade, investment, and the movement of businesses and workers.'],
+ ['7.4','Seasonal Unemployment','Joblessness at certain times of year when some jobs are not needed, like construction in winter.'],
+ ['7.4','Cyclical Unemployment','Joblessness that rises when the economy goes into a contraction or recession.'],
+ ['7.4','Unemployment Rate','The percentage of the labor force that is out of work and actively looking for a job.'],
+ ['7.4','Full Employment','The lowest realistic level of unemployment, when there is no cyclical unemployment.'],
+ ['7.4','Underemployed','Working part time when you want full time, or working a job below your skills.'],
+ ['7.4','Discouraged Worker','Someone who wants a job but has stopped looking, so they are not counted as unemployed.']
+].map(function(r){return {s:r[0],t:r[1],d:r[2]};});
+
+var RANKS=[
+  {xp:0,name:'Intern',ic:'📋'},
+  {xp:800,name:'Research Analyst',ic:'📊'},
+  {xp:2000,name:'Associate Economist',ic:'📈'},
+  {xp:4000,name:'Economist',ic:'🎓'},
+  {xp:7000,name:'Senior Economist',ic:'💼'},
+  {xp:11000,name:'Chief Economist',ic:'🏛️'},
+  {xp:16000,name:'Fed Governor',ic:'🦅'},
+  {xp:22000,name:'Fed Chair',ic:'👑'}
+];
+
+var TROPHIES=[
+  {id:'first',ic:'🔔',n:'Opening Bell',h:'Finish your first round.'},
+  {id:'stars4',ic:'🗺️',n:'Diversified Portfolio',h:'Earn at least 1 star on all four stages.'},
+  {id:'perfect',ic:'💯',n:'Perfect Quarter',h:'Answer every question right in a stage round.'},
+  {id:'three4',ic:'⭐',n:'Gold Standard',h:'Earn 3 stars on all four stages.'},
+  {id:'streak10',ic:'🐂',n:'Bull Run',h:'Get 10 correct answers in a row.'},
+  {id:'streak25',ic:'🚀',n:'Economic Boom',h:'Get 25 correct answers in a row.'},
+  {id:'flash',ic:'⚡',n:'Flash Trade',h:'Answer correctly in under 1.5 seconds.'},
+  {id:'speed',ic:'🏎️',n:'Velocity of Money',h:'Finish a round averaging under 3 seconds per answer with 80% or better.'},
+  {id:'vshape',ic:'📉',n:'V-Shaped Recovery',h:'Lose a streak of 5 or more, then build another 5 streak in the same round.'},
+  {id:'boss',ic:'🏦',n:'Market Mover',h:'Clear the Boss Round with 70% or better.'},
+  {id:'bossperfect',ic:'🛬',n:'Soft Landing',h:'Answer every Boss Round question right.'},
+  {id:'rec10',ic:'🌧️',n:'Weathered the Storm',h:'Get 10 correct in Recession Mode.'},
+  {id:'rec25',ic:'🛡️',n:'Recession-Proof',h:'Get 25 correct in Recession Mode.'},
+  {id:'weak',ic:'🔧',n:'Structural Fix',h:'Finish a Weak Words round with 100%.'},
+  {id:'master10',ic:'🏗️',n:'Capital Deepening',h:'Master 10 terms.'},
+  {id:'master37',ic:'🏭',n:'Full Employment',h:'Master all 37 terms.'},
+  {id:'record',ic:'📊',n:'Record High GDP',h:'Score 4,000 points in a single round.'},
+  {id:'rounds25',ic:'⏳',n:'Long-Run Growth',h:'Play 25 rounds.'},
+  {id:'economist',ic:'🎓',n:'Promoted',h:'Reach the rank of Economist.'},
+  {id:'chair',ic:'👑',n:'Fed Chair',h:'Reach the rank of Fed Chair.'}
+];
+
+var MASTER_BOX=4;            // correct-in-a-row level counted as mastered
+var STORE_KEY='hse-u5-vocab-arcade-v1';
+
+/* ---------------- SAVE ---------------- */
+var mem=null;
+function blankSave(){
+  var s={v:1,name:'',xp:0,rounds:0,mute:false,relaxed:false,stages:{},boss:{best:0,cleared:false},rec:{best:0},
+    terms:{},trophies:{},bestStreak:0,totalCorrect:0,totalAnswered:0};
+  SECTIONS.forEach(function(x){s.stages[x.id]={stars:0,best:0};});
+  TERMS.forEach(function(x){s.terms[x.t]={b:0,c:0,w:0};});
+  return s;
+}
+function load(){
+  var s=blankSave(),raw=null;
+  try{raw=window.localStorage.getItem(STORE_KEY);}catch(e){raw=mem;}
+  if(raw){try{var o=JSON.parse(raw);
+    Object.keys(s).forEach(function(k){ if(o[k]!==undefined){
+      if(k==='stages'||k==='terms'){Object.keys(s[k]).forEach(function(kk){ if(o[k][kk]) s[k][kk]=o[k][kk]; });}
+      else s[k]=o[k]; }});
+  }catch(e){}}
+  return s;
+}
+function persist(){
+  var raw=JSON.stringify(S);
+  try{window.localStorage.setItem(STORE_KEY,raw);}catch(e){mem=raw;}
+}
+var S=load();
+
+/* ---------------- SOUND ---------------- */
+var AC=null;
+function ac(){
+  if(S.mute) return null;
+  try{ if(!AC){var C=window.AudioContext||window.webkitAudioContext; if(!C) return null; AC=new C();}
+       if(AC.state==='suspended') AC.resume(); }catch(e){return null;}
+  return AC;
+}
+function tone(freq,dur,type,vol,delay,slide){
+  var a=ac(); if(!a) return;
+  var t=a.currentTime+(delay||0), o=a.createOscillator(), g=a.createGain();
+  o.type=type||'square'; o.frequency.setValueAtTime(freq,t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  g.gain.setValueAtTime(vol||0.08,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+0.02);
+}
+var SFX={
+  click:function(){tone(660,.05,'square',.04);},
+  right:function(m){var b=520+Math.min(m,6)*40; tone(b,.08,'square',.07); tone(b*1.5,.12,'square',.07,.07);},
+  wrong:function(){tone(180,.28,'sawtooth',.08,0,90);},
+  tick:function(){tone(1000,.03,'square',.03);},
+  streak:function(){[660,880,1100,1320].forEach(function(f,i){tone(f,.07,'square',.06,i*.05);});},
+  star:function(i){tone(700+i*220,.18,'triangle',.12);},
+  troph:function(){[523,659,784,1047,784,1047].forEach(function(f,i){tone(f,.12,'square',.06,i*.09);});},
+  rank:function(){[392,523,659,784,1047].forEach(function(f,i){tone(f,.16,'triangle',.11,i*.12);});},
+  go:function(){tone(880,.25,'square',.08);},
+  count:function(){tone(440,.12,'square',.07);},
+  over:function(){[400,330,260,200].forEach(function(f,i){tone(f,.2,'sawtooth',.06,i*.16);});}
+};
+
+/* ---------------- HELPERS ---------------- */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function fmt(n){return Math.round(n).toLocaleString('en-US');}
+function show(id){
+  ['scrTitle','scrHub','scrPlay','scrResults','scrTrophies','scrReport'].forEach(function(s){$(s).classList.toggle('on',s===id);});
+  window.scrollTo(0,0);
+}
+function rankFor(xp){var r=RANKS[0],i;for(i=0;i<RANKS.length;i++) if(xp>=RANKS[i].xp) r=RANKS[i];return r;}
+function rankIndex(xp){var k=0;for(var i=0;i<RANKS.length;i++) if(xp>=RANKS[i].xp) k=i;return k;}
+function masteredCount(){var n=0;TERMS.forEach(function(x){if(S.terms[x.t].b>=MASTER_BOX) n++;});return n;}
+function sectionTerms(id){return TERMS.filter(function(x){return x.s===id;});}
+function totalStars(){var n=0;SECTIONS.forEach(function(x){n+=S.stages[x.id].stars;});return n;}
+function stageUnlocked(i){return i===0||S.stages[SECTIONS[i-1].id].stars>=1;}
+function allStagesAtLeast(n){return SECTIONS.every(function(x){return S.stages[x.id].stars>=n;});}
+function weakList(){
+  return TERMS.filter(function(x){var r=S.terms[x.t];return r.w>0 && r.b<MASTER_BOX;})
+    .sort(function(a,b){var A=S.terms[a.t],B=S.terms[b.t];return (A.b-B.b)||(B.w-A.w);});
+}
+function trophyCount(){return Object.keys(S.trophies).length;}
+
+/* ---------------- TOAST / FX ---------------- */
+var toastQ=[],toastBusy=false;
+function toast(ic,txt){toastQ.push([ic,txt]);if(!toastBusy) nextToast();}
+function nextToast(){
+  var t=toastQ.shift(); if(!t){toastBusy=false;return;}
+  toastBusy=true; $('toastIc').textContent=t[0]; $('toastTxt').textContent=t[1];
+  $('toast').classList.add('show'); SFX.troph();
+  setTimeout(function(){$('toast').classList.remove('show');setTimeout(nextToast,400);},2600);
+}
+function award(id){
+  if(S.trophies[id]) return false;
+  S.trophies[id]=Date.now();
+  var t=TROPHIES.filter(function(x){return x.id===id;})[0];
+  if(t) toast(t.ic,t.n);
+  return true;
+}
+function confetti(n){
+  var cols=['#004AA0','#C8102E','#ffcc33','#ffffff','#2a7bff'];
+  for(var i=0;i<n;i++){
+    var c=document.createElement('div'); c.className='confetti';
+    c.style.left=(Math.random()*100)+'vw'; c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(1.6+Math.random()*1.6)+'s'; c.style.animationDelay=(Math.random()*.4)+'s';
+    document.body.appendChild(c); (function(el){setTimeout(function(){el.remove();},3800);})(c);
+  }
+}
+function popAt(el,txt){
+  var r=el.getBoundingClientRect(), p=document.createElement('div');
+  p.className='pop'; p.textContent=txt; p.style.left=(r.left+r.width/2)+'px'; p.style.top=(r.top)+'px';
+  document.body.appendChild(p); setTimeout(function(){p.remove();},950);
+}
+
+/* ---------------- TOP BAR ---------------- */
+function syncToggles(){
+  $('btnMute').textContent='Sound: '+(S.mute?'Off':'On'); $('btnMute').classList.toggle('on',!S.mute);
+  $('btnRelax').textContent='Relaxed Timer: '+(S.relaxed?'On':'Off'); $('btnRelax').classList.toggle('on',S.relaxed);
+}
+$('btnMute').onclick=function(){S.mute=!S.mute;persist();syncToggles();SFX.click();};
+$('btnRelax').onclick=function(){
+  if(G&&G.active){return;}
+  S.relaxed=!S.relaxed;persist();syncToggles();SFX.click();
+};
+
+/* ---------------- TITLE ---------------- */
+function startTitle(){
+  if(S.name){ $('nameBox').innerHTML='<p style="font-size:20px;margin:26px 0 22px">Welcome back, <b>'+esc(S.name)+'</b>.</p>'; }
+  show('scrTitle');
+}
+$('btnStart').onclick=function(){
+  var inp=$('nameInput');
+  if(inp&&!S.name){var v=inp.value.trim().replace(/\s+/g,' ');
+    if(!v){inp.focus();inp.style.borderColor='#C8102E';return;}
+    S.name=v.slice(0,24);persist();}
+  SFX.go(); renderHub(); show('scrHub');
+};
+if($('nameInput')) $('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter') $('btnStart').click();});
+
+/* ---------------- HUB ---------------- */
+function starsHtml(n,max){var h='';for(var i=0;i<(max||3);i++) h+='<span class="star'+(i<n?' on':'')+'">★</span>';return h;}
+function renderHub(){
+  var r=rankFor(S.xp),ri=rankIndex(S.xp),next=RANKS[ri+1];
+  $('hubBadge').textContent=r.ic; $('hubName').textContent=S.name||'Player'; $('hubRank').textContent=r.name.toUpperCase();
+  if(next){var pct=(S.xp-r.xp)/(next.xp-r.xp)*100;$('hubXpBar').style.width=pct+'%';
+    $('hubXpNums').textContent=fmt(S.xp)+' XP · '+fmt(next.xp-S.xp)+' XP to '+next.name;}
+  else{$('hubXpBar').style.width='100%';$('hubXpNums').textContent=fmt(S.xp)+' XP · Top rank reached';}
+  $('hubMastered').textContent=masteredCount()+'/'+TERMS.length;
+  $('hubStars').textContent=totalStars()+'/12';
+  $('hubTroph').textContent=trophyCount()+'/'+TROPHIES.length;
+  var g=$('stageGrid'); g.innerHTML='';
+  SECTIONS.forEach(function(sec,i){
+    var st=S.stages[sec.id],un=stageUnlocked(i),terms=sectionTerms(sec.id);
+    var m=terms.filter(function(x){return S.terms[x.t].b>=MASTER_BOX;}).length;
+    var b=document.createElement('button'); b.className='stage'+(un?'':' locked');
+    b.innerHTML='<div class="num">'+sec.id+'</div><div class="nm">'+esc(sec.name)+'</div><div class="stars">'+starsHtml(st.stars)+'</div>'+
+      '<div class="best">Best: '+fmt(st.best)+'</div><div class="mast">'+m+'/'+terms.length+' terms mastered</div>';
+    b.onclick=function(){ if(!un){SFX.wrong();modalMsg('Locked','Earn at least 1 star on '+SECTIONS[i-1].id+' to unlock this stage.');return;} startRound('stage',sec.id); };
+    g.appendChild(b);
+  });
+  var mg=$('modeGrid'); mg.innerHTML='';
+  var weak=weakList(), bossUn=allStagesAtLeast(2), recUn=allStagesAtLeast(1);
+  var modes=[
+    {k:'boss',cls:'bossm',t:'BOSS ROUND',p:'20 questions from all four sections with tricky look-alike answers and a faster clock.',
+      un:bossUn,req:bossUn?('Best: '+fmt(S.boss.best)+(S.boss.cleared?' · Cleared':'')):'Unlock: 2 stars on every stage'},
+    {k:'recession',cls:'',t:'RECESSION MODE',p:'Endless questions. 3 lives. The clock shrinks with every right answer. How long can you last?',
+      un:recUn,req:recUn?('Record: '+S.rec.best+' correct'):'Unlock: 1 star on every stage'},
+    {k:'weak',cls:'weak',t:'WEAK WORDS',p:'Drill only the terms you have missed until you master them.',
+      un:weak.length>0,req:weak.length?(weak.length+' term'+(weak.length===1?'':'s')+' to work on'):'Unlocks when you miss a term'}
+  ];
+  modes.forEach(function(md){
+    var b=document.createElement('button'); b.className='mode '+md.cls+(md.un?'':' locked');
+    b.innerHTML='<h3>'+md.t+'</h3><p>'+md.p+'</p><div class="req">'+md.req+'</div>';
+    b.onclick=function(){ if(!md.un){SFX.wrong();modalMsg(md.t,md.req+'.');return;} startRound(md.k); };
+    mg.appendChild(b);
+  });
+}
+$('btnTrophies').onclick=function(){SFX.click();renderTrophies();show('scrTrophies');};
+$('btnReport').onclick=function(){SFX.click();renderReport();show('scrReport');};
+Array.prototype.forEach.call(document.querySelectorAll('[data-go="hub"]'),function(b){b.onclick=function(){SFX.click();renderHub();show('scrHub');};});
+$('btnHelp').onclick=function(){
+  modalMsg('How scoring works',
+   '<p>Every right answer is worth 100 points plus a speed bonus of up to 100 more.</p>'+
+   '<p>Build a streak to raise your multiplier: x1.5 at 3 in a row, up to x3 at 12 in a row. A miss resets it.</p>'+
+   '<p><b>Stars:</b> 1 star for 60% correct, 2 stars for 80%, and 3 stars for 90% with an average answer time under '+(S.relaxed?'12':'6')+' seconds.</p>'+
+   '<p><b>Mastery:</b> get a term right several times in a row to master it. Misses send it back to your Weak Words list.</p>'+
+   '<p>Keyboard: press 1 to 4 to answer.</p>',true);
+};
+$('btnReset').onclick=function(){
+  modalMsg('Reset progress?','<p>This erases your XP, stars, trophies, and mastery on this device. It cannot be undone.</p>'+
+   '<div class="btnrow"><button class="big" id="confirmReset">ERASE</button><button class="big gray" id="cancelReset">CANCEL</button></div>',true,true);
+  $('confirmReset').onclick=function(){var m=S.mute;S=blankSave();S.mute=m;persist();closeModal();syncToggles();location.reload();};
+  $('cancelReset').onclick=closeModal;
+};
+function modalMsg(title,html,isHtml,noBtn){
+  $('modalBody').innerHTML='<div class="res-title" style="font-size:15px">'+esc(title)+'</div><div style="font-size:15px;line-height:1.5">'+(isHtml?html:'<p>'+esc(html)+'</p>')+'</div>'+
+    (noBtn?'':'<div class="btnrow"><button class="big blue" id="modalOk">OK</button></div>');
+  $('modal').classList.add('on');
+  if(!noBtn) $('modalOk').onclick=closeModal;
+}
+function closeModal(){$('modal').classList.remove('on');}
+
+/* ---------------- ROUND SETUP ---------------- */
+var G=null;
+function weightedPick(pool,n){
+  // lower mastery boxes and more misses are more likely to be chosen
+  var scored=pool.map(function(x){var r=S.terms[x.t];return {x:x,k:Math.random()*2+(MASTER_BOX-Math.min(r.b,MASTER_BOX))+r.w*0.3};});
+  scored.sort(function(a,b){return b.k-a.k;});
+  return scored.slice(0,n).map(function(o){return o.x;});
+}
+function makeQueue(mode,sec){
+  var q=[],pool,picks;
+  if(mode==='stage'){
+    pool=sectionTerms(sec);
+    if(pool.length>=10) picks=weightedPick(pool,10);
+    else picks=shuffle(pool).concat(weightedPick(pool,10-pool.length));
+  }else if(mode==='boss'){
+    picks=[];SECTIONS.forEach(function(s){picks=picks.concat(weightedPick(sectionTerms(s.id),5));});
+  }else if(mode==='weak'){
+    picks=weakList().slice(0,12);
+    if(picks.length<6) picks=picks.concat(picks);
+    if(picks.length<8){
+      var others=TERMS.filter(function(x){return picks.indexOf(x)<0&&S.terms[x.t].b<MASTER_BOX;});
+      picks=picks.concat(weightedPick(others,8-picks.length));
+    }
+  }
+  picks=shuffle(picks);
+  var lastType=null;
+  picks.forEach(function(t,i){
+    var seen=q.filter(function(z){return z.term===t;});
+    var type=seen.length?(seen[0].type==='A'?'B':'A'):(Math.random()<0.5?'A':'B');
+    q.push({term:t,type:type});
+  });
+  return q;
+}
+function nextRecessionQ(){
+  var t=weightedPick(TERMS,6); t=t[Math.floor(Math.random()*t.length)];
+  if(G.q.length&&G.q[G.q.length-1].term===t) t=TERMS[(TERMS.indexOf(t)+7)%TERMS.length];
+  return {term:t,type:Math.random()<0.5?'A':'B'};
+}
+function distractors(term,n,hard){
+  var same=shuffle(TERMS.filter(function(x){return x.s===term.s&&x!==term;}));
+  var other=shuffle(TERMS.filter(function(x){return x.s!==term.s;}));
+  var list=hard?same.concat(other):shuffle(same.slice(0,1).concat(other)).concat(same.slice(1));
+  return list.slice(0,n);
+}
+function timeFor(type){
+  var base;
+  if(G.mode==='boss') base=type==='A'?10000:8000;
+  else if(G.mode==='recession') base=Math.max(type==='A'?5000:4000,(type==='A'?12000:9000)-G.correct*300);
+  else base=type==='A'?12000:9000;
+  return S.relaxed?base*2:base;
+}
+function startRound(mode,sec){
+  ac();
+  G={active:false,mode:mode,sec:sec||null,idx:0,score:0,streak:0,bestStreak:0,correct:0,answered:0,lives:3,
+     times:[],missed:[],brokeBig:false,vshape:false,q:[],hard:(mode==='boss'||mode==='recession')};
+  if(mode==='recession'){G.q=[nextRecessionQ()];} else G.q=makeQueue(mode,sec);
+  var label={stage:(sec+' · '+(SECTIONS.filter(function(s){return s.id===sec;})[0]||{}).name),boss:'BOSS ROUND',recession:'RECESSION MODE',weak:'WEAK WORDS'}[mode];
+  $('hudMode').textContent=label.toUpperCase();
+  $('hudLives').textContent=mode==='recession'?'❤️❤️❤️':'';
+  show('scrPlay'); updHud();
+  $('prompt').innerHTML=''; $('opts').innerHTML=''; $('feedback').textContent='';
+  countdown(3,function(){G.active=true;ask();});
+}
+function countdown(n,cb){
+  var el=$('countdown'); el.classList.add('on');
+  (function step(k){
+    if(k===0){el.textContent='GO!';SFX.go();setTimeout(function(){el.classList.remove('on');cb();},450);return;}
+    el.textContent=k;SFX.count();setTimeout(function(){step(k-1);},650);
+  })(n);
+}
+
+/* ---------------- PLAY LOOP ---------------- */
+var raf=null,qStart=0,qDur=0,lastTick=0,locked=false,cur=null;
+function updHud(){
+  $('hudScore').textContent=fmt(G.score);
+  var m=multFor(G.streak); $('hudMult').textContent='x'+m; $('hudMult').classList.toggle('hot',m>=2);
+  $('hudStreak').textContent='STREAK '+G.streak;
+  $('hudProg').textContent=G.mode==='recession'?(G.correct+' CORRECT'):((Math.min(G.idx+1,G.q.length))+' / '+G.q.length);
+  var c=$('combo').children,fill=G.streak%3; if(G.streak>0&&fill===0&&multFor(G.streak)>1) fill=3;
+  for(var i=0;i<c.length;i++) c[i].classList.toggle('on',i<fill);
+  if(G.mode==='recession'){var h='';for(var j=0;j<3;j++) h+=(j<G.lives?'❤️':'🖤');$('hudLives').textContent=h;}
+}
+function multFor(s){return Math.min(3,1+Math.floor(s/3)*0.5);}
+function ask(){
+  cur=G.q[G.idx]; locked=false;
+  var term=cur.term,hard=G.hard,opts,i;
+  var pr=$('prompt'),op=$('opts');
+  pr.classList.remove('shake'); $('feedback').textContent='';
+  var qlabel=G.mode==='recession'?('Q'+(G.answered+1)):('Q'+(G.idx+1));
+  if(cur.type==='A'){
+    opts=shuffle([term].concat(distractors(term,2,hard)));
+    pr.innerHTML='<span class="tag">PICK THE DEFINITION</span><span class="qn">'+qlabel+'</span><div class="term">'+esc(term.t)+'</div>';
+    op.className='opts three';
+  }else{
+    opts=shuffle([term].concat(distractors(term,3,hard)));
+    pr.innerHTML='<span class="tag">PICK THE TERM</span><span class="qn">'+qlabel+'</span><div class="def">'+esc(term.d)+'</div>';
+    op.className='opts four';
+  }
+  op.innerHTML='';
+  cur.opts=opts;
+  opts.forEach(function(o,k){
+    var b=document.createElement('button'); b.className='opt';
+    b.innerHTML='<span class="k">'+(k+1)+'</span>'+esc(cur.type==='A'?o.d:o.t);
+    b.onclick=function(){answer(k);};
+    op.appendChild(b);
+  });
+  qDur=timeFor(cur.type); qStart=performance.now(); lastTick=0;
+  cancelAnimationFrame(raf); raf=requestAnimationFrame(loop);
+  updHud();
+}
+function loop(now){
+  if(!G||!G.active||locked) return;
+  var left=qDur-(now-qStart), pct=Math.max(0,left/qDur);
+  $('timerFill').style.transform='scaleX('+pct+')';
+  $('timer').className='timer'+(pct<.25?' danger':pct<.5?' warn':'');
+  var secLeft=Math.ceil(left/1000);
+  if(secLeft<=3&&secLeft>0&&secLeft!==lastTick){lastTick=secLeft;SFX.tick();}
+  if(left<=0){answer(-1);return;}
+  raf=requestAnimationFrame(loop);
+}
+function answer(k){
+  if(locked||!G||!G.active||G.paused) return;
+  locked=true; cancelAnimationFrame(raf);
+  var el=performance.now()-qStart, term=cur.term, btns=$('opts').children, right=(k>=0&&cur.opts[k]===term);
+  var rec=S.terms[term.t];
+  G.answered++; S.totalAnswered++;
+  for(var i=0;i<btns.length;i++){btns[i].disabled=true; if(cur.opts[i]===term) btns[i].classList.add('right'); else if(i===k) btns[i].classList.add('wrong'); else btns[i].classList.add('dim');}
+  if(right){
+    G.streak++; G.correct++; S.totalCorrect++; G.times.push(el);
+    if(G.streak>G.bestStreak) G.bestStreak=G.streak;
+    if(G.streak>S.bestStreak) S.bestStreak=G.streak;
+    var m=multFor(G.streak), speed=Math.round(100*Math.max(0,1-el/qDur)), pts=Math.round((100+speed)*m);
+    G.score+=pts; rec.c++; rec.b=Math.min(5,rec.b+1);
+    SFX.right(G.streak); popAt(btns[k],'+'+pts);
+    if(G.streak>0&&G.streak%3===0&&multFor(G.streak)>multFor(G.streak-1)) setTimeout(SFX.streak,120);
+    $('feedback').innerHTML='<span style="color:#22d36b">'+(speed>=70?'LIGHTNING!':speed>=40?'NICE!':'CORRECT')+'</span>';
+    if(el<1500) award('flash');
+    if(G.streak>=10) award('streak10');
+    if(G.streak>=25) award('streak25');
+    if(G.brokeBig&&G.streak>=5) award('vshape');
+    if(rec.b===MASTER_BOX){ if(masteredCount()>=10) award('master10'); if(masteredCount()>=TERMS.length) award('master37'); }
+  }else{
+    if(G.streak>=5) G.brokeBig=true;
+    G.streak=0; rec.w++; rec.b=Math.max(0,rec.b-2);
+    if(G.missed.indexOf(term)<0) G.missed.push(term);
+    if(G.mode==='recession') G.lives--;
+    SFX.wrong(); $('prompt').classList.add('shake');
+    $('feedback').innerHTML='<span style="color:#ff3355">'+(k<0?'TIME\'S UP!':'MISSED IT')+'</span>';
+  }
+  updHud(); persist();
+  setTimeout(advance,right?850:1900);
+}
+function advance(){
+  if(!G||!G.active) return;
+  if(G.paused){G.pendingAdvance=true;return;}
+  if(G.mode==='recession'){
+    if(G.lives<=0){finish();return;}
+    G.idx++; G.q.push(nextRecessionQ()); ask(); return;
+  }
+  G.idx++;
+  if(G.idx>=G.q.length){finish();return;}
+  ask();
+}
+$('btnQuit').onclick=function(){
+  if(!G||!G.active||G.paused) return;
+  var timing=!locked, elapsed=performance.now()-qStart;
+  G.paused=true; locked=true; cancelAnimationFrame(raf);
+  modalMsg('Quit this round?','<p>Your mastery progress from this round is kept, but you will not earn stars or XP.</p>'+
+    '<div class="btnrow"><button class="big" id="qYes">QUIT</button><button class="big gray" id="qNo">KEEP PLAYING</button></div>',true,true);
+  $('qYes').onclick=function(){closeModal();G.active=false;G=null;renderHub();show('scrHub');};
+  $('qNo').onclick=function(){
+    closeModal(); G.paused=false;
+    if(G.pendingAdvance){G.pendingAdvance=false;advance();return;}
+    if(timing){qStart=performance.now()-elapsed;locked=false;raf=requestAnimationFrame(loop);}
+  };
+};
+document.addEventListener('keydown',function(e){
+  if(!$('scrPlay').classList.contains('on')||$('modal').classList.contains('on')) return;
+  var n=parseInt(e.key,10); if(n>=1&&n<=4&&$('opts').children[n-1]) answer(n-1);
+});
+
+/* ---------------- FINISH ---------------- */
+function finish(){
+  G.active=false; cancelAnimationFrame(raf);
+  var acc=G.answered?G.correct/G.answered:0;
+  var avg=G.times.length?G.times.reduce(function(a,b){return a+b;},0)/G.times.length:0;
+  var limit=S.relaxed?12000:6000, stars=0, firstStarsBonus=0, title='ROUND COMPLETE';
+  var oldRank=rankIndex(S.xp), banners=[];
+  if(G.mode==='stage'){
+    if(acc>=0.6) stars=1; if(acc>=0.8) stars=2; if(acc>=0.9&&avg<=limit) stars=3;
+    var st=S.stages[G.sec];
+    if(stars>st.stars){firstStarsBonus=(stars-st.stars)*100; st.stars=stars;}
+    if(G.score>st.best) st.best=G.score;
+    if(acc===1) award('perfect');
+    if(allStagesAtLeast(1)) award('stars4');
+    if(allStagesAtLeast(3)) award('three4');
+    title=stars===3?'TRIPLE STAR!':stars>0?'STAGE CLEARED':'TRY AGAIN';
+  }else if(G.mode==='boss'){
+    if(G.score>S.boss.best) S.boss.best=G.score;
+    if(acc>=0.7){ if(!S.boss.cleared) firstStarsBonus=300; S.boss.cleared=true; award('boss'); title='BOSS DEFEATED!'; } else title='THE BOSS WINS THIS TIME';
+    if(acc===1) award('bossperfect');
+  }else if(G.mode==='recession'){
+    SFX.over(); title='GAME OVER · '+G.correct+' CORRECT';
+    if(G.correct>S.rec.best){S.rec.best=G.correct; banners.push('<div class="banner troph">NEW RECESSION RECORD: '+G.correct+'</div>');}
+    if(G.correct>=10) award('rec10'); if(G.correct>=25) award('rec25');
+  }else if(G.mode==='weak'){
+    title=acc===1?'WEAK WORDS FIXED!':'KEEP DRILLING';
+    if(acc===1) award('weak');
+  }
+  if(G.answered>=8&&acc>=0.8&&avg>0&&avg<3000) award('speed');
+  if(G.score>=4000) award('record');
+  var xpGain=Math.round(G.score/10)+40+firstStarsBonus;
+  var before=S.xp; S.xp+=xpGain; S.rounds++;
+  award('first'); if(S.rounds>=25) award('rounds25');
+  var newRank=rankIndex(S.xp);
+  if(S.xp>=RANKS[3].xp) award('economist');
+  if(newRank===RANKS.length-1) award('chair');
+  persist();
+
+  $('resTitle').textContent=title;
+  if(G.mode==='stage'){
+    $('resStars').innerHTML=starsHtml(stars);
+    $('resCrit').innerHTML='1★ 60% · 2★ 80% · 3★ 90% and under '+(limit/1000)+'s average';
+    var ss=$('resStars').children;
+    for(var i=0;i<ss.length;i++)(function(k){setTimeout(function(){ss[k].classList.add('show'); if(k<stars) SFX.star(k);},300+k*350);})(i);
+    if(stars===3) setTimeout(function(){confetti(70);},1300);
+  }else{ $('resStars').innerHTML=''; $('resCrit').innerHTML=''; if(title.indexOf('DEFEATED')>=0||title.indexOf('FIXED')>=0) confetti(70); }
+  $('resStats').innerHTML=
+    '<div class="stat"><span>Score</span><b>'+fmt(G.score)+'</b></div>'+
+    '<div class="stat"><span>Accuracy</span><b>'+Math.round(acc*100)+'%</b></div>'+
+    '<div class="stat"><span>Avg time</span><b>'+(avg?(avg/1000).toFixed(1)+'s':'-')+'</b></div>'+
+    '<div class="stat"><span>Best streak</span><b>'+G.bestStreak+'</b></div>';
+  var r=RANKS[newRank], nx=RANKS[newRank+1];
+  var pct=nx?((S.xp-r.xp)/(nx.xp-r.xp)*100):100, pct0=nx&&newRank===oldRank?((before-r.xp)/(nx.xp-r.xp)*100):0;
+  $('resXp').innerHTML='<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><b>+'+fmt(xpGain)+' XP'+(firstStarsBonus?' (includes '+firstStarsBonus+' bonus)':'')+'</b><span class="muted">'+r.ic+' '+r.name+'</span></div>'+
+    '<div class="bar gold"><i id="resXpBar" style="width:'+pct0+'%"></i></div>'+
+    '<div class="xpnums">'+(nx?(fmt(nx.xp-S.xp)+' XP to '+nx.name):'Top rank reached')+'</div>';
+  setTimeout(function(){var b=$('resXpBar'); if(b) b.style.width=pct+'%';},250);
+  if(newRank>oldRank){ banners.push('<div class="banner rank">PROMOTED! YOU ARE NOW: '+r.name.toUpperCase()+' '+r.ic+'</div>'); setTimeout(SFX.rank,900); }
+  $('resBanners').innerHTML=banners.join('');
+  var rv='';
+  if(G.missed.length){
+    rv='<h4>REVIEW WHAT YOU MISSED</h4>'+G.missed.map(function(t){return '<div class="rv"><b>'+esc(t.t)+'</b><br>'+esc(t.d)+'</div>';}).join('');
+  }else if(G.answered){ rv='<h4 style="color:#22d36b">NO MISSES THIS ROUND!</h4>'; }
+  $('resReview').innerHTML=rv;
+  var m=G.mode,s=G.sec;
+  $('btnRetry').onclick=function(){SFX.click(); if(m==='weak'&&!weakList().length){renderHub();show('scrHub');return;} startRound(m,s);};
+  $('btnRetry').textContent=(m==='weak'&&!weakList().length)?'ALL FIXED':'PLAY AGAIN';
+  show('scrResults');
+}
+$('btnToHub').onclick=function(){SFX.click();G=null;renderHub();show('scrHub');};
+
+/* ---------------- TROPHIES / REPORT ---------------- */
+function renderTrophies(){
+  $('trophCount').textContent=trophyCount()+' of '+TROPHIES.length+' collected';
+  $('trophGrid').innerHTML=TROPHIES.map(function(t){
+    var got=S.trophies[t.id];
+    return '<div class="troph'+(got?' got':'')+'"><div class="ic">'+t.ic+'</div><div><h5>'+(got?esc(t.n):'???')+'</h5><p>'+esc(t.h)+'</p>'+
+      (got?'<div class="when">Earned '+new Date(got).toLocaleDateString()+'</div>':'')+'</div></div>';
+  }).join('');
+}
+function renderReport(){
+  var r=rankFor(S.xp), now=new Date();
+  var rows=SECTIONS.map(function(s){var st=S.stages[s.id];return '<tr><td>'+s.id+' '+esc(s.name)+'</td><td>'+('★'.repeat(st.stars)+'☆'.repeat(3-st.stars))+'  ·  best '+fmt(st.best)+'</td></tr>';}).join('');
+  var acc=S.totalAnswered?Math.round(S.totalCorrect/S.totalAnswered*100):0;
+  $('reportBody').innerHTML='<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px"><span style="font-size:20px;font-weight:bold">'+esc(S.name||'Player')+'</span><span>'+now.toLocaleDateString()+' '+now.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'</span></div>'+
+    '<table>'+
+    '<tr><td>Rank</td><td>'+r.ic+' '+esc(r.name)+'</td></tr>'+
+    '<tr><td>Total XP</td><td>'+fmt(S.xp)+'</td></tr>'+
+    '<tr><td>Terms mastered</td><td>'+masteredCount()+' / '+TERMS.length+'</td></tr>'+
+    rows+
+    '<tr><td>Boss Round</td><td>'+(S.boss.cleared?'Cleared':'Not cleared')+'  ·  best '+fmt(S.boss.best)+'</td></tr>'+
+    '<tr><td>Recession Mode record</td><td>'+S.rec.best+' correct</td></tr>'+
+    '<tr><td>Trophies</td><td>'+trophyCount()+' / '+TROPHIES.length+'</td></tr>'+
+    '<tr><td>Rounds played</td><td>'+S.rounds+'</td></tr>'+
+    '<tr><td>Lifetime accuracy</td><td>'+acc+'%</td></tr>'+
+    '<tr><td>Longest streak</td><td>'+S.bestStreak+'</td></tr>'+
+    '</table><p style="font-size:12px;color:#555;margin:10px 0 0">Relaxed Timer: '+(S.relaxed?'On':'Off')+'</p>';
+}
+
+/* ---------------- BOOT ---------------- */
+syncToggles();
+startTitle();
+window.__vocabArcade={terms:TERMS,state:function(){return S;},game:function(){return G;}};
+})();
+</script>
+</body>
+</html>
