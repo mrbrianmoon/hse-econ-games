@@ -742,6 +742,7 @@ function timeFor(type){
   if(G.mode==='boss') base=type==='A'?10000:8000;
   else if(G.mode==='recession') base=Math.max(type==='A'?5000:4000,(type==='A'?12000:9000)-G.correct*300);
   else base=type==='A'?12000:9000;
+  base+=3000; // extra reading time on every question
   return S.relaxed?base*2:base;
 }
 function startRound(mode,sec){
