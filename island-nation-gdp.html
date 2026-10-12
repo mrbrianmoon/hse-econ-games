@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Island Nation: GDP Tycoon</title>
+<style>
+  :root{
+    --royal:#004AA0; --royal-dark:#003B80; --red:#C8102E; --gray:#C6C8CE;
+    --navy:#1A2230; --bg:#EEF2F7; --card:#FFFFFF; --muted:#5B6472;
+    --good:#1E7B3A; --goodbg:#E6F4EA; --badbg:#FBE9EC; --sea:#D6E6F7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--navy);min-height:100vh;}
+  .wrap{max-width:760px;margin:0 auto;padding:16px;}
+  header.top{background:linear-gradient(135deg,var(--royal) 0%,var(--royal-dark) 100%);color:#fff;border-radius:14px;border-bottom:5px solid var(--red);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  header.top h1{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;margin:0;}
+  header.top .sub{font-size:.8rem;opacity:.85;letter-spacing:.08em;text-transform:uppercase;}
+  .hud{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 11px;font-size:.85rem;white-space:nowrap;}
+  .iconbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 11px;font-size:.85rem;cursor:pointer;font-family:inherit;}
+  .progress{display:flex;gap:6px;margin:14px 0 4px;}
+  .progress span{flex:1;height:8px;border-radius:4px;background:var(--gray);}
+  .progress span.done{background:var(--royal);}
+  .progress span.now{background:var(--red);}
+  .panel{background:var(--card);border-radius:14px;padding:20px;margin-top:14px;box-shadow:0 1px 4px rgba(20,30,50,.12);}
+  .panel h2{font-family:Georgia,serif;color:var(--royal-dark);margin:0 0 6px;font-size:1.3rem;}
+  .panel h3{font-family:Georgia,serif;color:var(--royal-dark);margin:16px 0 6px;font-size:1.05rem;}
+  .step{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red);font-weight:bold;margin-bottom:4px;}
+  p{line-height:1.5;margin:8px 0;}
+  .muted{color:var(--muted);font-size:.9rem;}
+  .btn{display:inline-block;background:var(--royal);color:#fff;border:none;border-radius:10px;padding:12px 18px;font-size:1rem;font-family:inherit;font-weight:bold;cursor:pointer;min-height:46px;}
+  .btn:active{transform:translateY(1px);}
+  .btn.red{background:var(--red);}
+  .btn.ghost{background:#fff;color:var(--royal);border:2px solid var(--royal);}
+  .btn:disabled{background:var(--gray);color:#fff;cursor:default;}
+  .btn.picked{outline:4px solid var(--navy);outline-offset:2px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  input[type=text]{font-family:inherit;font-size:1.1rem;padding:10px 12px;border:2px solid var(--gray);border-radius:10px;width:100%;max-width:320px;}
+  input:focus{outline:none;border-color:var(--royal);}
+  label{font-weight:bold;display:block;margin:12px 0 4px;}
+  .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px;}
+  .choice{background:#fff;border:2px solid var(--gray);border-radius:12px;padding:14px;text-align:left;cursor:pointer;font-family:inherit;color:var(--navy);font-size:.95rem;min-height:120px;}
+  .choice b{display:block;font-family:Georgia,serif;color:var(--royal-dark);font-size:1.05rem;margin-bottom:6px;}
+  .choice .tag{display:inline-block;margin-top:8px;font-size:.75rem;font-weight:bold;color:#fff;background:var(--royal);border-radius:6px;padding:2px 7px;margin-right:4px;}
+  .choice.sel{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.15);}
+  .event{border-left:6px solid var(--red);background:#FFF7F8;border-radius:10px;padding:14px 16px;margin-top:10px;}
+  .event.blue{border-left-color:var(--royal);background:#F2F6FC;}
+  .event .big{font-size:2rem;}
+  .ledger{width:100%;border-collapse:collapse;margin-top:10px;font-size:1rem;}
+  .ledger th{text-align:left;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:2px solid var(--gray);}
+  .ledger th.num,.ledger td.num{text-align:right;}
+  .ledger td{padding:10px 8px;border-bottom:1px solid #E3E6EB;font-variant-numeric:tabular-nums;}
+  .ledger td.num{font-weight:bold;white-space:nowrap;}
+  .ledger td.q{color:var(--red);font-weight:bold;}
+  .ledger .ico{font-size:1.3rem;margin-right:6px;}
+  .ledger tr.tot td{border-bottom:none;font-weight:bold;}
+  .chg{font-size:.75rem;font-weight:bold;margin-left:4px;}
+  .up{color:var(--red);} .down{color:var(--good);}
+  .formula{background:var(--sea);border-radius:10px;padding:10px 14px;margin-top:12px;font-weight:bold;text-align:center;font-size:1rem;line-height:1.4;}
+  .fb{border-radius:10px;padding:12px 14px;margin-top:12px;display:none;line-height:1.45;}
+  .fb.ok{display:block;background:var(--goodbg);border-left:5px solid var(--good);}
+  .fb.no{display:block;background:var(--badbg);border-left:5px solid var(--red);}
+  .fb table{margin-top:6px;border-collapse:collapse;}
+  .fb td{padding:2px 10px 2px 0;font-variant-numeric:tabular-nums;}
+  .grid5{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .grid5 .btn{width:100%;}
+  .grid5 .btn.wide{grid-column:1 / -1;}
+  .tf{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;}
+  .tf .btn{width:100%;}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px;}
+  .stat{background:var(--bg);border-radius:10px;padding:10px 12px;}
+  .stat .k{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+  .stat .v{font-size:1.35rem;font-weight:bold;font-family:Georgia,serif;color:var(--royal-dark);}
+  .chartbox{margin-top:12px;background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:8px;}
+  .legend{display:flex;gap:16px;font-size:.85rem;margin:6px 4px 0;flex-wrap:wrap;}
+  .legend i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px;}
+  .missed li{margin:8px 0;line-height:1.45;}
+  .cert{border:3px solid var(--royal);border-radius:14px;padding:18px;text-align:center;margin-top:14px;background:#fff;}
+  .cert .name{font-family:Georgia,serif;font-size:1.5rem;color:var(--royal-dark);}
+  .help{position:fixed;inset:0;background:rgba(10,20,40,.55);display:none;align-items:flex-start;justify-content:center;padding:20px;overflow:auto;z-index:20;}
+  .help.open{display:flex;}
+  .help .box{background:#fff;border-radius:14px;max-width:560px;width:100%;padding:20px;}
+  .help dt{font-weight:bold;color:var(--royal-dark);margin-top:10px;}
+  .help dd{margin:2px 0 0 0;line-height:1.4;}
+  .island{display:block;margin:10px auto 0;max-width:260px;width:100%;}
+  footer{text-align:center;color:#8B94A3;font-size:.75rem;margin:18px 0 8px;}
+  @media (max-width:560px){ .tf{grid-template-columns:1fr;} header.top h1{font-size:1.15rem;} .ledger{font-size:.9rem;} .ledger td,.ledger th{padding-left:4px;padding-right:4px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="sub">HSE Indiana Economics &middot; Unit 5</div>
+      <h1 id="titleText">Island Nation: GDP Tycoon</h1>
+    </div>
+    <div class="hud">
+      <span class="pill" id="hudYear">Year 0 of 6</span>
+      <span class="pill" id="hudScore">Score 0</span>
+      <button class="iconbtn" id="helpBtn" type="button">Word Help</button>
+      <button class="iconbtn" id="muteBtn" type="button">Sound: On</button>
+    </div>
+  </header>
+  <div class="progress" id="progressBar"></div>
+  <div id="screen"></div>
+  <footer>HSE Indiana Economics &middot; Mr. Moon &middot; Unit 5 &middot; 7.1 Gross Domestic Product</footer>
+</div>
+
+<div class="help" id="helpModal">
+  <div class="box">
+    <h2 style="font-family:Georgia,serif;color:#003B80;margin-top:0">Word Help</h2>
+    <dl>
+      <dt>Gross domestic product (GDP)</dt><dd>The dollar value of all final goods and services produced within a country's borders in a given year.</dd>
+      <dt>Final goods</dt><dd>Products in the form sold to consumers, like a finished computer.</dd>
+      <dt>Intermediate goods</dt><dd>Products used to make final goods, like the memory chips inside a computer. They are not counted, so nothing gets counted twice.</dd>
+      <dt>Durable goods</dt><dd>Goods that last a long time, like a refrigerator.</dd>
+      <dt>Nondurable goods</dt><dd>Goods that last a short time, like food or sneakers.</dd>
+      <dt>The four spending categories</dt><dd>Consumer goods and services, business goods and services, government goods and services, and net exports. Add all four to get GDP.</dd>
+      <dt>Net exports</dt><dd>Exports (made here, bought in other countries) minus imports (made in other countries, bought here).</dd>
+      <dt>Nominal GDP</dt><dd>GDP measured in current prices: this year's quantities times this year's prices.</dd>
+      <dt>Real GDP</dt><dd>GDP in constant prices: this year's quantities times the base year's prices. It shows if output really grew.</dd>
+      <dt>Base year</dt><dd>The year whose prices are used to measure real GDP. On your island, it is Year 1.</dd>
+      <dt>Price level</dt><dd>The overall level of prices in the economy.</dd>
+      <dt>Gross national product (GNP)</dt><dd>The value of goods and services produced by a nation's citizens and firms, even if made in another country.</dd>
+      <dt>Nonmarket activities</dt><dd>Work people do for themselves for free, like mowing their own lawn. Not counted in GDP.</dd>
+      <dt>Underground economy</dt><dd>Sales that are never reported to the government, like cash "under the table." Not counted in GDP.</dd>
+      <dt>Negative externalities</dt><dd>Harmful side effects, like pollution, that are not subtracted from GDP.</dd>
+    </dl>
+    <div class="row"><button class="btn" id="helpClose" type="button">Close</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TOTAL_YEARS = 6;
+  var SAVE_KEY = "hse-island-nation-gdp-v3";
+
+  // ---------- the island's three final goods ----------
+  var GOODS = [
+    {k:"pine",  name:"Crates of pineapples", ico:"🍍", unit:1},
+    {k:"boat",  name:"Fishing boats",        ico:"⛵",       unit:100},
+    {k:"panel", name:"Solar panels",         ico:"☀️", unit:10}
+  ];
+  // Every student gets a different starting island (about 1.6 million combinations),
+  // so Year 1 answers almost never match a neighbor's. Values stay calculator-friendly.
+  function range(lo, hi, step){ var a=[]; for(var v=lo; v<=hi; v+=step) a.push(v); return a; }
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  var START_RANGE = {pine:range(300,500,10), boat:range(8,16,1),       panel:range(40,80,2)};
+  var PRICE_RANGE = {pine:range(40,60,5),    boat:range(6000,10000,500), panel:range(400,800,50)};
+
+  // q: absolute change, qp: percent change to quantity, pp: percent change to price
+  var POLICIES = [
+    {id:"factory",  name:"Build a Solar Panel Factory", text:"A company builds a big plant on the edge of town that turns out solar panels.", q:{panel:25}, tags:["More solar panels"], miss:"externality"},
+    {id:"harbor",   name:"Expand the Harbor", text:"The government helps boat builders add new docks and work sheds.", q:{boat:3}, tags:["More fishing boats"]},
+    {id:"fields",   name:"Clear Forest for Pineapple Fields", text:"Cut down part of the island's forest and plant new pineapple fields.", q:{pine:120}, tags:["More pineapples"], miss:"surroundings"},
+    {id:"longweek", name:"Longer Work Week", text:"A new law lets companies schedule 50-hour weeks.", qp:{pine:10, boat:10, panel:10}, tags:["More of everything"], miss:"leisure"},
+    {id:"training", name:"Job Training Program", text:"Train workers to build boats and install solar panels.", q:{boat:1, panel:12}, tags:["More boats","More panels"]},
+    {id:"taxcut",   name:"Cut Taxes", text:"Families keep more of each paycheck. They buy more, and stores raise some prices.", qp:{pine:5, boat:5, panel:5}, pp:{pine:4, boat:4, panel:4}, tags:["More output","Higher prices"]},
+    {id:"loans",    name:"Small Business Loans", text:"Loans help new farms and solar startups get going.", q:{pine:60, panel:8}, tags:["More pineapples","More panels"]},
+    {id:"coop",     name:"Fishing Co-op", text:"Fishing families team up to buy boats and share farm equipment.", q:{boat:2, pine:30}, tags:["More boats","More pineapples"]}
+  ];
+
+  var EVENTS = {
+    calm:        {icon:"☀️", name:"A Calm Year", text:"Nothing big happens. Output grows a little, and prices creep up a little.", qp:{pine:4, boat:4, panel:4}, pp:{pine:2, boat:2, panel:2}},
+    hurricane:   {icon:"🌀", name:"Hurricane!", text:"A hurricane smashes boats in the harbor and floods pineapple fields.", q:{boat:-4}, qp:{pine:-25}, pp:{pine:3, boat:3, panel:3}},
+    surge:       {icon:"⛽", name:"Price Surge", text:"World fuel prices spike. Almost everything on the island costs a lot more this year, and businesses make a little less.", qp:{pine:-6, boat:-6, panel:-6}, pp:{pine:12, boat:12, panel:12}},
+    craze:       {icon:"🌍", name:"Pineapple Craze Overseas", text:"A food trend sweeps other countries. Farms ship more pineapples abroad as exports.", qp:{pine:25}, pp:{pine:5, boat:2, panel:2}},
+    partner:     {icon:"📉", name:"Neighbor in Recession", text:"Your biggest trading partner hits hard times and buys fewer island goods.", q:{boat:-2}, qp:{pine:-10}, pp:{pine:1, boat:1, panel:1}},
+    population:  {icon:"👶", name:"Population Boom", text:"More families move to the island. Businesses hire and produce more.", qp:{pine:8, boat:8, panel:8}, pp:{pine:3, boat:3, panel:3}},
+    tech:        {icon:"💡", name:"Tech Breakthrough", text:"An island startup finds a cheaper way to make solar panels. Panel output jumps and panel prices fall.", q:{panel:20}, pp:{pine:2, boat:2, panel:-5}},
+    underground: {icon:"💵", name:"Cash Under the Table", text:"Some boat builders start selling boats for cash and never report the sales. The boats are real, but the government's records miss them.", q:{boat:-2}, pp:{pine:2, boat:2, panel:2}, miss:"underground"},
+    backyard:    {icon:"🏡", name:"Backyard Pineapples", text:"Families start growing their own pineapples at home instead of buying them.", qp:{pine:-15}, pp:{pine:2, boat:2, panel:2}, miss:"nonmarket"}
+  };
+
+  // Classify: cat = consumer | business | government | netexports | none
+  var CLASSIFY = [
+    {q:"A family buys a brand-new refrigerator made on the island.", cat:"consumer", why:"A new final good bought by a household. It is a durable good, so it counts as consumer goods and services."},
+    {q:"A family buys groceries for the week at the island market.", cat:"consumer", why:"Food is a nondurable good bought by a household. It counts as consumer goods and services."},
+    {q:"A delivery company buys a new van built on the island.", cat:"business", why:"A business buying new equipment counts as business goods and services."},
+    {q:"A pineapple farm buys a new tractor made on the island.", cat:"business", why:"Equipment a business buys to do its work counts as business goods and services."},
+    {q:"The island government pays a company to build a new bridge.", cat:"government", why:"Spending by the government counts as government goods and services."},
+    {q:"Island farms sell pineapples to a grocery chain in Canada.", cat:"netexports", why:"Goods made here and bought in another country are exports. Exports minus imports gives net exports."},
+    {q:"A bakery on the island buys flour to make bread.", cat:"none", why:"Flour is an intermediate good. It gets counted when the bread is sold. Counting it twice would make GDP too high."},
+    {q:"Maya buys a used pickup truck from her neighbor.", cat:"none", why:"The truck was counted in GDP the year it was made. Reselling it does not count again."},
+    {q:"An island-owned company makes phones in a factory overseas.", cat:"none", why:"It was not produced within your island's borders, so it is not in your GDP. It would count in GNP."},
+    {q:"A teenager mows the family lawn for free.", cat:"none", why:"That is a nonmarket activity. Work people do for themselves is not counted in GDP."},
+    {q:"A student earns cash babysitting for a neighbor and never reports it.", cat:"none", why:"Unreported cash work is part of the underground economy, so it is not included in GDP."},
+    {q:"Leo sells his old bike to a friend.", cat:"none", why:"The bike was counted when it was new, and informal sales between friends are not reported. It is not counted."}
+  ];
+  var CAT_LABEL = {consumer:"Consumer goods and services", business:"Business goods and services", government:"Government goods and services", netexports:"Net exports", none:"Not counted in GDP"};
+
+  var MISSED = {
+    externality:  "<b>Negative externalities:</b> your solar factory raised GDP, but GDP does not subtract the smoke and dust it put into the air.",
+    surroundings: "<b>Quality of life:</b> clearing the forest raised GDP, but GDP does not count the pleasant surroundings your people lost.",
+    leisure:      "<b>Quality of life:</b> the 50-hour work week raised GDP, but GDP does not count the leisure time your people gave up.",
+    underground:  "<b>The underground economy:</b> boats sold for cash under the table were really built, but GDP never saw them.",
+    nonmarket:    "<b>Nonmarket activities:</b> families growing their own pineapples LOWERED GDP, even though people ate just as well."
+  };
+  var MISSED_ALWAYS = "GDP is a useful yardstick, but it does not fully measure the well-being of your people. More goods and services do not always make people happier.";
+
+  // ---------- state ----------
+  var S = null;
+  var muted = false;
+  var screenEl = document.getElementById("screen");
+
+  function freshState(name, island){
+    var q = {}, p = {}, base = {};
+    GOODS.forEach(function(g){ q[g.k]=pick(START_RANGE[g.k]); base[g.k]=pick(PRICE_RANGE[g.k]); p[g.k]=base[g.k]; });
+    return {
+      name:name, island:island, year:1, phase:"policy", score:0, firstTry:0, attempts:0, helpCount:0,
+      q:q, p:p, base:base, history:[], misses:[], usedPolicies:[],
+      classQ:shuffle(CLASSIFY.map(function(_,i){return i;})).slice(0,TOTAL_YEARS),
+      events:buildEvents(), offered:null, pick:null, tries:0, cur:null, done:false, eventApplied:false
+    };
+  }
+
+  function buildEvents(){
+    var first = ["calm","population","tech","craze"][Math.floor(Math.random()*4)];
+    var surgeYear = 3 + Math.floor(Math.random()*3);
+    var hurYears = [2,3,4,5,6].filter(function(y){return y!==surgeYear;});
+    var hurYear = hurYears[Math.floor(Math.random()*hurYears.length)];
+    var rest = shuffle(["partner","underground","backyard","calm","population","tech","craze"].filter(function(e){return e!==first;}));
+    var yrs = [null, first];
+    for(var y=2;y<=TOTAL_YEARS;y++){
+      if(y===surgeYear) yrs[y]="surge";
+      else if(y===hurYear) yrs[y]="hurricane";
+      else yrs[y]=rest.shift();
+    }
+    return yrs;
+  }
+
+  function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+  function loadSaved(){ try{ var s=localStorage.getItem(SAVE_KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+  function clearSaved(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+
+  // ---------- sound ----------
+  var actx = null;
+  function beep(freqs){
+    if(muted) return;
+    try{
+      if(!actx){ var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return; actx = new AC(); }
+      var t = actx.currentTime;
+      freqs.forEach(function(f,i){
+        var o=actx.createOscillator(), g=actx.createGain();
+        o.type="triangle"; o.frequency.value=f;
+        g.gain.setValueAtTime(0.0001,t+i*0.09); g.gain.exponentialRampToValueAtTime(0.18,t+i*0.09+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.09+0.16);
+        o.connect(g); g.connect(actx.destination); o.start(t+i*0.09); o.stop(t+i*0.09+0.18);
+      });
+    }catch(e){}
+  }
+  function good(){ beep([523,659,784]); }
+  function bad(){ beep([220,180]); }
+
+  // ---------- helpers ----------
+  function el(html){ screenEl.innerHTML = html; window.scrollTo(0,0); }
+  function $(id){ return document.getElementById(id); }
+  function money(n){ return (n<0?"-$":"$") + Math.abs(n).toLocaleString("en-US"); }
+  function commas(n){ return n.toLocaleString("en-US"); }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];}); }
+  function parseNum(v){ v=String(v).replace(/[$,\s]/g,""); if(v===""||isNaN(Number(v))) return null; return Number(v); }
+  function pct(a,b){ return Math.round((b-a)/a*100); }
+
+  function hud(){
+    $("hudYear").textContent = S ? ("Year " + Math.min(S.year,TOTAL_YEARS) + " of " + TOTAL_YEARS) : "Year 0 of 6";
+    $("hudScore").textContent = "Score " + (S?S.score:0);
+    var bar = "";
+    for(var y=1;y<=TOTAL_YEARS;y++){
+      var cls = !S ? "" : (S.done || y<S.year ? "done" : (y===S.year ? "now" : ""));
+      bar += '<span class="'+cls+'"></span>';
+    }
+    $("progressBar").innerHTML = bar;
+    $("titleText").textContent = (S && S.island ? S.island : "Island Nation") + ": GDP Tycoon";
+  }
+
+  function applyChange(ch, allowPrice){
+    GOODS.forEach(function(g){
+      var k = g.k;
+      if(ch.qp && ch.qp[k]) S.q[k] = Math.round(S.q[k]*(1+ch.qp[k]/100));
+      if(ch.q && ch.q[k]) S.q[k] = S.q[k] + ch.q[k];
+      S.q[k] = Math.max(1, S.q[k]);
+      if(allowPrice && ch.pp && ch.pp[k]){
+        S.p[k] = Math.max(g.unit, Math.round(S.p[k]*(1+ch.pp[k]/100)/g.unit)*g.unit);
+      }
+    });
+  }
+  function valueAt(q, p){ var t=0; GOODS.forEach(function(g){ t += q[g.k]*p[g.k]; }); return t; }
+
+  // ---------- screens ----------
+  function startScreen(){
+    S = null; hud();
+    var saved = loadSaved();
+    var resume = saved && !saved.done ? '<div class="event blue"><b>Welcome back, '+esc(saved.name)+'.</b> You were in Year '+saved.year+' of '+esc(saved.island)+'.<div class="row"><button class="btn" id="resumeBtn" type="button">Resume my island</button><button class="btn ghost" id="newBtn" type="button">Start over</button></div></div>' : "";
+    el(
+      '<div class="panel">' +
+        '<div class="step">Mission Briefing</div>' +
+        '<h2>You are the new leader of an island nation.</h2>' +
+        islandSVG() +
+        '<p>Your island produces three final goods: <b>crates of pineapples</b>, <b>fishing boats</b>, and <b>solar panels</b>. For the next <b>6 years</b> you will make one big decision each year. Then the world will throw something at you. At the end of each year <b>you</b> calculate how the economy did.</p>' +
+        '<p>Each year you will:</p>' +
+        '<ol style="line-height:1.6;margin:6px 0 0 0;padding-left:22px">' +
+          '<li>Choose a policy for your island</li>' +
+          '<li>Face a random world event</li>' +
+          '<li>Sort a purchase into a GDP spending category (or decide it does not count)</li>' +
+          '<li>Calculate <b>nominal GDP</b> using this year\'s prices</li>' +
+          '<li>Calculate <b>real GDP</b> using Year 1 prices</li>' +
+        '</ol>' +
+        '<p class="muted">Bring a calculator. Tap <b>Word Help</b> at the top any time you forget a term.</p>' +
+        resume +
+        '<label for="nameIn">Your first and last name</label><input type="text" id="nameIn" maxlength="40" autocomplete="off">' +
+        '<label for="islandIn">Name your island</label><input type="text" id="islandIn" maxlength="24" autocomplete="off" placeholder="Example: Royal Isle">' +
+        '<div class="fb" id="startFb"></div>' +
+        '<div class="row"><button class="btn red" id="goBtn" type="button">Take Office</button></div>' +
+      '</div>'
+    );
+    $("goBtn").onclick = function(){
+      var n = $("nameIn").value.trim(), i = $("islandIn").value.trim();
+      if(!n || !i){ var f=$("startFb"); f.className="fb no"; f.textContent="Enter your name and an island name to begin."; return; }
+      clearSaved(); S = freshState(n, i); save(); route();
+    };
+    if($("resumeBtn")){
+      $("resumeBtn").onclick = function(){ S = saved; route(); };
+      $("newBtn").onclick = function(){ clearSaved(); startScreen(); };
+    }
+  }
+
+  function islandSVG(){
+    return '<svg class="island" viewBox="0 0 260 120" role="img" aria-label="Island">' +
+      '<rect x="0" y="0" width="260" height="120" rx="12" fill="#D6E6F7"/>' +
+      '<ellipse cx="130" cy="88" rx="96" ry="22" fill="#E8D7A8"/>' +
+      '<ellipse cx="130" cy="80" rx="74" ry="16" fill="#5E9B5A"/>' +
+      '<rect x="92" y="52" width="26" height="26" fill="#004AA0"/><rect x="99" y="60" width="6" height="6" fill="#fff"/><rect x="108" y="60" width="6" height="6" fill="#fff"/>' +
+      '<rect x="124" y="44" width="18" height="34" fill="#C6C8CE"/><rect x="128" y="36" width="5" height="10" fill="#5B6472"/>' +
+      '<polygon points="150,78 166,56 182,78" fill="#C8102E"/><rect x="158" y="66" width="16" height="12" fill="#fff"/>' +
+      '<path d="M60 74 q4 -18 0 -30" stroke="#7A5A2E" stroke-width="3" fill="none"/><path d="M60 44 q-14 -2 -18 8 M60 44 q14 -2 18 8 M60 44 q-6 -10 -14 -12 M60 44 q6 -10 14 -12" stroke="#2F7A3A" stroke-width="3" fill="none"/>' +
+      '<path d="M20 106 q10 -6 20 0 t20 0 M200 104 q10 -6 20 0 t20 0" stroke="#004AA0" stroke-width="2" fill="none" opacity=".5"/>' +
+    '</svg>';
+  }
+
+  function route(){
+    hud(); save();
+    if(S.done) return finalScreen();
+    var p = S.phase;
+    if(p==="policy") return policyScreen();
+    if(p==="event") return eventScreen();
+    if(p==="classify") return classifyScreen();
+    if(p==="nominal") return nominalScreen();
+    if(p==="real") return realScreen();
+    if(p==="compare") return compareScreen();
+    if(p==="summary") return summaryScreen();
+  }
+
+  function findPolicy(id){ return POLICIES.filter(function(x){return x.id===id;})[0]; }
+
+  function policyScreen(){
+    if(!S.offered){
+      var avail = POLICIES.filter(function(p){ return S.usedPolicies.indexOf(p.id)<0; });
+      S.offered = shuffle(avail).slice(0,3).map(function(p){return p.id;});
+      save();
+    }
+    var cards = S.offered.map(function(id){
+      var p = findPolicy(id);
+      return '<button class="choice" type="button" data-id="'+p.id+'"><b>'+p.name+'</b>'+p.text+'<br>'+p.tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join("")+'</button>';
+    }).join("");
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Step 1 of 5</div>' +
+        '<h2>Choose this year\'s policy</h2>' +
+        '<p>Your advisors bring you three options. Each one changes what your island produces. Pick one.</p>' +
+        (S.year===1?'<p class="muted">Year 1 is your <b>base year</b>. Its prices will be used to measure real GDP in every year after.</p>':'') +
+        '<div class="choices">'+cards+'</div>' +
+        '<div class="row"><button class="btn" id="confirmPolicy" type="button" disabled>Sign the order</button></div>' +
+      '</div>'
+    );
+    var btns = screenEl.querySelectorAll(".choice");
+    Array.prototype.forEach.call(btns, function(b){
+      b.onclick = function(){
+        Array.prototype.forEach.call(btns,function(x){x.classList.remove("sel");});
+        b.classList.add("sel"); S.pick = b.getAttribute("data-id"); $("confirmPolicy").disabled=false;
+      };
+    });
+    $("confirmPolicy").onclick = function(){
+      S.prevQ = JSON.parse(JSON.stringify(S.q)); S.prevP = JSON.parse(JSON.stringify(S.p));
+      var p = findPolicy(S.pick);
+      applyChange(p, S.year>1);
+      S.usedPolicies.push(p.id); S.yearPolicy = p.id;
+      if(p.miss && S.misses.indexOf(p.miss)<0) S.misses.push(p.miss);
+      S.offered = null; S.phase = "event"; S.eventApplied=false; beep([440,554]); route();
+    };
+  }
+
+  function eventScreen(){
+    var key = S.events[S.year], ev = EVENTS[key];
+    if(!S.eventApplied){
+      applyChange(ev, S.year>1);
+      if(ev.miss && S.misses.indexOf(ev.miss)<0) S.misses.push(ev.miss);
+      var nominal = valueAt(S.q, S.p), real = valueAt(S.q, S.base);
+      S.cur = {q:JSON.parse(JSON.stringify(S.q)), p:JSON.parse(JSON.stringify(S.p)), nominal:nominal, real:real, event:key, policy:S.yearPolicy};
+      S.eventApplied = true; save();
+    }
+    var priceLine = S.year===1
+      ? 'This is the <b>base year</b>, so this year\'s prices are the yardstick for every year after.'
+      : (function(){
+          var ups = GOODS.filter(function(g){return S.cur.p[g.k]>S.prevP[g.k];}).length;
+          var downs = GOODS.filter(function(g){return S.cur.p[g.k]<S.prevP[g.k];}).length;
+          if(ups===3) return 'Prices of all three goods went <b>up</b> this year. Watch what that does to nominal GDP.';
+          if(ups && downs) return 'Some prices went up and some went down this year.';
+          if(ups) return 'Some prices went <b>up</b> this year.';
+          return 'Prices held steady this year.';
+        })();
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Step 2 of 5</div>' +
+        '<h2>World Event</h2>' +
+        '<div class="event"><div class="big">'+ev.icon+'</div><h3 style="margin-top:4px">'+ev.name+'</h3><p>'+ev.text+'</p></div>' +
+        '<p>'+priceLine+'</p>' +
+        '<div class="row"><button class="btn" id="nextBtn" type="button">Continue</button></div>' +
+      '</div>'
+    );
+    $("nextBtn").onclick = function(){ S.phase="classify"; S.tries=0; route(); };
+  }
+
+  function classifyScreen(){
+    var item = CLASSIFY[S.classQ[S.year-1]];
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Step 3 of 5</div>' +
+        '<h2>Where does it go in GDP?</h2>' +
+        '<p>Economists add up spending in four categories to find GDP. Your economists found this in this year\'s records. Which category does it belong in, or does it not count at all?</p>' +
+        '<div class="event blue"><p style="font-size:1.1rem;margin:0"><b>'+item.q+'</b></p></div>' +
+        '<div class="grid5">' +
+          '<button class="btn" data-c="consumer" type="button">Consumer goods and services</button>' +
+          '<button class="btn" data-c="business" type="button">Business goods and services</button>' +
+          '<button class="btn" data-c="government" type="button">Government goods and services</button>' +
+          '<button class="btn" data-c="netexports" type="button">Net exports</button>' +
+          '<button class="btn red wide" data-c="none" type="button">Not counted in GDP</button>' +
+        '</div>' +
+        '<div class="fb" id="fb"></div>' +
+        '<div class="row" id="nextRow" style="display:none"><button class="btn" id="nextBtn" type="button">Open the books</button></div>' +
+      '</div>'
+    );
+    var btns = screenEl.querySelectorAll(".grid5 .btn");
+    Array.prototype.forEach.call(btns, function(b){
+      b.onclick = function(){
+        Array.prototype.forEach.call(btns,function(x){x.disabled=true;});
+        b.classList.add("picked");
+        var f=$("fb"); S.attempts++;
+        if(b.getAttribute("data-c")===item.cat){ S.score+=50; S.firstTry++; f.className="fb ok"; f.innerHTML="<b>Correct! +50</b><br>"+item.why; good(); }
+        else { f.className="fb no"; f.innerHTML="<b>Not quite.</b> The answer is <b>"+CAT_LABEL[item.cat]+"</b>.<br>"+item.why; bad(); }
+        $("nextRow").style.display="flex"; hud(); save();
+      };
+    });
+    $("nextBtn").onclick = function(){ S.phase="nominal"; S.tries=0; route(); };
+  }
+
+  function changeMark(now, before){
+    if(before===undefined || now===before) return "";
+    return '<span class="chg '+(now>before?"up":"down")+'">'+(now>before?"▲":"▼")+'</span>';
+  }
+
+  function ledgerHTML(q, p, priceHead, showPriceChange){
+    var rows = GOODS.map(function(g){
+      return '<tr><td><span class="ico">'+g.ico+'</span>'+g.name+'</td>' +
+        '<td class="num">'+commas(q[g.k])+changeMark(q[g.k], S.year>1 && S.prevQ ? S.prevQ[g.k] : undefined)+'</td>' +
+        '<td class="num">'+money(p[g.k])+(showPriceChange?changeMark(p[g.k], S.year>1 && S.prevP ? S.prevP[g.k] : undefined):'')+'</td>' +
+        '<td class="num q" id="val-'+g.k+'">?</td></tr>';
+    }).join("");
+    return '<table class="ledger"><tr><th>Good</th><th class="num">Quantity</th><th class="num">'+priceHead+'</th><th class="num">Value</th></tr>'+rows+
+      '<tr class="tot"><td colspan="3">Total</td><td class="num q">?</td></tr></table>';
+  }
+
+  function workedHTML(q, p, total){
+    var r = GOODS.map(function(g){ return '<tr><td>'+g.name+':</td><td>'+commas(q[g.k])+' &times; '+money(p[g.k])+'</td><td>= <b>'+money(q[g.k]*p[g.k])+'</b></td></tr>'; }).join("");
+    return '<table>'+r+'<tr><td><b>Total:</b></td><td></td><td>= <b>'+money(total)+'</b></td></tr></table>';
+  }
+
+  function attemptBlock(id, label){
+    return '<label for="'+id+'">'+label+'</label>' +
+      '<input type="text" inputmode="decimal" id="'+id+'" autocomplete="off" placeholder="Example: 152000">' +
+      '<div class="fb" id="fb"></div>' +
+      '<div class="row"><button class="btn" id="checkBtn" type="button">Check</button><button class="btn" id="nextBtn" type="button" style="display:none">Continue</button></div>';
+  }
+
+  // Calculation steps: students can NOT move on until the answer is correct.
+  //   Miss 1 -> the first good is worked out for them, then they try again.
+  //   Miss 2+ -> they are told to raise a hand or ask a classmate, and keep trying.
+  // ctx = {q, p, correct, pts, explain, priceWord, other, otherName}
+  function firstItemHTML(ctx){
+    var g = GOODS[0], v = ctx.q[g.k]*ctx.p[g.k];
+    var cell = $("val-"+g.k); if(cell){ cell.textContent = money(v); cell.style.color = "#1E7B3A"; }
+    return '<p style="margin:8px 0 4px"><b>Here is how to do the first good:</b></p>' +
+      '<p style="margin:0 0 6px;font-size:1.05rem">'+g.name+': '+commas(ctx.q[g.k])+' &times; '+money(ctx.p[g.k])+' = <b>'+money(v)+'</b></p>' +
+      '<p style="margin:0">Now do the same for <b>'+GOODS[1].name.toLowerCase()+'</b> and <b>'+GOODS[2].name.toLowerCase()+'</b> using '+ctx.priceWord+'. Then <b>add all three values</b> together.</p>';
+  }
+  function helpHTML(){
+    return '<div style="margin-top:10px;padding:12px 14px;border:3px solid #004AA0;border-radius:10px;background:#fff">' +
+      '<p style="margin:0;font-size:1.15rem"><b>✋ Time to get help.</b></p>' +
+      '<p style="margin:6px 0 0">Raise your hand so Mr. Moon can come over, or ask a classmate who finished this step to explain <b>how</b> they did it. Their island has different numbers, so copying their answer will not work.</p></div>';
+  }
+  function diagnose(ctx, given){
+    var parts = GOODS.map(function(g){ return ctx.q[g.k]*ctx.p[g.k]; });
+    var sumQP = 0; GOODS.forEach(function(g){ sumQP += ctx.q[g.k] + ctx.p[g.k]; });
+    if(ctx.other!==undefined && ctx.other!==ctx.correct && given===ctx.other) return "That is "+ctx.otherName+". Check which prices you used.";
+    if(given===sumQP) return "It looks like you added the quantities and prices. Multiply each quantity by its price first.";
+    if(parts.indexOf(given)>=0) return "That is the value of just one good. You need all three added together.";
+    if(given===parts[0]+parts[1] || given===parts[0]+parts[2] || given===parts[1]+parts[2]) return "Close! It looks like you left out one of the three goods.";
+    return "";
+  }
+  function showStage(ctx, note){
+    var f = $("fb"); if(!f || S.tries<1) return;
+    f.className = "fb no";
+    var lead = note ? '<p style="margin:0 0 6px"><b>Not yet.</b> '+note+'</p>' : '<p style="margin:0 0 6px"><b>Not yet.</b></p>';
+    f.innerHTML = lead + firstItemHTML(ctx) + (S.tries>=2 ? helpHTML() : '');
+  }
+  function grade(ctx, given){
+    var f = $("fb");
+    if(given===null){ f.className="fb no"; f.innerHTML="Type a number first. Numbers only (example: 152000)."; return; }
+    S.tries++;
+    if(given===ctx.correct){
+      var earned = S.tries===1 ? ctx.pts : (S.tries===2 ? Math.round(ctx.pts/2) : 0);
+      S.score += earned; if(S.tries===1){ S.firstTry++; } S.attempts++;
+      f.className="fb ok"; f.innerHTML="<b>Correct!"+(earned?" +"+earned:"")+"</b>"+ctx.explain; good(); finishAttempt();
+    } else {
+      if(S.tries===2) S.helpCount = (S.helpCount||0) + 1;
+      showStage(ctx, diagnose(ctx, given)); bad();
+      var i = $("ans"); if(i){ i.focus(); i.select(); }
+    }
+    hud(); save();
+  }
+  function finishAttempt(){ $("checkBtn").style.display="none"; $("nextBtn").style.display="inline-block"; var i=screenEl.querySelector("input"); if(i) i.disabled=true; }
+
+  function nominalScreen(){
+    var c = S.cur;
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Step 4 of 5</div>' +
+        '<h2>The Books: Calculate Nominal GDP</h2>' +
+        '<p>Here is everything '+esc(S.island)+' produced this year. <b>Nominal GDP</b> uses <b>current prices</b>: this year\'s quantities times this year\'s prices.</p>' +
+        ledgerHTML(c.q, c.p, "This year's price", true) +
+        '<div class="formula">Quantity &times; this year\'s price for each good, then add the three values</div>' +
+        (S.year>1?'<p class="muted">▲ and ▼ show what changed since last year.</p>':'') +
+        attemptBlock("ans","Nominal GDP for Year "+S.year+" (in dollars)") +
+      '</div>'
+    );
+    var ctx = {q:c.q, p:c.p, correct:c.nominal, pts:100, explain:workedHTML(c.q, c.p, c.nominal), priceWord:"this year's prices"};
+    $("checkBtn").onclick = function(){ grade(ctx, parseNum($("ans").value)); };
+    showStage(ctx);
+    $("ans").onkeydown = function(e){ if(e.key==="Enter") $("checkBtn").click(); };
+    $("nextBtn").onclick = function(){ S.phase="real"; S.tries=0; route(); };
+  }
+
+  function realScreen(){
+    var c = S.cur, base = S.year===1;
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Step 5 of 5</div>' +
+        '<h2>Constant Prices: Calculate Real GDP</h2>' +
+        '<p>Nominal GDP can rise just because prices went up. <b>Real GDP</b> uses <b>constant prices</b>: this year\'s quantities times the <b>base year (Year 1)</b> prices. That shows whether '+esc(S.island)+' actually produced more.</p>' +
+        ledgerHTML(c.q, S.base, "Year 1 price", false) +
+        '<div class="formula">Quantity &times; Year 1 price for each good, then add the three values</div>' +
+        (base?'<p class="muted">Hint: this IS the base year. Compare these prices to the ones you just used.</p>':'') +
+        attemptBlock("ans","Real GDP for Year "+S.year+" (in Year 1 dollars)") +
+      '</div>'
+    );
+    var explain = workedHTML(c.q, S.base, c.real) + (base
+      ? "<p>In the base year, this year's prices ARE the base-year prices, so real GDP equals nominal GDP.</p>"
+      : (c.nominal>c.real ? "<p>Real GDP is <b>"+money(c.nominal-c.real)+"</b> lower than nominal GDP. That difference is caused by higher prices, not more output.</p>" : ""));
+    var ctx = {q:c.q, p:S.base, correct:c.real, pts:100, explain:explain, priceWord:"the <b>Year 1</b> prices", other:c.nominal, otherName:"nominal GDP (this year's prices)"};
+    $("checkBtn").onclick = function(){ grade(ctx, parseNum($("ans").value)); };
+    showStage(ctx);
+    $("ans").onkeydown = function(e){ if(e.key==="Enter") $("checkBtn").click(); };
+    $("nextBtn").onclick = function(){
+      S.history.push({year:S.year, nominal:c.nominal, real:c.real, event:c.event, policy:c.policy});
+      S.phase = S.year===1 ? "summary" : "compare"; S.tries=0; route();
+    };
+  }
+
+  function compareScreen(){
+    var h = S.history, now = h[h.length-1], prev = h[h.length-2];
+    var dn = now.nominal - prev.nominal, dr = now.real - prev.real;
+    var key = Math.abs(dr) <= prev.real*0.005 ? "same" : (dr>0 ? "rose" : "fell");
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' &middot; Bonus Question</div>' +
+        '<h2>Did the island really grow?</h2>' +
+        '<div class="stats">' +
+          '<div class="stat"><div class="k">Nominal GDP, Yr '+prev.year+'</div><div class="v">'+money(prev.nominal)+'</div></div>' +
+          '<div class="stat"><div class="k">Nominal GDP, Yr '+now.year+'</div><div class="v">'+money(now.nominal)+'</div></div>' +
+          '<div class="stat"><div class="k">Real GDP, Yr '+prev.year+'</div><div class="v">'+money(prev.real)+'</div></div>' +
+          '<div class="stat"><div class="k">Real GDP, Yr '+now.year+'</div><div class="v">'+money(now.real)+'</div></div>' +
+        '</div>' +
+        '<p>Compared to last year, did '+esc(S.island)+' actually produce <b>more</b> goods and services, about the <b>same</b>, or <b>less</b>?</p>' +
+        '<div class="tf"><button class="btn" data-k="rose" type="button">Produced more</button><button class="btn" data-k="same" type="button">About the same</button><button class="btn" data-k="fell" type="button">Produced less</button></div>' +
+        '<div class="fb" id="fb"></div>' +
+        '<div class="row" id="nextRow" style="display:none"><button class="btn" id="nextBtn" type="button">Year-end report</button></div>' +
+      '</div>'
+    );
+    var trick = (dn>0 && key!=="rose");
+    var why = "Real GDP went from "+money(prev.real)+" to "+money(now.real)+". " +
+      (trick ? "Watch out: nominal GDP <b>rose</b> by "+money(dn)+", but that was mostly <b>higher prices</b>. Real GDP shows the island did not really produce more. That is the problem real GDP solves."
+             : "Real GDP is the measure that shows changes in actual output, because it uses constant prices.");
+    var btns = screenEl.querySelectorAll(".tf .btn");
+    Array.prototype.forEach.call(btns, function(b){
+      b.onclick = function(){
+        Array.prototype.forEach.call(btns,function(x){x.disabled=true;});
+        b.classList.add("picked");
+        var f=$("fb"); S.attempts++;
+        if(b.getAttribute("data-k")===key){ S.score+=50; S.firstTry++; f.className="fb ok"; f.innerHTML="<b>Correct! +50</b><br>"+why; good(); }
+        else { f.className="fb no"; f.innerHTML="<b>Not quite.</b> Look at <b>real</b> GDP, not nominal.<br>"+why; bad(); }
+        $("nextRow").style.display="flex"; hud(); save();
+      };
+    });
+    $("nextBtn").onclick = function(){ S.phase="summary"; route(); };
+  }
+
+  function summaryScreen(){
+    var last = S.history[S.history.length-1], isLast = S.year>=TOTAL_YEARS;
+    el(
+      '<div class="panel">' +
+        '<div class="step">Year '+S.year+' Complete</div>' +
+        '<h2>Year-End Report</h2>' +
+        '<div class="stats">' +
+          '<div class="stat"><div class="k">Nominal GDP</div><div class="v">'+money(last.nominal)+'</div></div>' +
+          '<div class="stat"><div class="k">Real GDP</div><div class="v">'+money(last.real)+'</div></div>' +
+          '<div class="stat"><div class="k">Gap from higher prices</div><div class="v">'+money(last.nominal-last.real)+'</div></div>' +
+        '</div>' +
+        '<h3>Your island so far</h3>' +
+        chartSVG() +
+        '<div class="row"><button class="btn red" id="nextBtn" type="button">'+(isLast?"See final results":"Start Year "+(S.year+1))+'</button></div>' +
+      '</div>'
+    );
+    $("nextBtn").onclick = function(){
+      if(isLast){ S.done=true; }
+      else { S.year++; S.phase="policy"; S.eventApplied=false; S.cur=null; }
+      beep([392,523]); route();
+    };
+  }
+
+  function chartSVG(){
+    var h = S.history;
+    var W=640, H=280, L=78, R=18, T=18, B=40;
+    var vals = []; h.forEach(function(p){ vals.push(p.nominal, p.real); });
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+    var pad = Math.max(5000, (mx-mn)*0.15);
+    mn = Math.floor((mn-pad)/10000)*10000; mx = Math.ceil((mx+pad)/10000)*10000;
+    function x(i){ return L + i*(W-L-R)/(TOTAL_YEARS-1); }
+    function y(v){ return T + (mx-v)*(H-T-B)/(mx-mn); }
+    var g = "", ticks = 4;
+    for(var t=0;t<=ticks;t++){
+      var v = Math.round(mn + (mx-mn)*t/ticks);
+      g += '<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="#E3E6EB"/>';
+      g += '<text x="'+(L-8)+'" y="'+(y(v)+5)+'" text-anchor="end" font-size="15" fill="#5B6472">$'+Math.round(v/1000)+'k</text>';
+    }
+    for(var i=0;i<TOTAL_YEARS;i++){
+      g += '<text x="'+x(i)+'" y="'+(H-12)+'" text-anchor="middle" font-size="15" fill="#5B6472">Yr '+(i+1)+'</text>';
+    }
+    function line(key, color, dash){
+      var pts = h.map(function(p,i){ return x(i)+","+y(p[key]); }).join(" ");
+      var s = h.length>1 ? '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="3.5" stroke-linejoin="round" '+(dash?'stroke-dasharray="7 5"':'')+'/>' : "";
+      h.forEach(function(p,i){ s += '<circle cx="'+x(i)+'" cy="'+y(p[key])+'" r="5" fill="'+color+'"/>'; });
+      return s;
+    }
+    g += line("nominal","#C8102E",true) + line("real","#004AA0",false);
+    return '<div class="chartbox"><svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="Nominal and real GDP by year">'+g+'</svg>' +
+      '<div class="legend"><span><i style="background:#C8102E"></i>Nominal GDP (dashed)</span><span><i style="background:#004AA0"></i>Real GDP (solid)</span></div></div>';
+  }
+
+  function finalScreen(){
+    hud();
+    var h = S.history, first = h[0], last = h[h.length-1];
+    var nomGrowth = pct(first.nominal, last.nominal), realGrowth = pct(first.real, last.real);
+    var acc = S.attempts ? Math.round(S.firstTry/S.attempts*100) : 0;
+    var missed = S.misses.map(function(k){return '<li>'+MISSED[k]+'</li>';}).join("") + '<li>'+MISSED_ALWAYS+'</li>';
+    var worst = null;
+    for(var i=1;i<h.length;i++){ var d=h[i].real-h[i-1].real; if(worst===null || d<worst.d) worst={d:d, yr:h[i].year, ev:EVENTS[h[i].event].name}; }
+    var dt = new Date();
+    var stamp = (dt.getMonth()+1)+"/"+dt.getDate()+"/"+dt.getFullYear()+" "+dt.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+    el(
+      '<div class="panel">' +
+        '<div class="step">Term Complete</div>' +
+        '<h2>Six Years on '+esc(S.island)+'</h2>' +
+        chartSVG() +
+        '<div class="stats">' +
+          '<div class="stat"><div class="k">Nominal GDP growth</div><div class="v">'+(nomGrowth>=0?"+":"")+nomGrowth+'%</div></div>' +
+          '<div class="stat"><div class="k">Real GDP growth</div><div class="v">'+(realGrowth>=0?"+":"")+realGrowth+'%</div></div>' +
+          '<div class="stat"><div class="k">Year 6 gap from prices</div><div class="v">'+money(last.nominal-last.real)+'</div></div>' +
+        '</div>' +
+        '<p>Nominal GDP grew <b>'+nomGrowth+'%</b>, but real GDP grew only <b>'+realGrowth+'%</b>. The space between the two lines is caused by a rising <b>price level</b>. Part of the "growth" was just higher prices.'+(worst && worst.d<0?' Your worst year for real output was <b>Year '+worst.yr+'</b> ('+worst.ev+').':'')+'</p>' +
+        '<h3>What GDP missed on your island</h3>' +
+        '<ul class="missed">'+missed+'</ul>' +
+        '<div class="cert">' +
+          '<div class="muted">Completion record</div>' +
+          '<div class="name">'+esc(S.name)+'</div>' +
+          '<p style="margin:6px 0">Leader of '+esc(S.island)+'</p>' +
+          '<div class="stats" style="text-align:left">' +
+            '<div class="stat"><div class="k">Score</div><div class="v">'+S.score+'</div></div>' +
+            '<div class="stat"><div class="k">First-try accuracy</div><div class="v">'+acc+'%</div></div>' +
+            '<div class="stat"><div class="k">Calculations needing help</div><div class="v">'+(S.helpCount||0)+' of 12</div></div>' +
+            '<div class="stat"><div class="k">Real GDP, Year 6</div><div class="v">'+money(last.real)+'</div></div>' +
+          '</div>' +
+          '<p class="muted" style="margin-top:10px">Finished '+stamp+'. Take a screenshot of this screen and submit it in Canvas.</p>' +
+        '</div>' +
+        '<div class="row"><button class="btn ghost" id="againBtn" type="button">Play again with a new island</button></div>' +
+      '</div>'
+    );
+    $("againBtn").onclick = function(){ clearSaved(); startScreen(); };
+    save();
+  }
+
+  // ---------- chrome ----------
+  $("helpBtn").onclick = function(){ $("helpModal").classList.add("open"); };
+  $("helpClose").onclick = function(){ $("helpModal").classList.remove("open"); };
+  $("helpModal").onclick = function(e){ if(e.target===$("helpModal")) $("helpModal").classList.remove("open"); };
+  try{ muted = localStorage.getItem(SAVE_KEY+"-muted")==="1"; }catch(e){}
+  function muteLabel(){ $("muteBtn").textContent = "Sound: " + (muted?"Off":"On"); }
+  muteLabel();
+  $("muteBtn").onclick = function(){ muted=!muted; try{localStorage.setItem(SAVE_KEY+"-muted", muted?"1":"0");}catch(e){} muteLabel(); };
+
+  startScreen();
+})();
+</script>
+</body>
+</html>
