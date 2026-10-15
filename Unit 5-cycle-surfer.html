@@ -167,6 +167,7 @@
       <button class="iconbtn" id="achBtn" type="button">Achievements</button>
       <button class="iconbtn" id="helpBtn" type="button">Word Help</button>
       <button class="iconbtn" id="muteBtn" type="button">Sound: On</button>
+      <button class="iconbtn" id="musicBtn" type="button">Music: On</button>
     </div>
   </header>
 
@@ -533,7 +534,7 @@
   function beep(freqs, type){
     if(muted) return;
     try{
-      if(!actx){ var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return; actx = new AC(); }
+      if(!getCtx()) return;
       if(actx.state==="suspended") actx.resume();
       var t = actx.currentTime;
       freqs.forEach(function(f,i){
@@ -550,6 +551,161 @@
   function sCoin(){ beep([988,1319]); }
   function sJump(){ beep([392,523],"sine"); }
   function sAch(){ beep([523,659,784,1047]); }
+
+  // ======================= original soundtrack (generated live with Web Audio) =======================
+  // Four looping tracks: a calm Forecast Room theme, a tense Stage 3 room theme,
+  // surf rock for expansions, a minor-key drive for contractions, and a faster storm mix.
+  function getCtx(){
+    if(!actx){ var AC = window.AudioContext || window.webkitAudioContext; if(!AC) return null; try{ actx = new AC(); }catch(e){ return null; } }
+    return actx;
+  }
+  var Music = (function(){
+    var MUSIC_KEY = "hse-cycle-surfer-music";
+    var on = true; try{ on = localStorage.getItem(MUSIC_KEY)!=="0"; }catch(e){}
+    var master = null, bus = null, noiseBuf = null, timer = null, curName = null, playingName = null, trk = null, step = 0, nextTime = 0;
+    var SEMI = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+    function midi(n){ return 440*Math.pow(2,(n-69)/12); }
+    function nn(name){ var m = /^([A-G])(#|b)?(\d)$/.exec(name); if(!m) return null; return 12*(+m[3]+1) + SEMI[m[1]] + (m[2]==="#"?1:(m[2]==="b"?-1:0)); }
+    function parseBar(str){ // "D5 - - F#5 . ..." -> [{st, n, len}]
+      var ev = [], last = null;
+      str.split(/\s+/).forEach(function(tok, i){
+        if(tok==="-"){ if(last) last.len++; }
+        else if(tok==="."){ last = null; }
+        else { last = {st:i, n:nn(tok), len:1}; ev.push(last); }
+      });
+      return ev;
+    }
+    function N(list){ return list.split(" ").map(nn); }
+
+    var TRACKS = {
+      room:{ bpm:76, vol:0.55, pad:true, arp:true, leadWave:"sine", leadVol:0.05, bassWave:"sine", bassVol:0.10,
+        bars:[
+          {c:N("C4 E4 G4 B4"), r:nn("C2"), b:"R.......5.......", l:"E5 - - - - - - - D5 - - - C5 - - -"},
+          {c:N("A3 C4 E4 G4"), r:nn("A1"), b:"R.......5.......", l:". . . . . . . . . . . . . . . ."},
+          {c:N("F3 A3 C4 E4"), r:nn("F1"), b:"R.......5.......", l:"A4 - - - - - - - G4 - - - A4 - C5 -"},
+          {c:N("G3 B3 D4 E4"), r:nn("G1"), b:"R.......5.......", l:"B4 - - - - - - - . . . . . . . ."},
+          {c:N("C4 E4 G4 B4"), r:nn("C2"), b:"R.......5.......", l:"E5 - - - - - - - G5 - - - E5 - - -"},
+          {c:N("E3 G3 B3 D4"), r:nn("E1"), b:"R.......5.......", l:"D5 - - - - - - - . . . . B4 - - -"},
+          {c:N("F3 A3 C4 E4"), r:nn("F1"), b:"R.......5.......", l:"C5 - - - - - - - A4 - - - C5 - - -"},
+          {c:N("G3 C4 D4 G4"), r:nn("G1"), b:"R.......5...R...", l:"D5 - - - - - - - - - - - . . . ."}
+        ]},
+      roomTense:{ bpm:84, vol:0.55, pad:true, arp:true, leadWave:"sine", leadVol:0.05, bassWave:"triangle", bassVol:0.11,
+        bars:[
+          {c:N("A3 C4 E4"), r:nn("A1"), b:"R.R.R.R.R.R.R.R.", l:"A4 - - - - - - - C5 - - - B4 - - -"},
+          {c:N("F3 A3 C4"), r:nn("F1"), b:"R.R.R.R.R.R.R.R.", l:". . . . . . . . . . . . . . . ."},
+          {c:N("D3 F3 A3"), r:nn("D2"), b:"R.R.R.R.R.R.R.R.", l:"D5 - - - - - - - F5 - - - E5 - - -"},
+          {c:N("E3 G#3 B3"), r:nn("E1"), b:"R.R.R.R.R.R.8.8.", l:"G#4 - - - - - - - - - - - . . . ."}
+        ]},
+      rideUp:{ bpm:144, vol:0.7, pad:true, stabs:true, drums:"k.h.s.h.k.k.s.h.", leadWave:"square", leadVol:0.045, bassWave:"square", bassVol:0.09, leadShift:-12,
+        bars:[
+          {c:N("D4 F#4 A4"), r:nn("D2"), b:"R.R.5.R.R.R.8.5.", l:"D5 - - F#5 - - A5 - B5 - A5 - F#5 - E5 -"},
+          {c:N("D4 F#4 A4"), r:nn("D2"), b:"R.R.5.R.R.R.8.5.", l:"D5 - - - . . F#5 E5 D5 - E5 - F#5 - - -"},
+          {c:N("D4 G4 B4"),  r:nn("G1"), b:"R.R.5.R.R.R.8.5.", l:"G5 - - B5 - - D6 - B5 - A5 - G5 - F#5 -"},
+          {c:N("C#4 E4 A4"), r:nn("A1"), b:"R.R.5.R.R.R.8.5.", l:"E5 - - - A5 - - - C#6 - B5 - A5 - - -"},
+          {c:N("D4 F#4 B4"), r:nn("B1"), b:"R.R.5.R.R.R.8.5.", l:"B5 - - D6 - - F#6 - E6 - D6 - B5 - A5 -"},
+          {c:N("D4 G4 B4"),  r:nn("G1"), b:"R.R.5.R.R.R.8.5.", l:"G5 - - B5 - - D6 - E6 - D6 - B5 - G5 -"},
+          {c:N("C#4 E4 A4"), r:nn("A1"), b:"R.R.5.R.R.R.8.5.", l:"A5 - B5 - C#6 - A5 - E6 - - - C#6 - - -"},
+          {c:N("C#4 E4 A4"), r:nn("A1"), b:"R.R.5.R.8.5.R.R.", l:"A5 - - - . . E5 F#5 G5 - F#5 - E5 - C#5 -"}
+        ]},
+      rideDown:{ bpm:132, vol:0.7, pad:true, drums:"k...s..kk...s...", leadWave:"square", leadVol:0.045, bassWave:"sawtooth", bassVol:0.07, leadShift:0,
+        bars:[
+          {c:N("A3 C4 E4"),  r:nn("A1"), b:"R.R.R.R.R.R.R.R.", l:"A4 - - C5 - - E5 - D5 - C5 - B4 - - -"},
+          {c:N("A3 C4 E4"),  r:nn("A1"), b:"R.R.R.R.R.R.R.R.", l:"A4 - - - . . E4 - A4 - B4 - C5 - - -"},
+          {c:N("F3 A3 C4"),  r:nn("F1"), b:"R.R.R.R.R.R.R.R.", l:"F5 - - E5 - - C5 - A4 - C5 - D5 - - -"},
+          {c:N("G3 B3 D4"),  r:nn("G1"), b:"R.R.R.R.R.R.R.R.", l:"G5 - - F5 - - D5 - B4 - D5 - E5 - - -"},
+          {c:N("A3 C4 E4"),  r:nn("A1"), b:"R.R.R.R.R.R.R.R.", l:"E5 - - - A5 - - - G5 - E5 - C5 - D5 -"},
+          {c:N("A3 C4 E4"),  r:nn("A1"), b:"R.R.R.R.R.R.R.R.", l:"E5 - - - . . A4 - C5 - E5 - A5 - - -"},
+          {c:N("D3 F3 A3"),  r:nn("D2"), b:"R.R.R.R.R.R.R.R.", l:"F5 - - E5 - - D5 - A4 - D5 - F5 - - -"},
+          {c:N("E3 G#3 B3"), r:nn("E1"), b:"R.R.R.R.8.8.8.8.", l:"E5 - - - G#5 - - - B5 - - - G#5 - E5 -"}
+        ]}
+    };
+    // storm mix: the contraction tune, faster, with 16th-note hats and extra kicks
+    TRACKS.rideStorm = {bpm:150, vol:0.75, pad:true, stabs:true, drums:"kxhxsxhkkxhxsxhh", leadWave:"square", leadVol:0.05, bassWave:"sawtooth", bassVol:0.08, leadShift:0, bars:TRACKS.rideDown.bars};
+    Object.keys(TRACKS).forEach(function(k){ TRACKS[k].bars.forEach(function(b){ b.ev = parseBar(b.l); }); });
+
+    function setup(){
+      var c = getCtx(); if(!c) return null;
+      if(!master){
+        master = c.createGain(); master.gain.value = 0.5; master.connect(c.destination);
+        noiseBuf = c.createBuffer(1, c.sampleRate*0.5, c.sampleRate);
+        var d = noiseBuf.getChannelData(0); for(var i=0;i<d.length;i++) d[i] = Math.random()*2-1;
+      }
+      return c;
+    }
+    function voice(c, type, f, t, dur, peak, cutoff, attack){
+      var o = c.createOscillator(), g = c.createGain(), out = g;
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      if(cutoff){ var flt = c.createBiquadFilter(); flt.type = "lowpass"; flt.frequency.value = cutoff; o.connect(flt); flt.connect(g); } else o.connect(g);
+      var a = attack || 0.01;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t+a);
+      g.gain.setValueAtTime(peak, t+Math.max(a, dur*0.6)); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+      out.connect(bus); o.start(t); o.stop(t+dur+0.05);
+      return o;
+    }
+    function noise(c, t, dur, peak, ftype, freq){
+      var s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      s.buffer = noiseBuf; f.type = ftype; f.frequency.value = freq;
+      g.gain.setValueAtTime(peak, t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+      s.connect(f); f.connect(g); g.connect(bus); s.start(t); s.stop(t+dur+0.02);
+    }
+    function kick(c, t){ var o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t+0.12); g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t+0.18); o.connect(g); g.connect(bus); o.start(t); o.stop(t+0.2); }
+    function snare(c, t){ noise(c, t, 0.13, 0.22, "bandpass", 1800); voice(c, "triangle", 190, t, 0.09, 0.08); }
+    function hat(c, t, open){ noise(c, t, open?0.14:0.035, 0.07, "highpass", 7000); }
+
+    function scheduleStep(c, s, t, sd){
+      var T = trk, bar = T.bars[Math.floor(s/16) % T.bars.length], st = s % 16;
+      if(T.pad && st===0) bar.c.forEach(function(n){ voice(c, "sawtooth", midi(n)*1.003, t, sd*16, 0.016, 900, 0.35); voice(c, "sawtooth", midi(n)*0.997, t, sd*16, 0.016, 900, 0.35); });
+      if(T.arp && st%2===0){ var an = bar.c[(st/2) % bar.c.length] + 12; voice(c, "triangle", midi(an), t, 0.4, 0.05); }
+      if(T.stabs && (st===2 || st===6 || st===10 || st===14)) bar.c.forEach(function(n){ voice(c, "sawtooth", midi(n+12), t, 0.09, 0.022, 1600); });
+      var bc = bar.b.charAt(st);
+      if(bc && bc!=="."){
+        var third = bar.c[1]-bar.c[0];
+        var bn = bar.r + (bc==="5" ? 7 : (bc==="8" ? 12 : (bc==="3" ? third : 0))) + 12;
+        voice(c, T.bassWave, midi(bn), t, sd*1.8, T.bassVol, 650);
+      }
+      if(T.drums){
+        var dc = T.drums.charAt(st);
+        if(dc==="k" || dc==="x") kick(c, t);
+        if(dc==="s") snare(c, t);
+        if(dc==="h" || dc==="x") hat(c, t, false);
+      }
+      bar.ev.forEach(function(e){ if(e.st===st && e.n!==null) voice(c, T.leadWave, midi(e.n + (T.leadShift||0)), t, e.len*sd*0.95, T.leadVol, 2600); });
+    }
+    function tick(){
+      var c = actx; if(!c || !trk) return;
+      var sd = 60/trk.bpm/4;
+      while(nextTime < c.currentTime + 0.15){ scheduleStep(c, step, nextTime, sd); nextTime += sd; step++; }
+    }
+    function fadeOutBus(){
+      if(!bus) return; var c = actx, old = bus;
+      try{ old.gain.cancelScheduledValues(c.currentTime); old.gain.setValueAtTime(old.gain.value, c.currentTime); old.gain.linearRampToValueAtTime(0, c.currentTime+0.6); }catch(e){}
+      setTimeout(function(){ try{ old.disconnect(); }catch(e){} }, 900);
+      bus = null;
+    }
+    function startTrack(){
+      var c = setup(); if(!c || c.state!=="running" || !curName) return;
+      if(playingName===curName && timer) return;
+      fadeOutBus(); if(timer){ clearInterval(timer); timer = null; }
+      trk = TRACKS[curName]; playingName = curName;
+      bus = c.createGain(); bus.gain.setValueAtTime(0, c.currentTime); bus.gain.linearRampToValueAtTime(trk.vol, c.currentTime+0.8); bus.connect(master);
+      step = 0; nextTime = c.currentTime + 0.1;
+      timer = setInterval(tick, 25); tick();
+    }
+    function stopAll(){ fadeOutBus(); if(timer){ clearInterval(timer); timer = null; } playingName = null; }
+    return {
+      play:function(name){ curName = name; if(on) startTrack(); },
+      unlock:function(){ var c = getCtx(); if(!c) return; if(c.state==="suspended"){ c.resume().then(function(){ if(on) startTrack(); }); } else if(on) startTrack(); },
+      toggle:function(){ on = !on; try{ localStorage.setItem(MUSIC_KEY, on?"1":"0"); }catch(e){} if(on){ Music.unlock(); } else stopAll(); return on; },
+      isOn:function(){ return on; },
+      playing:function(){ return playingName; },
+      master:function(){ return master; }
+    };
+  })();
+  // browsers only allow audio after the student taps or types, so start the music on the first interaction
+  ["pointerdown","touchend","keydown"].forEach(function(ev){ document.addEventListener(ev, function(){ Music.unlock(); }, true); });
+  document.addEventListener("visibilitychange", function(){ if(!actx) return; if(document.hidden) actx.suspend(); else actx.resume(); });
+  function rideTrack(){ if(!R) return "rideUp"; if(R.severe || R.stag || R.C===CONDS.storm || R.C===CONDS.nightstorm) return "rideStorm"; return R.d==="up" ? "rideUp" : "rideDown"; }
+
 
   // ======================= achievements =======================
   function achStore(){ try{ return JSON.parse(localStorage.getItem(ACH_KEY)||"{}"); }catch(e){ return {}; } }
@@ -694,6 +850,7 @@
     roomEl.style.display = which==="room" ? "block" : "none";
     rideEl.style.display = which==="ride" ? "block" : "none";
     if(which!=="ride") stopLoop();
+    Music.play(which==="ride" ? rideTrack() : (which==="room" && S && S.stage===3 ? "roomTense" : "room"));
     window.scrollTo(0,0);
   }
 
@@ -1833,6 +1990,9 @@
   $("helpClose").onclick = function(){ $("helpOverlay").classList.remove("open"); };
   function muteLabel(){ $("muteBtn").textContent = "Sound: " + (muted ? "Off" : "On"); }
   muteLabel();
+  function musicLabel(){ $("musicBtn").textContent = "Music: " + (Music.isOn() ? "On" : "Off"); }
+  musicLabel();
+  $("musicBtn").onclick = function(){ Music.toggle(); musicLabel(); };
   $("muteBtn").onclick = function(){ muted = !muted; try{ localStorage.setItem(MUTE_KEY, muted?"1":"0"); }catch(e){} muteLabel(); };
 
   $("shopBtn").onclick = openShop;
