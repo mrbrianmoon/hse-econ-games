@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPI Higher or Lower</title>
+<style>
+  :root{
+    --royal:#004AA0; --royal-dark:#003B80; --red:#C8102E; --navy:#1A2230;
+    --gray:#C6C8CE; --bg:#F3F5F8; --card:#FFFFFF; --muted:#5B6472;
+    --good:#1E7B3C; --good-bg:#E6F4EA; --bad-bg:#FBE9EC;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--navy);min-height:100vh;}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 40px;}
+  header.top{background:linear-gradient(135deg,var(--royal) 0%,var(--royal-dark) 100%);color:#fff;border-radius:14px;border-bottom:5px solid var(--red);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  header.top h1{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;margin:0;}
+  header.top .sub{font-size:.8rem;opacity:.85;margin-top:2px;}
+  .hud{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .pill{background:rgba(255,255,255,.15);border-radius:999px;padding:5px 11px;font-size:.82rem;font-weight:bold;white-space:nowrap;}
+  .pill.streak{background:var(--red);}
+  .iconbtn{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:999px;padding:5px 10px;font-size:.9rem;cursor:pointer;}
+  .screen{display:none;margin-top:18px;}
+  .screen.on{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .panel{background:var(--card);border-radius:14px;padding:22px;box-shadow:0 1px 4px rgba(20,30,50,.12);}
+  h2{font-family:Georgia,serif;color:var(--royal-dark);margin:0 0 10px;font-size:1.4rem;}
+  p{line-height:1.5;margin:0 0 12px;}
+  .muted{color:var(--muted);font-size:.88rem;}
+  .rounds{display:grid;gap:10px;margin:14px 0 18px;}
+  .rcard{border-left:5px solid var(--royal);background:#F7F9FC;border-radius:10px;padding:12px 14px;}
+  .rcard b{font-family:Georgia,serif;color:var(--royal-dark);}
+  .btn{display:inline-block;border:0;border-radius:10px;padding:13px 22px;font-size:1rem;font-weight:bold;cursor:pointer;font-family:inherit;transition:transform .1s ease,filter .1s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn.primary{background:var(--royal);color:#fff;}
+  .btn.primary:hover{filter:brightness(1.1);}
+  .btn.red{background:var(--red);color:#fff;}
+  .center{text-align:center;}
+  .roundtag{display:inline-block;background:var(--red);color:#fff;font-size:.75rem;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:4px 9px;margin-bottom:10px;}
+  .progress{height:8px;background:#DDE2EA;border-radius:999px;overflow:hidden;margin:4px 0 16px;}
+  .progress > div{height:100%;background:var(--royal);width:0;transition:width .3s ease;}
+  .qmeta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);}
+  .prompt{font-family:Georgia,serif;font-size:1.2rem;text-align:center;margin:4px 0 16px;color:var(--navy);}
+  .duel{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;}
+  .vs{align-self:center;font-family:Georgia,serif;font-weight:bold;color:var(--red);font-size:1.1rem;}
+  .icard{background:var(--card);border-radius:14px;padding:18px 14px;text-align:center;box-shadow:0 1px 4px rgba(20,30,50,.12);border-top:6px solid var(--royal);display:flex;flex-direction:column;justify-content:center;min-height:210px;}
+  .icard.mystery{border-top-color:var(--red);}
+  .icard .emoji{font-size:2.6rem;line-height:1;margin-bottom:8px;}
+  .icard .name{font-family:Georgia,serif;font-weight:bold;font-size:1.08rem;color:var(--royal-dark);}
+  .icard .where{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+  .icard .val{font-size:2.3rem;font-weight:bold;margin-top:10px;font-family:Georgia,serif;}
+  .icard .val.q{color:var(--red);}
+  .icard.right-ans{background:var(--good-bg);}
+  .icard.wrong-ans{background:var(--bad-bg);}
+  .choices{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+  .choice{min-width:160px;font-size:1.1rem;padding:15px 20px;}
+  .choice.hi{background:var(--royal);color:#fff;}
+  .choice.lo{background:var(--navy);color:#fff;}
+  .choice:disabled{opacity:.45;cursor:default;}
+  .feedback{margin-top:16px;border-radius:12px;padding:14px 16px;display:none;}
+  .feedback.on{display:block;animation:fade .25s ease;}
+  .feedback.good{background:var(--good-bg);border-left:5px solid var(--good);}
+  .feedback.bad{background:var(--bad-bg);border-left:5px solid var(--red);}
+  .feedback .verdict{font-weight:bold;font-size:1.05rem;margin-bottom:4px;}
+  .feedback .why{margin:6px 0 0;font-size:.95rem;}
+  .feedback .row{display:flex;justify-content:flex-end;margin-top:10px;}
+  .bigscore{font-family:Georgia,serif;font-size:3rem;color:var(--royal-dark);margin:6px 0;}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+  .stat{background:#F7F9FC;border-radius:10px;padding:12px;text-align:center;}
+  .stat .n{font-family:Georgia,serif;font-size:1.5rem;font-weight:bold;color:var(--royal-dark);}
+  .stat .l{font-size:.78rem;color:var(--muted);}
+  ul.take{padding-left:20px;margin:6px 0 14px;}
+  ul.take li{margin-bottom:8px;line-height:1.45;}
+  .discuss{background:#F7F9FC;border-left:5px solid var(--red);border-radius:10px;padding:12px 14px;margin-bottom:16px;}
+  footer{text-align:center;color:#8B94A3;font-size:.75rem;margin-top:22px;line-height:1.5;}
+  footer a{color:#6B7483;}
+  .shake{animation:shake .35s ease;}
+  @keyframes shake{0%,100%{transform:none;}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .pop{animation:pop .35s ease;}
+  @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.06);}100%{transform:scale(1);}}
+  @media (max-width:560px){
+    .duel{grid-template-columns:1fr 1fr;}
+    .vs{display:none;}
+    .icard{min-height:180px;padding:14px 8px;}
+    .icard .val{font-size:1.8rem;}
+    .icard .emoji{font-size:2.1rem;}
+    .icard .name{font-size:.95rem;}
+    .choice{min-width:0;flex:1;}
+    .stats{grid-template-columns:1fr 1fr 1fr;}
+    .bigscore{font-size:2.4rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>CPI: Higher or Lower?</h1>
+      <div class="sub">Mr. Moon &middot; Indiana Economics &middot; 7.5 Inflation</div>
+    </div>
+    <div class="hud">
+      <span class="pill" id="hudScore">Score 0</span>
+      <span class="pill streak" id="hudStreak">Streak 0</span>
+      <button class="iconbtn" id="muteBtn" aria-label="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <!-- TITLE -->
+  <section class="screen on" id="scrTitle">
+    <div class="panel">
+      <h2>Which prices are climbing fastest?</h2>
+      <p>The <b>Consumer Price Index (CPI)</b> tracks the cost of a "market basket" of goods and services that typical urban households buy. When the CPI rises, the overall price level is rising: that is <b>inflation</b>.</p>
+      <p>Every number in this game is real government data: the <b>12-month percent change</b> in prices from September 2025 to September 2026. A positive number means prices went up. A negative number means prices went down.</p>
+      <div class="rounds">
+        <div class="rcard"><b>Round 1: Beat the Headline.</b> Overall Midwest prices rose 4.2%. Did each item rise faster or slower than that?</div>
+        <div class="rcard"><b>Round 2: Head to Head.</b> Classic higher or lower. Did the next item's price rise more or less than the last one?</div>
+        <div class="rcard"><b>Round 3: Midwest vs. Nation.</b> Did prices here in the Midwest (including Indiana) rise faster or slower than the U.S. average?</div>
+      </div>
+      <p class="muted">Each correct answer earns 100 points plus a streak bonus. A wrong answer resets your streak.</p>
+      <div class="center"><button class="btn red" id="startBtn">Start Game</button></div>
+    </div>
+  </section>
+
+  <!-- ROUND INTRO -->
+  <section class="screen" id="scrRound">
+    <div class="panel center">
+      <span class="roundtag" id="riTag">Round 1</span>
+      <h2 id="riTitle">Beat the Headline</h2>
+      <p id="riText"></p>
+      <button class="btn primary" id="riGo">Let's Go</button>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="scrPlay">
+    <div class="qmeta"><span id="qRound">Round 1</span><span id="qCount">1 / 10</span></div>
+    <div class="progress"><div id="qBar"></div></div>
+    <div class="prompt" id="qPrompt"></div>
+    <div class="duel">
+      <div class="icard" id="cardL">
+        <div class="emoji" id="lEmoji"></div>
+        <div class="name" id="lName"></div>
+        <div class="where" id="lWhere"></div>
+        <div class="val" id="lVal"></div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="icard mystery" id="cardR">
+        <div class="emoji" id="rEmoji"></div>
+        <div class="name" id="rName"></div>
+        <div class="where" id="rWhere"></div>
+        <div class="val q" id="rVal">?</div>
+      </div>
+    </div>
+    <div class="choices">
+      <button class="btn choice hi" id="btnHi">▲ Higher</button>
+      <button class="btn choice lo" id="btnLo">▼ Lower</button>
+    </div>
+    <div class="feedback" id="fb">
+      <div class="verdict" id="fbVerdict"></div>
+      <div id="fbCompare"></div>
+      <p class="why" id="fbWhy"></p>
+      <div class="row"><button class="btn primary" id="nextBtn">Next</button></div>
+    </div>
+  </section>
+
+  <!-- ROUND END -->
+  <section class="screen" id="scrRoundEnd">
+    <div class="panel center">
+      <span class="roundtag" id="reTag">Round 1 Complete</span>
+      <h2 id="reTitle"></h2>
+      <div class="bigscore" id="reScore"></div>
+      <p id="reText"></p>
+      <button class="btn primary" id="reNext">Next Round</button>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="screen" id="scrFinal">
+    <div class="panel">
+      <div class="center">
+        <span class="roundtag">Game Over</span>
+        <h2>Final Score</h2>
+        <div class="bigscore" id="fScore">0</div>
+        <p class="muted" id="fRank"></p>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="fCorrect">0</div><div class="l">Correct</div></div>
+        <div class="stat"><div class="n" id="fBest">0</div><div class="l">Best Streak</div></div>
+        <div class="stat"><div class="n" id="fHigh">0</div><div class="l">High Score (this device)</div></div>
+      </div>
+      <h2 style="font-size:1.15rem;">What the data shows</h2>
+      <ul class="take">
+        <li><b>One number hides a lot.</b> Overall Midwest inflation was 4.2%, but individual items ranged from about -2% to +36%.</li>
+        <li><b>Energy did the heavy lifting.</b> Gasoline rose about 35%. Remove food and energy and Midwest inflation drops to 3.0% (U.S.: 2.6%). That smaller number is called <b>core inflation</b>.</li>
+        <li><b>Falling prices are not deflation.</b> Used cars, furniture, and car insurance got cheaper, but deflation only happens when the <i>overall</i> price level falls.</li>
+        <li><b>Where you live matters.</b> The Midwest (4.2%) ran hotter than the nation (3.7%), largely because of electricity and housing costs.</li>
+      </ul>
+      <div class="discuss"><b>Discuss:</b> Think about what YOU spend money on. Would your personal inflation rate be higher or lower than 4.2%? Which single category would affect you the most?</div>
+      <div class="center"><button class="btn red" id="againBtn">Play Again</button></div>
+    </div>
+  </section>
+
+  <footer>
+    Data: U.S. Bureau of Labor Statistics, CPI-U, 12-month percent change to September 2026, not seasonally adjusted.<br>
+    <a href="https://www.bls.gov/regions/midwest/cpi-summary/ro5xg01a.htm" target="_blank" rel="noopener">Midwest CPI Summary</a> &middot; HSE Indiana Economics
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA (BLS CPI-U, Sep 2025 to Sep 2026, NSA) ----------
+  // us / mw = 12-month % change. null = not published.
+  var ITEMS = {
+    allitems:   {name:"All Items (Overall CPI)", emoji:"🧺", us:3.7,  mw:4.2},
+    gasoline:   {name:"Gasoline",               emoji:"⛽", us:34.2, mw:35.5,
+      why:"The biggest mover on the entire report. Gas prices rose more than a third in one year, and because almost everything is shipped by truck, energy costs ripple into other prices too."},
+    electricity:{name:"Electricity",            emoji:"⚡", us:4.4,  mw:8.8,
+      why:"Midwest electricity rose about twice as fast as the national rate. Demand for electricity is inelastic: households can't easily cut back, so price increases hit budgets hard."},
+    hhenergy:   {name:"Household Energy",       emoji:"🔌", us:6.2,  mw:7.7,
+      why:"Household energy (electricity plus home heating fuel) is part of the energy group that pushed overall inflation up."},
+    utilgas:    {name:"Natural Gas for Homes",  emoji:"🔥", us:5.0,  mw:1.9,
+      why:"Energy prices don't all move together. Home natural gas rose much more slowly in the Midwest than electricity did."},
+    shelter:    {name:"Shelter (Housing)",      emoji:"🏠", us:3.2,  mw:4.4,
+      why:"Shelter is the largest category in the CPI basket, roughly a third of it. When housing costs rise faster than the headline, they pull the whole index up."},
+    rent:       {name:"Rent",                   emoji:"🔑", us:2.8,  mw:4.3,
+      why:"Close call! Midwest rent rose just barely faster than overall prices. Nationally, rent rose only 2.8%."},
+    foodaway:   {name:"Restaurant Meals",       emoji:"🍔", us:3.5,  mw:4.3,
+      why:"Eating out rose almost three times faster than groceries in the Midwest. Restaurants pay for workers, rent, and energy, not just the food on your plate."},
+    foodhome:   {name:"Groceries",              emoji:"🛒", us:1.8,  mw:1.5,
+      why:"Grocery prices rose slowly. Cooking at home was one of the better ways to beat inflation this year."},
+    cereals:    {name:"Bread and Cereal",       emoji:"🍞", us:2.1,  mw:1.4,
+      why:"Bakery and cereal products rose well below the overall rate."},
+    meats:      {name:"Meat, Fish, and Eggs",   emoji:"🥩", us:0.3,  mw:0.3,
+      why:"Meat, poultry, fish, and eggs were nearly flat for the year."},
+    dairy:      {name:"Dairy",                  emoji:"🥛", us:-0.7, mw:0.1,
+      why:"Dairy barely moved, and nationally it actually got a little cheaper."},
+    fruitveg:   {name:"Fruits and Vegetables",  emoji:"🥦", us:3.7,  mw:2.2,
+      why:"Produce prices can swing with weather and growing seasons, which is one reason food is left out of core inflation."},
+    drinks:     {name:"Soft Drinks and Coffee", emoji:"🥤", us:3.8,  mw:3.5,
+      why:"Nonalcoholic beverages (soda, juice, coffee, tea) rose a bit faster than most grocery items."},
+    apparel:    {name:"Clothing",               emoji:"👕", us:3.4,  mw:4.2,
+      why:"Clothing prices rose 3.4% nationally. Clothing prices are very seasonal, so they can jump around from month to month."},
+    newcars:    {name:"New Cars",               emoji:"🚗", us:0.6,  mw:0.8,
+      why:"New vehicle prices barely changed, even while gas prices exploded."},
+    usedcars:   {name:"Used Cars",              emoji:"🚙", us:-1.5, mw:-1.7,
+      why:"Used cars got CHEAPER. A price drop in one category is not deflation. Deflation means the overall price level falls."},
+    carins:     {name:"Car Insurance",          emoji:"🛡️", us:-5.0, mw:null,
+      why:"Car insurance prices fell 5% nationally, one of the biggest drops on the report. Not every price goes up!"},
+    furnish:    {name:"Furniture and Household Supplies", emoji:"🛋️", us:1.6, mw:-0.9,
+      why:"In the Midwest these prices actually fell, while nationally they rose a little."},
+    medical:    {name:"Medical Care",           emoji:"🩺", us:1.5,  mw:1.7,
+      why:"Medical care rose slowly this year compared with overall prices."},
+    recreation: {name:"Recreation (Games, Sports, Pets)", emoji:"🎮", us:2.8, mw:3.8,
+      why:"Recreation covers things like video games, sporting goods, pets, and admission tickets."},
+    tuition:    {name:"Tuition and Childcare",  emoji:"🎓", us:3.8,  mw:3.5,
+      why:"Tuition, school fees, and childcare rose near the national headline rate."},
+    educomm:    {name:"Education and Phone/Internet", emoji:"📱", us:2.3, mw:2.5,
+      why:"This group includes tuition plus phone service, internet, and computers. Tech items often get cheaper over time, which holds this group down."},
+    other:      {name:"Personal Care and Other", emoji:"🧴", us:4.1, mw:2.6,
+      why:"Other goods and services includes things like haircuts, toiletries, and personal care products."},
+    core:       {name:"Core CPI (No Food or Energy)", emoji:"📊", us:2.6, mw:3.0,
+      why:"Core inflation removes food and energy because their prices bounce around a lot. Without them, inflation is noticeably lower. Energy was the main driver this year."}
+  };
+
+  var R1_POOL = ["gasoline","electricity","hhenergy","shelter","rent","foodaway","recreation","drinks","tuition","core","other","educomm","fruitveg","utilgas","medical","foodhome","cereals","newcars","meats","dairy","furnish","usedcars"];
+  var R2_POOL = ["gasoline","utilgas","electricity","other","tuition","drinks","fruitveg","foodaway","apparel","shelter","rent","recreation","educomm","cereals","foodhome","furnish","medical","newcars","meats","dairy","usedcars","carins"];
+  var R3_POOL = ["allitems","electricity","utilgas","shelter","rent","foodaway","foodhome","furnish","gasoline","recreation","other","fruitveg","apparel","dairy","core","usedcars"];
+
+  var VS_WHY = {
+    allitems:"Overall, prices rose faster in the Midwest (4.2%) than in the nation (3.7%).",
+    electricity:"Midwest electricity (+8.8%) rose about twice as fast as the U.S. average (+4.4%). This is a big reason the Midwest's overall rate is higher.",
+    utilgas:"Surprise! Even though Midwest electricity soared, Midwest home natural gas rose much more slowly than the nation.",
+    shelter:"Housing costs rose faster here than nationally. Since shelter is the biggest part of the CPI basket, this matters a lot.",
+    rent:"Midwest rent rose much faster than the national average, 4.3% versus 2.8%.",
+    foodaway:"Eating out got more expensive faster in the Midwest than across the U.S.",
+    foodhome:"Midwest groceries rose a little slower than the national average.",
+    furnish:"Midwest furniture and household supplies actually got cheaper while national prices rose.",
+    gasoline:"Gas rose a bit faster here than nationally, though both were up more than a third.",
+    recreation:"Fun got pricier faster in the Midwest: 3.8% versus 2.8% nationally.",
+    other:"Personal care and other goods rose slower in the Midwest than nationally.",
+    fruitveg:"Produce prices rose slower here than in the nation overall.",
+    apparel:"Clothing rose faster in the Midwest (4.2%) than nationally (3.4%).",
+    dairy:"Nationally dairy got cheaper, but in the Midwest it inched up slightly.",
+    core:"Even without food and energy, the Midwest ran a bit hotter than the nation.",
+    usedcars:"Used cars got cheaper both places, but they fell slightly more in the Midwest, so the Midwest number is lower."
+  };
+
+  var Q_PER_ROUND = 10;
+
+  // ---------- STATE ----------
+  var state = {round:0, qs:[], qi:0, score:0, streak:0, best:0, correct:0, roundCorrect:0, roundScore:0, answered:false};
+  var muted = false;
+  try { muted = localStorage.getItem("cpiHL_muted") === "1"; } catch(e) {}
+
+  // ---------- HELPERS ----------
+  function $(id){ return document.getElementById(id); }
+  function shuffle(a){ a = a.slice(); for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function fmt(v){ var s = Math.abs(v).toFixed(1) + "%"; if (v > 0) return "+" + s; if (v < 0) return "-" + s; return s; }
+  function show(id){ var s = document.querySelectorAll(".screen"); for (var i=0;i<s.length;i++) s[i].classList.remove("on"); $(id).classList.add("on"); window.scrollTo(0,0); }
+
+  // ---------- SOUND ----------
+  var actx = null;
+  function tone(freq, dur, type, delay){
+    if (muted) return;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      var t0 = actx.currentTime + (delay || 0);
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || "square"; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.12, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+    } catch(e) {}
+  }
+  function sndGood(){ tone(660,0.12,"square",0); tone(880,0.16,"square",0.1); }
+  function sndBad(){ tone(220,0.22,"sawtooth",0); tone(160,0.28,"sawtooth",0.15); }
+  function sndClick(){ tone(520,0.06,"triangle",0); }
+  function sndFanfare(){ [523,659,784,1047].forEach(function(f,i){ tone(f,0.18,"square",i*0.12); }); }
+  function setMuteIcon(){ $("muteBtn").textContent = muted ? "🔇" : "🔊"; }
+
+  // ---------- ROUND BUILDERS ----------
+  // Every question: left card is known, right card is hidden. Player guesses if right is higher or lower than left.
+  function buildR1(){
+    var picks = shuffle(R1_POOL).slice(0, Q_PER_ROUND);
+    return picks.map(function(k){
+      var it = ITEMS[k];
+      return {
+        prompt: "Did <b>" + it.name + "</b> rise more or less than overall Midwest prices?",
+        L:{emoji:"🧺", name:"Overall Inflation", where:"Midwest, all items", val:ITEMS.allitems.mw},
+        R:{emoji:it.emoji, name:it.name, where:"Midwest", val:it.mw},
+        why: it.why
+      };
+    });
+  }
+  function buildR2(){
+    var order = shuffle(R2_POOL), chain = [order[0]];
+    for (var i=1;i<order.length && chain.length < Q_PER_ROUND + 1;i++){
+      if (ITEMS[order[i]].us !== ITEMS[chain[chain.length-1]].us) chain.push(order[i]);
+    }
+    var qs = [];
+    for (var j=1;j<chain.length;j++){
+      var a = ITEMS[chain[j-1]], b = ITEMS[chain[j]];
+      qs.push({
+        prompt: "Did <b>" + b.name + "</b> rise more or less than <b>" + a.name + "</b>?",
+        L:{emoji:a.emoji, name:a.name, where:"U.S. average", val:a.us},
+        R:{emoji:b.emoji, name:b.name, where:"U.S. average", val:b.us},
+        why: b.why
+      });
+    }
+    return qs;
+  }
+  function buildR3(){
+    var picks = shuffle(R3_POOL).slice(0, Q_PER_ROUND);
+    return picks.map(function(k){
+      var it = ITEMS[k];
+      return {
+        prompt: "<b>" + it.name + ":</b> did Midwest prices rise more or less than the U.S. average?",
+        L:{emoji:"🇺🇸", name:it.name, where:"U.S. average", val:it.us},
+        R:{emoji:it.emoji, name:it.name, where:"Midwest", val:it.mw},
+        why: VS_WHY[k]
+      };
+    });
+  }
+
+  var ROUNDS = [
+    {title:"Beat the Headline", build:buildR1,
+     intro:"Overall Midwest prices rose <b>4.2%</b> in the past year. For each item, decide: did its price rise <b>higher</b> or <b>lower</b> than 4.2%?"},
+    {title:"Head to Head", build:buildR2,
+     intro:"Classic higher or lower using U.S. data. Did the mystery item's price change <b>more</b> or <b>less</b> than the item you can see? Then the mystery item becomes the next one to beat."},
+    {title:"Midwest vs. Nation", build:buildR3,
+     intro:"Indiana is part of the Midwest region. For each item you'll see the U.S. average. Did prices in the <b>Midwest</b> rise faster (higher) or slower (lower)?"}
+  ];
+
+  // ---------- FLOW ----------
+  function updateHud(){
+    $("hudScore").textContent = "Score " + state.score;
+    $("hudStreak").textContent = "Streak " + state.streak;
+  }
+  function startGame(){
+    state.round = 0; state.score = 0; state.streak = 0; state.best = 0; state.correct = 0;
+    updateHud(); roundIntro();
+  }
+  function roundIntro(){
+    var r = ROUNDS[state.round];
+    $("riTag").textContent = "Round " + (state.round + 1) + " of " + ROUNDS.length;
+    $("riTitle").textContent = r.title;
+    $("riText").innerHTML = r.intro;
+    show("scrRound");
+  }
+  function startRound(){
+    state.qs = ROUNDS[state.round].build();
+    state.qi = 0; state.roundCorrect = 0; state.roundScore = 0;
+    show("scrPlay"); renderQ();
+  }
+  function renderQ(){
+    var q = state.qs[state.qi];
+    state.answered = false;
+    $("qRound").textContent = "Round " + (state.round + 1) + ": " + ROUNDS[state.round].title;
+    $("qCount").textContent = (state.qi + 1) + " / " + state.qs.length;
+    $("qBar").style.width = (state.qi / state.qs.length * 100) + "%";
+    $("qPrompt").innerHTML = q.prompt;
+    $("lEmoji").textContent = q.L.emoji; $("lName").textContent = q.L.name; $("lWhere").textContent = q.L.where; $("lVal").textContent = fmt(q.L.val);
+    $("rEmoji").textContent = q.R.emoji; $("rName").textContent = q.R.name; $("rWhere").textContent = q.R.where;
+    var rv = $("rVal"); rv.textContent = "?"; rv.classList.add("q");
+    var cr = $("cardR"); cr.classList.remove("right-ans","wrong-ans","shake","pop");
+    $("btnHi").disabled = false; $("btnLo").disabled = false;
+    $("fb").className = "feedback";
+  }
+  function countUp(el, target, done){
+    var start = null, dur = 650;
+    el.classList.remove("q");
+    function step(ts){
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(Math.round(target * eased * 10) / 10);
+      if (p < 1) requestAnimationFrame(step); else { el.textContent = fmt(target); if (done) done(); }
+    }
+    requestAnimationFrame(step);
+  }
+  function answer(guessHigher){
+    if (state.answered) return;
+    state.answered = true;
+    sndClick();
+    $("btnHi").disabled = true; $("btnLo").disabled = true;
+    var q = state.qs[state.qi];
+    var isHigher = q.R.val > q.L.val;
+    var right = (guessHigher === isHigher);
+    countUp($("rVal"), q.R.val, function(){
+      var cr = $("cardR");
+      var fb = $("fb");
+      if (right){
+        state.streak++; state.correct++; state.roundCorrect++;
+        if (state.streak > state.best) state.best = state.streak;
+        var pts = 100 + Math.min(state.streak - 1, 8) * 25;
+        state.score += pts; state.roundScore += pts;
+        cr.classList.add("right-ans","pop"); sndGood();
+        $("fbVerdict").textContent = "Correct! +" + pts + (state.streak >= 3 ? "  (Streak x" + state.streak + ")" : "");
+        fb.className = "feedback good on";
+      } else {
+        state.streak = 0;
+        cr.classList.add("wrong-ans","shake"); sndBad();
+        $("fbVerdict").textContent = "Not quite. It was " + (isHigher ? "HIGHER." : "LOWER.");
+        fb.className = "feedback bad on";
+      }
+      $("fbCompare").innerHTML = "<b>" + q.R.name + " (" + q.R.where + "): " + fmt(q.R.val) + "</b> vs. " + q.L.name + " (" + q.L.where + "): " + fmt(q.L.val);
+      $("fbWhy").textContent = q.why || "";
+      $("nextBtn").textContent = (state.qi + 1 < state.qs.length) ? "Next" : "Finish Round";
+      updateHud();
+      $("nextBtn").focus();
+    });
+  }
+  function next(){
+    sndClick();
+    state.qi++;
+    if (state.qi < state.qs.length) { renderQ(); return; }
+    $("qBar").style.width = "100%";
+    roundEnd();
+  }
+  function roundEnd(){
+    var n = state.qs.length, c = state.roundCorrect;
+    $("reTag").textContent = "Round " + (state.round + 1) + " Complete";
+    $("reTitle").textContent = ROUNDS[state.round].title;
+    $("reScore").textContent = c + " / " + n;
+    var msg = c === n ? "Perfect round! You read the data like an economist." :
+              c >= n * 0.7 ? "Strong work. You earned " + state.roundScore + " points this round." :
+              "Prices are tricky! You earned " + state.roundScore + " points. Keep an eye on the energy items.";
+    $("reText").textContent = msg;
+    $("reNext").textContent = (state.round + 1 < ROUNDS.length) ? "Next Round" : "See Final Results";
+    if (c === n) sndFanfare(); else sndGood();
+    show("scrRoundEnd");
+  }
+  function afterRound(){
+    state.round++;
+    if (state.round < ROUNDS.length) roundIntro(); else finalScreen();
+  }
+  function finalScreen(){
+    var total = ROUNDS.length * Q_PER_ROUND;
+    var hs = 0;
+    try { hs = parseInt(localStorage.getItem("cpiHL_high") || "0", 10) || 0; } catch(e) {}
+    if (state.score > hs) { hs = state.score; try { localStorage.setItem("cpiHL_high", String(hs)); } catch(e) {} }
+    $("fScore").textContent = state.score;
+    $("fCorrect").textContent = state.correct + "/" + total;
+    $("fBest").textContent = state.best;
+    $("fHigh").textContent = hs;
+    var pct = state.correct / total;
+    $("fRank").textContent = pct >= 0.9 ? "Rank: Chief Economist" :
+                             pct >= 0.75 ? "Rank: Federal Reserve Analyst" :
+                             pct >= 0.5 ? "Rank: BLS Price Collector" : "Rank: Rookie Shopper";
+    sndFanfare();
+    show("scrFinal");
+  }
+
+  // ---------- EVENTS ----------
+  $("startBtn").addEventListener("click", function(){ sndClick(); startGame(); });
+  $("riGo").addEventListener("click", function(){ sndClick(); startRound(); });
+  $("btnHi").addEventListener("click", function(){ answer(true); });
+  $("btnLo").addEventListener("click", function(){ answer(false); });
+  $("nextBtn").addEventListener("click", next);
+  $("reNext").addEventListener("click", function(){ sndClick(); afterRound(); });
+  $("againBtn").addEventListener("click", function(){ sndClick(); startGame(); });
+  $("muteBtn").addEventListener("click", function(){
+    muted = !muted; setMuteIcon();
+    try { localStorage.setItem("cpiHL_muted", muted ? "1" : "0"); } catch(e) {}
+  });
+  document.addEventListener("keydown", function(e){
+    if (!$("scrPlay").classList.contains("on")) return;
+    if (!state.answered && (e.key === "ArrowUp" || e.key === "h" || e.key === "H")) answer(true);
+    else if (!state.answered && (e.key === "ArrowDown" || e.key === "l" || e.key === "L")) answer(false);
+  });
+  setMuteIcon();
+})();
+</script>
+</body>
+</html>
