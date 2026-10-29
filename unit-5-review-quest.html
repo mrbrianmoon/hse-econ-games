@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Unit 5 Review Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#004AA0; --blue-hi:#2a7bff; --navy:#00142e; --navy2:#001f47; --red:#C8102E; --red-hi:#ff3355;
+  --gray:#C6C8CE; --white:#ffffff; --gold:#ffcc33; --good:#22d36b; --bad:#ff3355;
+  --pix:'Press Start 2P','Courier New',monospace; --body:'Trebuchet MS','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{background:var(--navy);color:var(--white);font-family:var(--body);overflow-x:hidden;
+  background-image:radial-gradient(ellipse at 50% -10%,rgba(42,123,255,.35),transparent 60%),
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;background-attachment:fixed;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer;color:inherit;touch-action:manipulation}
+.wrap{max-width:960px;margin:0 auto;padding:16px 16px 40px}
+.screen{display:none;animation:fadeIn .25s ease}
+.screen.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand{font-family:var(--pix);font-size:10px;color:var(--gray);letter-spacing:2px}
+.spacer{flex:1}
+.iconbtn{background:var(--navy2);border:2px solid var(--blue);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:bold}
+.iconbtn:hover{border-color:var(--blue-hi)}
+/* title */
+.title-card{text-align:center;padding:36px 16px}
+.logo{font-family:var(--pix);font-size:clamp(22px,5vw,42px);line-height:1.35;text-shadow:0 0 18px var(--blue-hi),4px 4px 0 var(--red)}
+.logo small{display:block;font-size:.38em;color:var(--gold);text-shadow:none;margin-top:14px;letter-spacing:3px}
+.blink{animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+input.name{font-family:var(--body);font-size:20px;padding:12px 16px;border-radius:12px;border:3px solid var(--blue-hi);background:#fff;color:#111;width:min(340px,90%);text-align:center;margin:18px 0 6px;-webkit-user-select:text;user-select:text}
+.big{font-family:var(--pix);font-size:14px;padding:16px 26px;border-radius:14px;border:none;background:var(--red);color:#fff;box-shadow:0 6px 0 #7d0a1c,0 0 24px rgba(200,16,46,.5);transition:transform .08s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #7d0a1c}
+.big.blue{background:var(--blue);box-shadow:0 6px 0 #002a5c,0 0 24px rgba(42,123,255,.45)}
+.big.gray{background:#3a4560;box-shadow:0 6px 0 #1d2335}
+.big.gold{background:#b88a00;box-shadow:0 6px 0 #5e4600,0 0 24px rgba(255,204,51,.45)}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.muted{color:var(--gray);font-size:14px}
+.title-list{max-width:560px;margin:22px auto 0;text-align:left;line-height:1.6;font-size:15px;color:#dfe4ee}
+.title-list b{color:var(--gold)}
+/* player panel */
+.player{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,var(--navy2),#002b63);border:3px solid var(--blue);border-radius:18px;padding:14px 16px;box-shadow:0 0 30px rgba(42,123,255,.2)}
+.badge{width:62px;height:62px;border-radius:14px;background:var(--red);display:grid;place-items:center;font-size:30px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
+.pname{font-weight:bold;font-size:20px}
+.prank{font-family:var(--pix);font-size:10px;color:var(--gold);margin:6px 0 8px}
+.bar{height:14px;background:#0a1630;border:2px solid #33446a;border-radius:8px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-hi),#7fb3ff);width:0;transition:width .8s ease}
+.xpnums{font-size:12px;color:var(--gray);margin-top:4px}
+.pstats{text-align:right;font-size:13px;color:var(--gray);line-height:1.7}
+.pstats b{color:#fff;font-size:16px}
+/* map */
+.sectionlabel{font-family:var(--pix);font-size:11px;color:var(--gray);margin:22px 4px 10px;letter-spacing:2px;line-height:1.6}
+.stations{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stn{position:relative;display:flex;flex-direction:column;background:var(--navy2);border:3px solid var(--blue);border-radius:16px;padding:14px 12px 12px;text-align:left;min-height:158px;transition:transform .12s,box-shadow .12s}
+.stn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(42,123,255,.35)}
+.stn .num{font-family:var(--pix);font-size:16px;color:var(--red-hi);text-shadow:2px 2px 0 #000}
+.stn .ic{position:absolute;right:12px;top:10px;font-size:26px}
+.stn .nm{font-weight:bold;font-size:15px;margin:8px 0 4px;min-height:20px}
+.stn .ds{font-size:12px;color:#c9d3e6;line-height:1.35;min-height:32px}
+.stn .stars{font-size:22px;letter-spacing:2px;margin-top:auto;padding-top:6px}
+.stn .best{font-size:12px;color:var(--gray);margin-top:2px}
+.stn.vocab{border-color:var(--blue-hi);background:linear-gradient(160deg,#071a3a,#0c2f66)}
+.star{color:#33446a}.star.on{color:var(--gold);text-shadow:0 0 8px rgba(255,204,51,.7)}
+.boss{display:block;width:100%;margin-top:12px;background:linear-gradient(160deg,#1c1400,#4a3500);border:3px solid var(--gold);border-radius:16px;padding:16px;text-align:left;position:relative}
+.boss h3{font-family:var(--pix);font-size:13px;margin:0 0 8px;line-height:1.5;color:var(--gold)}
+.boss p{margin:0;font-size:14px;color:#efe6c8;line-height:1.4}
+.boss .req{font-size:12px;color:var(--gold);margin-top:8px}
+.boss.locked{opacity:.5;filter:grayscale(.7);cursor:not-allowed}
+.navrow{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.navrow .big{flex:1;min-width:200px;font-size:11px}
+.quitrow{text-align:center;margin-top:16px}
+.linkbtn{background:none;border:none;color:var(--gray);text-decoration:underline;font-size:13px}
+/* play */
+.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:10px}
+.hud .l{font-family:var(--pix);font-size:10px;color:var(--gray);line-height:1.8}
+.hud .c{text-align:center}
+.hud .r{text-align:right;font-family:var(--pix);font-size:10px;color:var(--gray);line-height:1.8}
+.score{font-family:var(--pix);font-size:22px;color:#fff;text-shadow:0 0 10px var(--blue-hi)}
+.mult{display:inline-block;font-family:var(--pix);font-size:12px;padding:6px 8px;border-radius:8px;background:#33446a;margin-top:6px}
+.mult.hot{background:var(--red);animation:pulse .6s ease infinite alternate}
+@keyframes pulse{to{transform:scale(1.12);box-shadow:0 0 16px var(--red-hi)}}
+.bonuslbl{font-family:var(--pix);font-size:8px;color:var(--gray);letter-spacing:1px}
+.timer{height:14px;background:#0a1630;border:2px solid #33446a;border-radius:10px;overflow:hidden;margin:4px 0 16px}
+.timer>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--good),#8dffb8)}
+.timer.warn>i{background:linear-gradient(90deg,#e0a400,var(--gold))}
+.timer.empty>i{background:#33446a}
+.prompt{position:relative;background:#fff;color:#0b1a33;border-radius:18px;padding:26px 22px 22px;min-height:120px;text-align:center;border:4px solid var(--blue);box-shadow:0 8px 0 #002a5c}
+.prompt .tag{position:absolute;top:-14px;left:18px;font-family:var(--pix);font-size:9px;background:var(--red);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .qn{position:absolute;top:-14px;right:18px;font-family:var(--pix);font-size:9px;background:var(--blue);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .q{font-size:clamp(18px,2.5vw,22px);line-height:1.45;font-weight:bold}
+.prompt .term{font-family:Georgia,serif;font-weight:bold;font-size:clamp(26px,4.4vw,38px);color:var(--blue)}
+.prompt table{margin:12px auto 4px;border-collapse:collapse;font-size:16px}
+.prompt th,.prompt td{border:2px solid #c9d3e6;padding:6px 12px}
+.prompt th{background:#e8eef8;color:#003B80}
+.prompt .data{display:inline-block;text-align:left;background:#f2f6fc;border-left:6px solid var(--blue);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:17px;line-height:1.6;font-weight:normal}
+.prompt svg{max-width:100%;height:auto;margin-top:10px}
+.opts{display:grid;gap:12px;margin-top:18px}
+.opts.list{grid-template-columns:1fr}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.four{grid-template-columns:1fr 1fr}
+.opt{position:relative;background:var(--navy2);border:3px solid var(--blue);border-radius:14px;padding:14px 14px 14px 52px;text-align:left;font-size:17px;line-height:1.35;min-height:62px;font-weight:bold;transition:transform .08s,background .12s}
+.opts.two .opt{text-align:center;padding:18px 12px;font-family:var(--pix);font-size:12px;line-height:1.6;min-height:80px}
+.opts.two .opt .k{display:none}
+.opt .k{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:8px;background:var(--blue);display:grid;place-items:center;font-family:var(--pix);font-size:10px}
+.opt:hover:not(:disabled){border-color:var(--blue-hi);background:#062a5e}
+.opt:active:not(:disabled){transform:scale(.98)}
+.opt:disabled{cursor:default}
+.opt.right{background:#0f5a32;border-color:var(--good);box-shadow:0 0 18px rgba(34,211,107,.6)}
+.opt.right .k{background:var(--good)}
+.opt.wrong{background:#5a0b1d;border-color:var(--bad);opacity:.7;text-decoration:line-through}
+.opt.wrong .k{background:var(--bad)}
+.opt.dim{opacity:.35}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.calcbox{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}
+.calcin{font-family:var(--body);font-size:26px;padding:12px 14px;border-radius:12px;border:3px solid var(--blue-hi);width:min(240px,62vw);text-align:center;font-weight:bold;color:#111;background:#fff;-webkit-user-select:text;user-select:text}
+.calcin:disabled{background:#d8f5e3;border-color:var(--good)}
+.unit{font-family:var(--pix);font-size:16px;color:var(--gold)}
+.calcnote{text-align:center;font-size:13px;color:var(--gray);margin-top:8px}
+.fbbox{margin-top:14px;border-radius:14px;padding:14px 16px;line-height:1.5;font-size:16px;text-align:left}
+.fbbox.ok{background:#0f3d24;border:3px solid var(--good)}
+.fbbox.no{background:#3d0a16;border:3px solid var(--bad)}
+.fbbox.work{background:#0a1f45;border:3px dashed var(--blue-hi)}
+.fbbox .h{font-family:var(--pix);font-size:10px;display:block;margin-bottom:8px;letter-spacing:1px}
+.fbbox.ok .h{color:var(--good)} .fbbox.no .h{color:var(--red-hi)} .fbbox.work .h{color:#8fb9ff}
+.hand{margin-top:14px;background:#fff;color:#0b1a33;border:4px solid var(--gold);border-radius:14px;padding:14px 16px;font-size:17px;line-height:1.45;box-shadow:0 0 24px rgba(255,204,51,.45)}
+.hand b.big2{display:block;font-family:var(--pix);font-size:13px;color:var(--red);margin-bottom:8px;line-height:1.5}
+.nextrow{text-align:center;margin-top:16px;display:none}
+.pop{position:fixed;font-family:var(--pix);font-size:18px;color:var(--gold);text-shadow:2px 2px 0 #000;pointer-events:none;animation:popup .9s ease-out forwards;z-index:50}
+@keyframes popup{from{opacity:1;transform:translate(-50%,0) scale(.8)}to{opacity:0;transform:translate(-50%,-70px) scale(1.25)}}
+/* results */
+.panel{background:var(--navy2);border:3px solid var(--blue);border-radius:18px;padding:20px}
+.res-title{font-family:var(--pix);font-size:clamp(16px,3vw,24px);text-align:center;margin:6px 0 14px;line-height:1.4}
+.bigstars{text-align:center;font-size:56px;letter-spacing:10px;margin:4px 0}
+.bigstars .star{display:inline-block;transform:scale(0)}
+.bigstars .star.show{animation:starIn .45s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes starIn{to{transform:scale(1)}}
+.crit{text-align:center;font-size:12px;color:var(--gray);margin-bottom:14px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.stat{background:#0a1630;border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--pix);font-size:15px;margin-top:8px;color:#fff}
+.stat span{font-size:12px;color:var(--gray)}
+.banner{text-align:center;font-family:var(--pix);font-size:11px;padding:12px;border-radius:12px;margin:10px 0;line-height:1.7}
+.banner.rank{background:var(--red);animation:pulse .7s ease infinite alternate}
+.banner.troph{background:#3d2e00;border:2px solid var(--gold);color:var(--gold)}
+.banner.info{background:#0a1630;border:2px solid var(--blue-hi);color:#cfe0ff}
+.review h4{font-family:var(--pix);font-size:11px;margin:18px 0 10px;color:var(--red-hi);line-height:1.6}
+.rv{background:#0a1630;border-left:5px solid var(--red);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:15px;line-height:1.45}
+.rv .s{font-family:var(--pix);font-size:8px;color:var(--gold);display:block;margin-bottom:6px}
+.rv b{color:#8fb9ff}
+.secbars{margin:10px 0}
+.secrow{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.secrow .bar>i{transition:none}
+.secrow .pct{text-align:right;font-family:var(--pix);font-size:10px}
+.btnrow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+/* trophies */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.troph{background:#0a1630;border:3px solid #33446a;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.troph .ic{font-size:34px;line-height:1;filter:grayscale(1) brightness(.35)}
+.troph.got{border-color:var(--gold);background:linear-gradient(160deg,#241b00,#0a1630)}
+.troph.got .ic{filter:none;text-shadow:0 0 12px rgba(255,204,51,.6)}
+.troph h5{margin:0 0 4px;font-size:15px}
+.troph p{margin:0;font-size:12.5px;color:var(--gray);line-height:1.35}
+/* finish certificate */
+.report{background:#fff;color:#0b1a33;border-radius:16px;overflow:hidden;border:4px solid var(--blue)}
+.report .rh{background:var(--blue);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:6px solid var(--red)}
+.report .rh .t{font-family:Georgia,serif;font-size:24px;font-weight:bold}
+.report .rh .u{background:var(--red);font-family:var(--pix);font-size:12px;padding:10px 12px;border-radius:8px}
+.report .rb{padding:16px 20px;font-size:15px;line-height:1.6}
+.report .who{font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#003B80}
+.report .stamp{display:inline-block;border:3px solid var(--red);color:var(--red);font-family:var(--pix);font-size:11px;padding:8px 10px;border-radius:8px;transform:rotate(-3deg);margin:8px 0}
+.report .stamp.pend{border-color:#8b94a3;color:#5b6472}
+.report .rowx{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e1e4ea;padding:7px 2px}
+.report .rowx span:last-child{font-weight:bold;text-align:right}
+.report .secrow{color:#0b1a33}
+.report .secrow .bar{background:#e8eef8;border-color:#c9d3e6}
+.report .note{font-size:13px;color:#5b6472;margin-top:12px}
+/* toast/modal */
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-160%);background:linear-gradient(135deg,#3d2e00,#6a5000);border:3px solid var(--gold);border-radius:14px;padding:12px 18px;display:flex;gap:12px;align-items:center;z-index:80;transition:transform .35s cubic-bezier(.2,1.4,.4,1);box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:92vw}
+.toast.show{transform:translate(-50%,0)}
+.toast .ic{font-size:30px}
+.toast small{display:block;font-family:var(--pix);font-size:8px;color:var(--gold);margin-bottom:5px}
+.toast b{font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,10,25,.8);display:none;place-items:center;z-index:70;padding:16px;overflow:auto}
+.modal.on{display:grid}
+.modal .panel{max-width:620px;width:100%;max-height:88vh;overflow:auto}
+.gl h4{font-family:var(--pix);font-size:10px;color:var(--gold);margin:16px 0 8px;line-height:1.6}
+.gl dt{font-weight:bold;color:#8fb9ff;margin-top:8px}
+.gl dd{margin:2px 0 0;line-height:1.4;color:#e6ebf5}
+.confetti{position:fixed;width:10px;height:14px;top:-20px;z-index:55;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.countdown{position:fixed;inset:0;display:none;place-items:center;z-index:65;background:rgba(0,10,25,.75);font-family:var(--pix);font-size:80px;color:#fff;text-shadow:0 0 30px var(--blue-hi),6px 6px 0 var(--red)}
+.countdown.on{display:grid}
+@media (max-width:760px){
+  .stations{grid-template-columns:1fr 1fr}
+  .statgrid{grid-template-columns:1fr 1fr}
+  .opts.four{grid-template-columns:1fr}
+  .player{grid-template-columns:auto 1fr}
+  .pstats{grid-column:1/-1;text-align:left;display:flex;gap:16px;flex-wrap:wrap}
+  .opt{font-size:15px}
+  .secrow{grid-template-columns:110px 1fr 56px;font-size:13px}
+}
+@media (max-width:440px){ .stations{grid-template-columns:1fr} .opts.two{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">HSE INDIANA ECONOMICS · UNIT 5</div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnHelp" type="button">Word Help</button>
+    <button class="iconbtn" id="btnMute" type="button">Sound: On</button>
+  </div>
+
+  <!-- TITLE -->
+  <section class="screen" id="scrTitle">
+    <div class="title-card">
+      <div class="logo">REVIEW<br>QUEST<small>UNIT 5 · MEASURING THE ECONOMY</small></div>
+      <div class="title-list">
+        Clear <b>5 review stations</b> (7.1 to 7.5), warm up in the <b>Vocab Lightning</b> round, then take on the <b>Exam Simulator</b>.<br>
+        Answer fast for a speed bonus. Chain first-try answers to build your multiplier.<br>
+        Calculation questions <b>lock</b> until you get them right. Show your work on scratch paper.
+      </div>
+      <div id="nameBox">
+        <input class="name" id="nameInput" maxlength="30" placeholder="First and last name" autocomplete="off">
+        <p class="muted" style="font-size:12px;margin:4px 0 18px">Your progress saves on this device.</p>
+      </div>
+      <button class="big" id="btnStart" type="button"><span class="blink">PRESS START</span></button>
+      <p class="muted" id="startMsg" style="min-height:20px"></p>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen" id="scrHub">
+    <div class="player">
+      <div class="badge" id="hubBadge">📋</div>
+      <div>
+        <div class="pname" id="hubName">Player</div>
+        <div class="prank" id="hubRank">INTERN</div>
+        <div class="bar"><i id="hubXpBar"></i></div>
+        <div class="xpnums" id="hubXpNums">0 XP</div>
+      </div>
+      <div class="pstats">
+        <div>Stars <b id="hubStars">0/18</b></div>
+        <div>Trophies <b id="hubTroph">0</b></div>
+        <div>Best exam sim <b id="hubSim">--</b></div>
+      </div>
+    </div>
+    <div class="sectionlabel">REVIEW STATIONS · PLAY IN ANY ORDER</div>
+    <div class="stations" id="stationGrid"></div>
+    <div class="sectionlabel">FINAL BOSS</div>
+    <button class="boss" id="bossTile" type="button"></button>
+    <div class="navrow">
+      <button class="big blue" id="btnTrophies" type="button">TROPHY CASE</button>
+      <button class="big gray" id="btnFinish" type="button">MY FINISH SCREEN</button>
+    </div>
+    <div class="quitrow"><button class="linkbtn" id="btnHow" type="button">How scoring works</button> · <button class="linkbtn" id="btnReset" type="button">Reset my progress</button></div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="scrPlay">
+    <div class="hud">
+      <div class="l"><div id="hudMode">7.1</div><div id="hudProg">1 / 12</div></div>
+      <div class="c"><div class="score" id="hudScore">0</div><div class="mult" id="hudMult">x1</div></div>
+      <div class="r"><div id="hudStreak">STREAK 0</div><div id="hudFirst">FIRST TRY 0</div></div>
+    </div>
+    <div class="bonuslbl">SPEED BONUS</div>
+    <div class="timer" id="timer"><i id="timerFill"></i></div>
+    <div class="prompt" id="prompt"></div>
+    <div id="answerArea"></div>
+    <div id="fbArea"></div>
+    <div class="nextrow" id="nextRow"><button class="big blue" id="btnNext" type="button">NEXT ▶</button></div>
+    <div class="quitrow"><button class="linkbtn" id="btnQuit" type="button">Quit round</button></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="scrResults">
+    <div class="panel">
+      <div class="res-title" id="resTitle">ROUND COMPLETE</div>
+      <div class="bigstars" id="resStars"></div>
+      <div class="crit" id="resCrit"></div>
+      <div class="statgrid" id="resStats"></div>
+      <div id="resSecs"></div>
+      <div id="resBanners"></div>
+      <div class="review" id="resReview"></div>
+      <div class="btnrow" id="resBtns"></div>
+    </div>
+  </section>
+
+  <!-- TROPHIES -->
+  <section class="screen" id="scrTrophies">
+    <div class="res-title">TROPHY CASE</div>
+    <p class="muted" style="text-align:center;margin-top:-6px" id="trophCount"></p>
+    <div class="tgrid" id="trophGrid"></div>
+    <div class="btnrow"><button class="big blue" type="button" data-go="hub">BACK TO MAP</button></div>
+  </section>
+
+  <!-- FINISH -->
+  <section class="screen" id="scrFinish">
+    <div class="report">
+      <div class="rh"><div><div style="font-size:12px;letter-spacing:2px;opacity:.85">HSE INDIANA ECONOMICS · MR. MOON</div><div class="t">Unit 5 Review Quest</div></div><div class="u">UNIT 05</div></div>
+      <div class="rb" id="finishBody"></div>
+    </div>
+    <div class="btnrow"><button class="big blue" type="button" data-go="hub">BACK TO MAP</button></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"><div class="ic" id="toastIc">🏆</div><div><small>TROPHY UNLOCKED</small><b id="toastTxt"></b></div></div>
+<div class="countdown" id="countdown"></div>
+<div class="modal" id="modal"><div class="panel" id="modalBody"></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   CONTENT. Source of truth: textbook sections 7.1 to 7.5.
+   All wording and numbers are original. Nothing here is copied from
+   the Unit 5 test.
+   ===================================================================== */
+var SECS=[
+  {id:'7.1',name:'Gross Domestic Product',ic:'🏭',ds:'What counts in GDP, nominal vs. real, GDP math'},
+  {id:'7.2',name:'Business Cycles',ic:'🎢',ds:'Phases, recessions, what drives the cycle, forecasting'},
+  {id:'7.3',name:'Economic Growth',ic:'🌱',ds:'Growth rate, GDP per capita, capital deepening, technology'},
+  {id:'7.4',name:'Unemployment',ic:'💼',ds:'Four types, labor force, unemployment rate math'},
+  {id:'7.5',name:'Inflation and Deflation',ic:'🎈',ds:'CPI, inflation rate math, who gets hurt, causes'}
+];
+var SECNAME={'7.1':'7.1 GDP','7.2':'7.2 Business Cycles','7.3':'7.3 Growth','7.4':'7.4 Unemployment','7.5':'7.5 Inflation','MIX':'Big Picture'};
+
+var TERMS=[
+ ['7.1','Gross Domestic Product (GDP)','The total dollar value of all final goods and services produced inside a country in one year.'],
+ ['7.1','Intermediate Goods','Products used as parts or inputs to make a final good, like tires for a new car.'],
+ ['7.1','Durable Goods','Goods that last a long time, usually three years or more, like cars and refrigerators.'],
+ ['7.1','Nondurable Goods','Goods that are used up or wear out quickly, like food, gasoline, and clothing.'],
+ ['7.1','Nominal GDP','GDP measured in current-year prices, so it can rise just because prices went up.'],
+ ['7.1','Real GDP','GDP adjusted for price changes, showing whether the economy actually produced more.'],
+ ['7.1','Gross National Product (GNP)','The total value of goods and services produced by a country\'s citizens and companies anywhere in the world.'],
+ ['7.1','Depreciation','The loss in value of machines, buildings, and other capital from normal wear and tear.'],
+ ['7.1','Price Level','The average of all prices across the whole economy.'],
+ ['7.1','Aggregate Supply','The total amount of goods and services all producers will offer at each price level.'],
+ ['7.1','Aggregate Demand','The total amount of goods and services everyone in the economy will buy at each price level.'],
+ ['7.2','Business Cycle','The repeating pattern of the economy growing, shrinking, and then growing again.'],
+ ['7.2','Expansion','The phase when real GDP rises, jobs are easier to find, and businesses do well.'],
+ ['7.2','Economic Growth','A steady increase in real GDP over a long period of time.'],
+ ['7.2','Peak','The highest point of an expansion, right before real GDP stops rising.'],
+ ['7.2','Contraction','The phase when real GDP falls and the economy slows down.'],
+ ['7.2','Trough','The lowest point of a contraction, right before the economy starts to recover.'],
+ ['7.2','Recession','A contraction where real GDP falls for at least two quarters in a row.'],
+ ['7.2','Depression','An especially long and severe recession with very high unemployment.'],
+ ['7.2','Stagflation','A slow or shrinking economy combined with rising prices at the same time.'],
+ ['7.2','Business Investment','Money companies spend on capital goods like equipment, buildings, and technology.'],
+ ['7.2','Leading Indicators','Statistics that usually change before the economy does, used to predict the business cycle.'],
+ ['7.3','Real GDP per Capita','Real GDP divided by population; the best single measure of standard of living.'],
+ ['7.3','Capital Deepening','Increasing the amount of capital each worker has, which makes workers more productive.'],
+ ['7.3','Saving','Income that is not spent on consumption right now.'],
+ ['7.3','Savings Rate','The percentage of income that people set aside instead of spending.'],
+ ['7.3','Technological Progress','Producing goods and services more efficiently through new inventions or better methods.'],
+ ['7.3','Capital Formation','Building up a nation\'s stock of capital through saving and investment.'],
+ ['7.4','Frictional Unemployment','Short-term joblessness while people move between jobs or look for their first job.'],
+ ['7.4','Structural Unemployment','Joblessness when workers\' skills no longer match the jobs available, often due to new technology.'],
+ ['7.4','Globalization','Countries becoming more connected through trade, investment, and the movement of businesses and workers.'],
+ ['7.4','Seasonal Unemployment','Joblessness at certain times of year when some jobs are not needed, like construction in winter.'],
+ ['7.4','Cyclical Unemployment','Joblessness that rises when the economy goes into a contraction or recession.'],
+ ['7.4','Unemployment Rate','The percentage of the labor force that is out of work and actively looking for a job.'],
+ ['7.4','Full Employment','The lowest realistic level of unemployment, when there is no cyclical unemployment.'],
+ ['7.4','Underemployed','Working part time when you want full time, or working a job below your skills.'],
+ ['7.4','Discouraged Worker','Someone who wants a job but has stopped looking, so they are not counted as unemployed.'],
+ ['7.5','Inflation','A general rise in prices across the whole economy over time.'],
+ ['7.5','Purchasing Power','The amount of goods and services that one unit of money can buy.'],
+ ['7.5','Price Index','A number that compares what a group of goods costs now to what it cost in a base period.'],
+ ['7.5','Consumer Price Index (CPI)','A price index that tracks the cost of a market basket of goods and services a typical consumer buys.'],
+ ['7.5','Market Basket','A fixed set of goods and services used to track changes in prices over time.'],
+ ['7.5','Inflation Rate','The percentage change in the price level from one period to another.'],
+ ['7.5','Core Inflation Rate','The inflation rate with food and energy prices left out, because those prices jump around a lot.'],
+ ['7.5','Hyperinflation','Inflation that is out of control, with prices rising extremely fast.'],
+ ['7.5','Quantity Theory','The idea that too much money in the economy causes inflation.'],
+ ['7.5','Wage-Price Spiral','A cycle where higher wages raise costs, costs raise prices, and higher prices lead workers to demand higher wages again.'],
+ ['7.5','Fixed Income','Income that stays the same amount even when prices rise, like many pensions.'],
+ ['7.5','Deflation','A sustained drop in the overall price level.']
+].map(function(r){return {s:r[0],t:r[1],d:r[2]};});
+
+/* Multiple choice banks: [question, correct answer, [wrong answers], why it is right] */
+var BANK={
+'7.1':[
+ ['GDP measures the dollar value of all ___ goods and services produced within a country\'s borders in one year.','final',['intermediate','imported','used'],'GDP counts only <b>final</b> goods and services, the ones sold to the people who use them.'],
+ ['Why do economists leave intermediate goods out of GDP?','Their value is already included in the price of the final good, so counting them would count it twice.',['They are too hard to measure.','They are always made in other countries.','They are never sold for money.'],'The flour is already part of the price of the bread. Counting both would <b>double count</b> the flour.'],
+ ['A German company builds SUVs at a factory in South Carolina. Where do those SUVs count?','In U.S. GDP, because they were produced inside U.S. borders',['In German GDP only, because a German company owns the factory','In no country\'s GDP','Only in U.S. GNP'],'GDP is about <b>where</b> something is made, not who owns the company.'],
+ ['A U.S. company makes sneakers at its factory in Vietnam. Those sneakers count in...','U.S. GNP, but not U.S. GDP',['U.S. GDP, but not U.S. GNP','both U.S. GDP and U.S. GNP','neither U.S. GDP nor U.S. GNP'],'<b>GNP</b> counts what a nation\'s citizens and companies produce anywhere. <b>GDP</b> only counts what is made inside the country.'],
+ ['Which of these is a durable good?','A washing machine',['A tank of gasoline','A box of cereal','A haircut'],'Durable goods last three years or more. Gasoline and cereal get used up, and a haircut is a service.'],
+ ['Which of these is a nondurable good?','A tube of toothpaste',['A pickup truck','A refrigerator','A laptop'],'Nondurable goods are used up quickly, like toothpaste, food, and clothing.'],
+ ['Nominal GDP rose this year, but the country produced exactly the same amount of goods and services. How is that possible?','Prices went up, so the same output was worth more dollars.',['Population went down.','The government stopped counting services.','Imports rose.'],'Nominal GDP uses <b>current prices</b>, so it rises when prices rise even if output does not.'],
+ ['Real GDP is calculated using...','prices from a base year, so price changes are taken out',['this year\'s prices','the price of gold','prices set by the government'],'Real GDP holds prices constant at <b>base-year</b> prices, so any change shows a change in actual output.'],
+ ['Nominal GDP grew 7 percent this year, and real GDP grew 7 percent. What does this tell you?','Output grew, and the overall price level did not change.',['All of the growth came from higher prices.','Output fell, but prices rose.','The economy is in a recession.'],'If real and nominal grow by the same amount, prices stayed flat and the growth was all <b>more output</b>.'],
+ ['Nominal GDP grew 9 percent this year, but real GDP grew 0 percent. What does this tell you?','The entire increase came from higher prices.',['Output grew 9 percent.','Output fell 9 percent.','The country produced more services and fewer goods.'],'Real GDP did not change, so output stayed the same. The 9 percent was all <b>rising prices</b>.'],
+ ['A family that always cleaned its own gutters hires a company to do it. What happens to GDP?','It rises, because a nonmarket activity became a market sale',['It falls, because the family did less work','It stays the same, because no new good was made','It rises only if the company is foreign'],'Work you do for yourself is a <b>nonmarket activity</b> and is not counted. Once someone is paid, it counts.'],
+ ['A teen is paid $40 in cash to rake leaves and never reports it. Why is this not in GDP?','It is part of the underground economy, so it is never recorded.',['Raking leaves is an intermediate good.','Services are never counted in GDP.','Teenagers are not part of the economy.'],'Unreported cash work is part of the <b>underground economy</b>, which GDP misses.'],
+ ['Which is a limitation of GDP as a measure of how well people live?','It does not measure things like pollution, leisure time, or quality of life.',['It counts every used car sale twice.','It only measures goods made by the government.','It changes every single day.'],'GDP measures output. It does not tell you about the <b>environment, free time, or happiness</b>.'],
+ ['The expenditure approach finds GDP by adding up...','spending on final goods and services',['all the income earned by workers and owners','the value of all intermediate goods','the money printed by the government'],'The <b>expenditure approach</b> adds up spending. The <b>income approach</b> adds up the income earned making those goods.'],
+ ['Why do economists prefer real GDP when comparing output across years?','It removes the effect of price changes, so it shows whether output really changed.',['It is always larger than nominal GDP.','It counts used goods.','It includes the underground economy.'],'Real GDP lets you compare <b>output</b> from year to year without inflation fooling you.']
+],
+'7.2':[
+ ['Which list shows the phases of a business cycle in order, starting with growth?','expansion, peak, contraction, trough',['peak, trough, expansion, contraction','expansion, trough, contraction, peak','contraction, expansion, trough, peak'],'The economy grows (<b>expansion</b>), tops out (<b>peak</b>), shrinks (<b>contraction</b>), and bottoms out (<b>trough</b>).'],
+ ['The highest point of an expansion, right before real GDP starts to fall, is the...','peak',['trough','recession','depression'],'The <b>peak</b> is the top of the expansion.'],
+ ['The lowest point of a contraction, right before recovery begins, is the...','trough',['peak','expansion','stagflation'],'The <b>trough</b> is the bottom of the contraction.'],
+ ['Real GDP has fallen for two quarters in a row. Economists call this a...','recession',['peak','depression','expansion'],'Two straight quarters (six months) of falling real GDP is a <b>recession</b>.'],
+ ['What usually happens to unemployment during a contraction?','It rises, because businesses produce less and need fewer workers.',['It falls, because workers retire.','It stays exactly the same.','It drops to zero.'],'Falling output means firms need fewer workers, so <b>unemployment rises</b>.'],
+ ['A long, extremely severe recession with very high unemployment is called a...','depression',['trough','stagflation','peak'],'A <b>depression</b> is a recession that is especially long and deep, like the 1930s.'],
+ ['Real GDP is falling while the price level is rising. This is called...','stagflation',['deflation','an expansion','a depression'],'<b>Stagflation</b> means a stagnant or shrinking economy plus inflation.'],
+ ['Businesses decide to stop building new factories and buying new equipment. What is the most likely effect?','Output and jobs fall in the industries that supply them, pushing the economy toward contraction.',['Real GDP rises quickly.','Interest rates rise to 20 percent.','Unemployment drops.'],'Less <b>business investment</b> means less spending on capital goods, so output and jobs fall.'],
+ ['Banks lower interest rates on car loans and home loans. What is the most likely effect?','People borrow and spend more, pushing the economy toward expansion.',['People stop buying cars and homes.','The economy goes into a recession.','Prices fall sharply.'],'Cheaper borrowing means more spending, which helps an <b>expansion</b>.'],
+ ['Families hear rumors of layoffs and stop buying cars and furniture. Stores cut orders and lay off workers. This shows...','consumer expectations acting like a self-fulfilling prophecy',['a positive external shock','rising business investment','the quantity theory of inflation'],'When people expect bad times and spend less, their <b>expectations</b> help cause the bad times.'],
+ ['Which is an example of a negative external shock?','A war cuts off a country\'s oil imports.',['A company hires 500 new workers.','A bank lowers interest rates.','Families buy more holiday gifts.'],'<b>External shocks</b> are big surprise events from outside normal business, like oil supply cuts, wars, or droughts.'],
+ ['What are leading indicators?','Statistics that usually change before real GDP does, so they help predict the cycle',['Statistics that only change after a recession ends','The names of the top economists','Last year\'s total GDP'],'<b>Leading indicators</b> like stock prices, interest rates, and new orders for capital goods turn before the economy does.'],
+ ['Stock prices drop for months and orders for new factory equipment fall. An economist would most likely predict...','a contraction may be coming',['a boom is about to start','unemployment will soon fall','the economy just hit its trough'],'Falling <b>leading indicators</b> point to a coming <b>contraction</b>.'],
+ ['Which of these is NOT a leading indicator?','The total number of people who voted last year',['Stock prices','Interest rates','Manufacturers\' new orders for capital goods'],'Voting totals do not predict the business cycle. The other three tend to change <b>before</b> GDP does.'],
+ ['Economic growth means...','a steady, long-term increase in real GDP',['a single good month for the stock market','rising prices','a short burst of hiring before the holidays'],'<b>Economic growth</b> is the long-run upward trend in real GDP.'],
+ ['A huge new oil field is discovered and energy gets much cheaper. This positive shock most likely...','raises output and helps the economy expand',['causes stagflation','causes a depression','raises the price of everything'],'A <b>positive shock</b> lowers costs, so firms produce more and real GDP rises.'],
+ ['Why is predicting the business cycle so hard?','Many forces, including surprise shocks, move the economy at once.',['The economy never changes.','Economists are not allowed to look at data.','The cycle always lasts exactly four years.'],'Investment, interest rates, expectations, and <b>unpredictable shocks</b> all push at once, so forecasts often miss.']
+],
+'7.3':[
+ ['Which measure do economists use as the best single measure of a nation\'s standard of living?','real GDP per capita',['nominal GDP','total population','the inflation rate'],'<b>Real GDP per capita</b> shows output per person, which is the best standard of living measure.'],
+ ['Real GDP per capita is found by...','dividing real GDP by the population',['multiplying real GDP by the population','subtracting population from real GDP','dividing population by nominal GDP'],'Per capita means <b>per person</b>: real GDP ÷ population.'],
+ ['For real GDP per capita to rise, real GDP must grow...','faster than the population',['slower than the population','at exactly zero percent','only when prices rise'],'If output grows faster than the number of people, each person\'s share <b>gets bigger</b>.'],
+ ['Capital deepening means...','increasing the amount of capital each worker has',['hiring more workers with no new equipment','digging deeper mines','raising interest rates'],'<b>Capital deepening</b> gives each worker more and better tools, which raises productivity.'],
+ ['A delivery company gives every driver a GPS tablet and a newer, faster van. This is an example of...','capital deepening',['structural unemployment','deflation','a negative external shock'],'More capital per worker is <b>capital deepening</b>, so each driver can deliver more.'],
+ ['When workers become more productive because of capital deepening, what usually happens to their wages?','Wages tend to rise because each worker produces more.',['Wages always fall.','Wages stay the same forever.','Workers stop being paid.'],'More output per worker means workers are worth more to employers, so <b>wages rise</b>.'],
+ ['How does saving help the economy grow?','Banks lend savings to businesses, which invest in new capital.',['Saving removes money from the economy forever.','Saving raises the price level.','Saving lowers the population.'],'Savings become loans for <b>investment</b>, which leads to capital deepening.'],
+ ['The savings rate is...','the percentage of income people save instead of spend',['the interest rate on a car loan','the number of banks in a country','the amount the government spends'],'<b>Savings rate</b> = the share of income set aside.'],
+ ['Technological progress is best described as...','producing more output with the same inputs because of new inventions or better methods',['hiring more workers','raising prices','buying more of the same machines'],'<b>Technological progress</b> is about efficiency: more output without more inputs.'],
+ ['Why does the government issue patents?','To give inventors the sole right to their invention for a time so they can earn back their costs',['To let anyone copy new inventions right away','To lower all prices to zero','To stop companies from doing research'],'<b>Patents</b> reward invention, which encourages technological progress.'],
+ ['Which of these is a source of technological progress?','Scientific research at universities',['Higher tariffs on all goods','A drought','A rise in seasonal unemployment'],'Research, innovation, education, and experience all drive <b>technological progress</b>.'],
+ ['A country\'s population grows very fast, but its stock of capital stays the same. What happens to capital per worker?','It falls, so each worker is less productive.',['It rises.','It stays exactly the same.','It doubles.'],'More workers sharing the same capital means <b>less capital per worker</b>.'],
+ ['Why is real GDP per capita NOT a perfect measure of quality of life?','It does not show things like how income is shared, free time, or the environment.',['It counts used goods.','It is the same in every country.','It ignores population.'],'Per capita GDP is an average, so it misses <b>distribution, leisure, and environmental quality</b>.'],
+ ['Workers who get more education and job training usually...','become more productive, which helps economic growth',['become less productive','cause inflation','cause a recession'],'Education builds skills, a form of <b>human capital</b>, which raises productivity.']
+],
+'7.4':[
+ ['Who is counted in the civilian labor force?','Civilians 16 and older who have a job or are actively looking for one',['Everyone over age 16','Only people with full-time jobs','All adults, including people who stopped looking for work'],'The <b>labor force</b> = people 16 and older who are employed or actively job hunting.'],
+ ['Which person is NOT part of the labor force?','A retiree who is not looking for work',['A full-time nurse','A part-time cashier','A college graduate actively applying for jobs'],'You must be <b>working or actively looking</b> to be in the labor force.'],
+ ['Why are discouraged workers not counted as unemployed?','They have stopped looking for work, so they are not in the labor force.',['They have jobs.','They are under 16.','They live in another country.'],'The unemployment rate only counts people <b>actively looking</b>. Discouraged workers gave up.'],
+ ['Marcus has an engineering degree but can only find work stocking shelves part time. He is...','underemployed',['a discouraged worker','frictionally unemployed','not in the labor force'],'Working below your skills or part time when you want full time is being <b>underemployed</b>.'],
+ ['Economists say the economy is at full employment when unemployment is about...','4 to 6 percent',['0 percent','15 to 20 percent','25 percent'],'Some frictional, seasonal, and structural unemployment always exists, so <b>full employment</b> is around 4 to 6 percent, not zero.'],
+ ['Why can unemployment never reach zero, even in a strong economy?','People are always changing jobs, entering the workforce, or waiting for seasonal work.',['The government does not allow it.','Everyone works for the government.','Prices are always rising.'],'Frictional, seasonal, and structural unemployment exist even in good times.'],
+ ['A clothing factory moves to another country where labor is cheaper. Its workers lack skills for other local jobs. This is linked to...','globalization, causing structural unemployment',['seasonal unemployment','the wage-price spiral','frictional unemployment'],'When jobs move overseas, the mismatch between workers\' skills and available jobs is <b>structural</b>.'],
+ ['The economy comes out of a recession and begins expanding. Which type of unemployment shrinks the most?','cyclical',['seasonal','frictional','structural'],'<b>Cyclical</b> unemployment rises in contractions and falls when the economy expands.'],
+ ['Which government agency calculates the unemployment rate?','The Bureau of Labor Statistics (BLS)',['The Supreme Court','The Department of Education','The Federal Aviation Administration'],'The <b>BLS</b> surveys households every month to find the unemployment rate.'],
+ ['Why is the official unemployment rate often reported as seasonally adjusted?','So normal seasonal ups and downs do not hide the real trend',['So it always looks lower','Because the BLS only counts winter jobs','Because seasonal workers do not exist'],'Adjusting for seasons removes predictable changes like summer jobs and holiday hiring.'],
+ ['Which type of unemployment is usually the hardest for workers to solve on their own?','structural, because they may need new skills or training',['frictional, because they just need to find the right job','seasonal, because the season will change','none of them are hard'],'<b>Structural</b> unemployment often means retraining or moving, which takes time.']
+],
+'7.5':[
+ ['As the general price level rises, the purchasing power of a dollar...','falls',['rises','stays the same','doubles'],'When prices rise, each dollar <b>buys less</b>.'],
+ ['The Consumer Price Index (CPI) tracks...','the cost of a market basket of goods and services a typical consumer buys',['the price of one company\'s stock','the number of people with jobs','how much the government spends'],'The <b>CPI</b> follows the price of the same market basket over time.'],
+ ['In the CPI, the base period is given an index number of...','100',['0','1','1,000'],'The base period is set to <b>100</b>, and every other year is compared to it.'],
+ ['The core inflation rate leaves out the prices of...','food and energy',['housing and clothing','medical care and education','cars and electronics'],'Food and energy prices jump around a lot, so <b>core inflation</b> leaves them out to show the trend.'],
+ ['Inflation that is completely out of control, with prices rising extremely fast, is called...','hyperinflation',['core inflation','deflation','stagflation'],'<b>Hyperinflation</b> can make money nearly worthless.'],
+ ['A sustained drop in the overall price level is called...','deflation',['inflation','stagflation','hyperinflation'],'<b>Deflation</b> is the opposite of inflation.'],
+ ['According to the quantity theory, what causes inflation?','Too much money in the economy',['Too few workers','Low interest rates on savings','Too many patents'],'The <b>quantity theory</b> says when the money supply grows too fast, prices rise.'],
+ ['Supporters of the quantity theory say that to keep prices stable, the money supply should grow...','at about the same rate as real GDP',['as fast as possible','not at all, ever','twice as fast as real GDP'],'If money grows at the same pace as output, there is no extra money to <b>push prices up</b>.'],
+ ['Workers at a steel mill win a big raise. The mill raises its prices to cover the cost. Carmakers pay more for steel and raise car prices. Workers then demand higher wages again. This is...','a wage-price spiral',['deflation','a positive external shock','capital deepening'],'Higher wages lead to higher prices, which lead to higher wages: a <b>wage-price spiral</b>.'],
+ ['Who is hurt most by unexpected high inflation?','A retiree whose pension pays the same amount every month',['A business owner who raises prices','A worker whose raise matches inflation each year','A plumber who raises fees every year'],'People on a <b>fixed income</b> cannot keep up when prices rise.'],
+ ['Your savings account pays 2 percent interest and inflation is 6 percent. What happens to your savings?','Their purchasing power falls by about 4 percent.',['Their purchasing power rises by 8 percent.','You break even.','Their purchasing power rises by 2 percent.'],'Interest minus inflation: 2 − 6 = <b>−4 percent</b> in purchasing power.'],
+ ['How do economists measure deflation?','By watching for negative changes in the CPI or other price indexes',['By counting unemployed workers','By checking the stock market only','By measuring real GDP per capita'],'If the CPI goes <b>down</b>, the inflation rate is negative: deflation.'],
+ ['An inflation rate between about 1 and 3 percent is usually...','not a big problem for the economy',['a sign of hyperinflation','a sign of deflation','a reason to shut down banks'],'Low, steady inflation lets people and businesses plan.'],
+ ['Why does high inflation make it hard for businesses to plan?','They cannot predict what their costs and prices will be.',['Prices never change.','Workers stop wanting raises.','Banks stop existing.'],'When prices change fast and unpredictably, <b>planning</b> becomes very difficult.'],
+ ['When prices are rising, why do some people buy now instead of saving?','They expect their money to buy less later.',['They expect prices to fall.','Saving earns more than inflation always.','Stores close during inflation.'],'Inflation shrinks <b>purchasing power</b>, so waiting means paying more.']
+],
+'MIX':[
+ ['An oil embargo cuts a country\'s fuel supply. Real GDP falls for three quarters, unemployment climbs, and the CPI jumps 8 percent. Which description fits best?','Stagflation caused by a negative external shock, with rising cyclical unemployment',['An expansion caused by business investment','Deflation caused by falling demand, with falling unemployment','Hyperinflation caused by printing money, with mostly seasonal unemployment'],'Falling output + rising prices = <b>stagflation</b>. The oil cut is an <b>external shock</b>. Job losses from a downturn are <b>cyclical</b>.'],
+ ['Over one year, nominal GDP grew 4 percent, inflation was 4 percent, and population grew 2 percent. What happened to the standard of living?','Real GDP barely changed, so real GDP per capita fell about 2 percent.',['Real GDP per capita rose 4 percent.','Real GDP per capita rose 2 percent.','Nothing can be concluded.'],'Nominal growth minus inflation is about 0 real growth. With 2 percent more people, each person\'s share <b>fell</b>.'],
+ ['A headline says unemployment fell from 9 percent to 6 percent. Which fact would make the headline misleading?','Most of the drop came from people who gave up and stopped looking for work.',['Many people found new jobs quickly.','Real GDP grew during the same time.','The rate was seasonally adjusted.'],'<b>Discouraged workers</b> leave the labor force, which lowers the rate even though no one found a job.'],
+ ['During a recession, the CPI falls from 300 to 291. Which statement is correct?','The inflation rate is −3 percent, which is deflation, and a dollar buys more than before.',['The inflation rate is 9 percent, which is hyperinflation.','The inflation rate is −9 percent, which is stagflation.','Prices fell, so purchasing power fell too.'],'(291 − 300) ÷ 300 × 100 = <b>−3 percent</b>. Falling prices mean <b>more</b> purchasing power.'],
+ ['A record harvest and a new energy-saving invention hit the economy at the same time. What is most likely?','Real GDP rises and the price level falls or rises more slowly.',['Real GDP falls and prices rise.','Stagflation begins.','A depression begins.'],'These are <b>positive shocks</b>: more output at lower cost.'],
+ ['Interest rates rise sharply. Families buy fewer homes and cars, and builders lay off workers. Which pair fits best?','The economy moves toward contraction, and cyclical unemployment rises.',['The economy expands, and seasonal unemployment rises.','Prices fall into hyperinflation.','Structural unemployment falls to zero.'],'Higher rates cut spending, causing a <b>contraction</b>, and downturn job losses are <b>cyclical</b>.'],
+ ['Country A\'s real GDP grew 5 percent and its population grew 1 percent. What happened to its standard of living?','Real GDP per capita rose about 4 percent, so the standard of living likely improved.',['It fell because population grew.','It stayed the same because GDP is nominal.','No conclusion is possible.'],'Output grew faster than population, so <b>output per person rose</b>.'],
+ ['Over ten years, a country\'s nominal GDP doubled, but its price level also doubled. What happened to real GDP?','It stayed about the same.',['It doubled.','It quadrupled.','It fell to zero.'],'If prices doubled and nominal GDP doubled, all the growth was <b>prices</b>, not output.'],
+ ['During a strong expansion, a bank replaces most of its tellers with an app. A teller with no tech skills cannot find work. Which type of unemployment is this?','structural',['cyclical','seasonal','frictional'],'The economy is expanding, so it is not cyclical. The job disappeared because of <b>technology</b>: structural.'],
+ ['Inflation is 7 percent this year. A retiree\'s pension stays exactly the same. What happened to the retiree?','The pension\'s purchasing power fell by about 7 percent.',['The retiree is 7 percent richer.','Nothing changed.','The pension\'s purchasing power rose.'],'A <b>fixed income</b> buys less when prices rise.'],
+ ['Stock prices are falling, interest rates are rising, and consumer confidence is dropping. What would an economist forecast?','A contraction, with cyclical unemployment likely rising',['A strong expansion with falling unemployment','Hyperinflation within a month','Deflation with no change in jobs'],'All the <b>leading indicators</b> point down, so expect a contraction and <b>cyclical</b> job losses.'],
+ ['A savings account pays 5 percent interest while inflation is 2 percent. What happened to the saver?','Purchasing power rose about 3 percent.',['Purchasing power fell 3 percent.','Purchasing power rose 7 percent.','The saver broke even.'],'Interest minus inflation: 5 − 2 = <b>3 percent</b> gain in purchasing power.']
+]};
+
+/* Does it count in GDP? [item, counts?, why] */
+var GDPSORT=[
+ ['A brand-new car built this year at a Toyota plant in Indiana',true,'Made inside the U.S. this year. Who owns the plant does not matter.'],
+ ['A haircut at a local salon',true,'Services count in GDP.'],
+ ['A new house finished this year in Fishers',true,'A new final good produced inside the U.S. this year.'],
+ ['A doctor\'s checkup that a patient pays for',true,'Paid services count.'],
+ ['A concert ticket for a show in Indianapolis',true,'Entertainment is a paid service produced in the U.S.'],
+ ['A new bike sold by a U.S. company and built in Wisconsin this year',true,'A final good made inside the U.S. this year.'],
+ ['A used video game console bought from a friend',false,'Used goods were counted when they were first made. Reselling them does not count again.'],
+ ['A 2018 pickup truck sold at a used car lot this year',false,'It was counted in 2018 when it was made.'],
+ ['The flour a bakery buys to make bread',false,'It is an intermediate good. Its value is already in the price of the bread.'],
+ ['The memory chips a computer maker buys to put in new laptops',false,'Intermediate goods are not counted separately.'],
+ ['Sneakers made in Vietnam by a U.S. company',false,'Made outside U.S. borders. That counts in U.S. GNP, not GDP.'],
+ ['Mowing your own lawn on Saturday',false,'Nonmarket activity. No one is paid, so nothing is recorded.'],
+ ['Cooking dinner at home for your family',false,'Nonmarket activity is not counted.'],
+ ['Unreported cash paid to a neighbor for babysitting',false,'Part of the underground economy, so it is never recorded.']
+];
+
+/* Unemployment type scenarios */
+var UTYPE={
+ frictional:['Maya quit her job at a bank and is searching for one closer to home.','Devon just finished college and is interviewing for his first full-time job.','After six years at home raising her kids, Lena is looking for work again.','Sam moved to Denver with his family and is job hunting there.','Ava left a retail job she disliked and is applying for office jobs.','A nurse turns down two offers while she looks for the right hospital.'],
+ seasonal:['A ski instructor in Colorado has no work in July.','A landscaper in Indiana is out of work from December through February.','A snowplow driver has nothing to do all summer.','A farmworker is between harvests and waiting for the next crop to ripen.','A worker at a pumpkin farm loses her job after Halloween.','A mall gift-wrapper is out of work in January.'],
+ structural:['Trucking companies switch to self-driving trucks, and a driver with no other training cannot find work.','Most people now stream movies, and a DVD store clerk cannot find a job using his skills.','A bank replaces its tellers with a mobile app, and a teller lacks the computer skills for other jobs.','Coal plants close as power companies switch to natural gas, and miners lack training for the new jobs nearby.','A typesetter loses her job when printing goes digital and she has never used design software.','A factory moves overseas, and its workers do not have the skills the local hospitals are hiring for.'],
+ cyclical:['During a recession, a car plant lays off 1,000 workers because car sales dropped.','Families eat out less during a contraction, so restaurants cut servers.','Home sales collapse in a recession, and a carpenter loses work.','Real GDP falls for two quarters, and factories across the country cut shifts.','People delay big purchases in a downturn, so a furniture store lays off sales staff.','Travel drops as the economy slows, and a hotel lets housekeepers go.']
+};
+var UWHY={
+ frictional:'<b>Frictional</b>: the person is between jobs or just entering the workforce and looking for the right fit.',
+ seasonal:'<b>Seasonal</b>: the work only exists during certain times of year.',
+ structural:'<b>Structural</b>: the person\'s skills no longer match the jobs available, often because of technology or globalization.',
+ cyclical:'<b>Cyclical</b>: the job loss happened because the whole economy went into a downturn.'
+};
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function fmt(n){return Math.round(n).toLocaleString('en-US');}
+function money(n){var neg=n<0; n=Math.abs(n); var s=(Math.round(n*100)%100!==0)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):Math.round(n).toLocaleString('en-US'); return (neg?'−':'')+'$'+s;}
+function num1(n){return (Math.round(n*10)/10).toString().replace('-','−');}
+function strip(h){var d=document.createElement('div'); d.innerHTML=h; return (d.textContent||'').replace(/\s+/g,' ').trim();}
+
+/* =====================================================================
+   QUESTION BUILDERS
+   q: {sec, kind:'mc'|'calc', tag, html, opts, ans (mc), layout, why,
+       calc:{ans, tol, unit, pre, work, note}}
+   ===================================================================== */
+function mcFrom(sec,row,tag){
+  return {sec:sec,kind:'mc',tag:tag||'CONCEPT',html:'<div class="q">'+esc(row[0])+'</div>',txt:row[0],opts:shuffle([row[1]].concat(row[2])),ans:row[1],layout:'list',why:row[3]};
+}
+function gdpSortQ(){
+  var it=pick(GDPSORT);
+  return {sec:'7.1',kind:'mc',tag:'DOES IT COUNT?',html:'<div class="q">Does this count in this year\'s U.S. GDP?</div><div class="data">'+esc(it[0])+'</div>',txt:'Does it count in U.S. GDP? '+it[0],
+    opts:['COUNTS IN GDP','DOES NOT COUNT'],fixed:true,ans:it[1]?'COUNTS IN GDP':'DOES NOT COUNT',layout:'two',why:(it[1]?'<b>Counts.</b> ':'<b>Does not count.</b> ')+esc(it[2])};
+}
+var GOODS=[['pizzas','sodas'],['bikes','scooters'],['phone cases','chargers'],['guitars','drum sets'],['jackets','hats'],['kayaks','paddles'],['tacos','smoothies'],['backpacks','water bottles']];
+function gdpCalcQ(){
+  var g=pick(GOODS), p1a=pick([4,5,6,8,10,12,15,20,25]), p1b=pick([2,3,4,5,6,8,10]);
+  var q1a=ri(5,20)*10, q1b=ri(5,25)*10, q2a=q1a+ri(1,6)*10, q2b=q1b+ri(-2,5)*10;
+  var p2a=p1a+ri(1,4), p2b=p1b+ri(1,3);
+  var nom1=q1a*p1a+q1b*p1b, nom2=q2a*p2a+q2b*p2b, real2=q2a*p1a+q2b*p1b;
+  var tbl='<table><tr><th></th><th>Year 1</th><th>Year 2</th></tr>'+
+    '<tr><td>'+g[0]+'</td><td>'+q1a+' at '+money(p1a)+'</td><td>'+q2a+' at '+money(p2a)+'</td></tr>'+
+    '<tr><td>'+g[1]+'</td><td>'+q1b+' at '+money(p1b)+'</td><td>'+q2b+' at '+money(p2b)+'</td></tr></table>';
+  var v=pick(['nom1','nom2','real2','real2']);
+  var ask, ans, work;
+  var intro='<div class="q">An economy makes only '+g[0]+' and '+g[1]+'.</div>'+tbl;
+  if(v==='nom1'){ask='What is <u>nominal GDP</u> in Year 1?'; ans=nom1;
+    work='Nominal GDP = quantity × price for each good, then add them up. Use <b>Year 1</b> numbers.<br>First good: '+q1a+' '+g[0]+' × '+money(p1a)+' = <b>'+money(q1a*p1a)+'</b>.<br>Now do the same for the '+g[1]+' and add the two together.';}
+  else if(v==='nom2'){ask='What is <u>nominal GDP</u> in Year 2?'; ans=nom2;
+    work='Nominal GDP uses <b>current</b> prices, so use Year 2 quantities AND Year 2 prices.<br>First good: '+q2a+' '+g[0]+' × '+money(p2a)+' = <b>'+money(q2a*p2a)+'</b>.<br>Now do the same for the '+g[1]+' and add the two together.';}
+  else {ask='Using Year 1 as the base year, what is <u>real GDP</u> in Year 2?'; ans=real2;
+    work='Real GDP uses <b>Year 2 quantities</b> but <b>Year 1 (base-year) prices</b>.<br>First good: '+q2a+' '+g[0]+' × '+money(p1a)+' (the Year 1 price) = <b>'+money(q2a*p1a)+'</b>.<br>Now do the same for the '+g[1]+' using its Year 1 price, and add the two together.';}
+  return {sec:'7.1',kind:'calc',tag:'GDP MATH',html:intro+'<div class="q" style="margin-top:10px">'+ask+'</div>',txt:strip(ask),
+    calc:{ans:ans,tol:0.5,unit:'$',pre:true,work:work},why:'Answer: <b>'+money(ans)+'</b>. '+(v==='real2'?'Real GDP keeps prices at base-year levels, so only changes in quantity show up.':'Nominal GDP multiplies each quantity by its price in that same year.')};
+}
+function gdpInterpretQ(){
+  var n1=ri(40,90)*1000, realg=pick([0,2,3,4,5]), pg=pick([0,3,4,5,6,8]);
+  if(realg===0&&pg===0) pg=5;
+  if(pg===realg) pg=realg+3;
+  var real2=Math.round(n1*(1+realg/100)), n2=Math.round(n1*(1+realg/100)*(1+pg/100));
+  var right, wrongs;
+  if(realg===0){right='Output did not change. The whole increase in nominal GDP came from higher prices.';}
+  else if(pg===0){right='Output grew, and prices did not change. All of the increase was more production.';}
+  else if(pg>realg){right='Output grew, but most of the increase in nominal GDP came from higher prices.';}
+  else {right='Output grew, and most of the increase in nominal GDP came from producing more.';}
+  wrongs=['Output fell because prices went up.','Nominal GDP and real GDP always change by the same amount.','The country must be in a recession.'];
+  var data='Year 1 nominal GDP: <b>'+money(n1)+'</b><br>Year 2 nominal GDP: <b>'+money(n2)+'</b><br>Year 2 real GDP (Year 1 prices): <b>'+money(real2)+'</b>';
+  return {sec:'7.1',kind:'mc',tag:'READ THE DATA',html:'<div class="q">Which conclusion is best supported by this data?</div><div class="data">'+data+'</div>',txt:'Nominal GDP went from '+money(n1)+' to '+money(n2)+', and Year 2 real GDP was '+money(real2)+'. Which conclusion fits?',
+    opts:shuffle([right].concat(wrongs)),ans:right,layout:'list',
+    why:'Real GDP went from '+money(n1)+' to '+money(real2)+', so output '+(realg?'grew '+realg+' percent':'did not change')+'. The gap between nominal ('+money(n2)+') and real ('+money(real2)+') is the part caused by <b>price changes</b>.'};
+}
+function cycleSVG(){
+  return '<svg viewBox="0 0 520 230" role="img" aria-label="Business cycle graph with points A through F">'+
+   '<line x1="40" y1="20" x2="40" y2="200" stroke="#5b6472" stroke-width="2"/><line x1="40" y1="200" x2="505" y2="200" stroke="#5b6472" stroke-width="2"/>'+
+   '<text x="14" y="110" font-size="12" fill="#5b6472" transform="rotate(-90 14 110)" text-anchor="middle">Real GDP</text><text x="272" y="222" font-size="12" fill="#5b6472" text-anchor="middle">Time</text>'+
+   '<line x1="60" y1="168" x2="495" y2="80" stroke="#8b94a3" stroke-width="2" stroke-dasharray="7 6"/>'+
+   '<path d="M60 170 C 95 170, 120 120, 150 105 S 200 48, 220 48 S 270 70, 300 115 S 350 175, 370 172 S 430 120, 495 70" fill="none" stroke="#004AA0" stroke-width="4"/>'+
+   [['A',60,170,0,22],['B',150,105,-14,-6],['C',220,48,0,-12],['D',300,115,14,-4],['E',370,172,0,24],['F',470,88,-14,-8]].map(function(p){
+     return '<circle cx="'+p[1]+'" cy="'+p[2]+'" r="7" fill="#C8102E"/><text x="'+(p[1]+p[3])+'" y="'+(p[2]+p[4])+'" font-size="17" font-weight="bold" fill="#0b1a33" text-anchor="middle">'+p[0]+'</text>';}).join('')+
+   '</svg>';
+}
+var CYCLEQ=[
+ ['Point C on the graph is the...','peak',['trough','expansion','recession'],'C is the highest point before real GDP starts falling: the <b>peak</b>.'],
+ ['Point E on the graph is the...','trough',['peak','expansion','stagflation'],'E is the lowest point before real GDP starts rising: the <b>trough</b>.'],
+ ['Between points A and C, the economy is in...','an expansion',['a contraction','a depression','a trough'],'Real GDP is rising from A to C, so it is an <b>expansion</b>.'],
+ ['Between points C and E, the economy is in...','a contraction',['an expansion','a peak','economic growth'],'Real GDP is falling from C to E, so it is a <b>contraction</b>.'],
+ ['If real GDP falls from C to E for six straight months, that period is called a...','recession',['peak','depression','trough'],'Two quarters (six months) in a row of falling real GDP is a <b>recession</b>.'],
+ ['What does the dashed line on the graph show?','Long-term economic growth: the steady upward trend in real GDP',['The price level','The unemployment rate','A depression'],'The dashed line is the long-run <b>growth trend</b>. The cycle goes up and down around it.'],
+ ['At which point would unemployment most likely be highest?','E',['C','B','F'],'Unemployment peaks near the <b>trough</b>, when output is lowest.'],
+ ['Between E and F, what is most likely happening to cyclical unemployment?','It is falling as the economy recovers.',['It is rising quickly.','It stays the same forever.','It turns into seasonal unemployment.'],'E to F is a new <b>expansion</b>, so firms hire and cyclical unemployment falls.']
+];
+function cycleGraphQ(){var r=pick(CYCLEQ); var q=mcFrom('7.2',r,'READ THE GRAPH'); q.html='<div class="q">'+esc(r[0])+'</div>'+cycleSVG(); return q;}
+function phaseOrderQ(){
+  var starts=[['expansion','peak','contraction','trough'],['peak','contraction','trough','expansion'],['contraction','trough','expansion','peak'],['trough','expansion','peak','contraction']];
+  var k=ri(0,3), right=starts[k].join(' → '), first=starts[k][0];
+  var wrongs=shuffle([[first,'trough','contraction','peak'],[first,'contraction','peak','trough'],[first,'peak','expansion','trough'],[first,'expansion','trough','peak']].map(function(a){return a.join(' → ');}).filter(function(s){return s!==right;})).slice(0,3);
+  return {sec:'7.2',kind:'mc',tag:'ORDER UP',html:'<div class="q">Starting with <b>'+first+'</b>, which list puts the business cycle phases in the correct order?</div>',txt:'Order the phases starting with '+first,
+    opts:shuffle([right].concat(wrongs)),ans:right,layout:'list',why:'The cycle always runs <b>expansion → peak → contraction → trough</b>, then repeats.'};
+}
+function growthRateQ(){
+  var a, r, guard=0;
+  do{ a=ri(4,18)*50; r=pick([2,4,5,6,8,10,12,15,20,25]); guard++; }while((a*r)%100!==0 && guard<200);
+  if((a*r)%100!==0){a=400; r=5;}
+  var b=a+(a*r)/100;
+  var nm=pick(['Country K','Country Z','Islandia','Northland','Country R']), yrs=pick([1,5,10]);
+  return {sec:'7.3',kind:'calc',tag:'GROWTH MATH',html:'<div class="q">'+nm+'\'s real GDP grew from <b>$'+fmt(a)+' billion</b> to <b>$'+fmt(b)+' billion</b> over '+yrs+(yrs===1?' year':' years')+'.<br>What was the growth rate of real GDP?</div>',txt:nm+'\'s real GDP grew from $'+fmt(a)+' billion to $'+fmt(b)+' billion. What was the growth rate?',
+    calc:{ans:r,tol:0.15,unit:'%',work:'Growth rate = (new − old) ÷ old × 100.<br>Change = '+fmt(b)+' − '+fmt(a)+' = <b>'+fmt(b-a)+'</b>.<br>Now divide '+fmt(b-a)+' by the old value, '+fmt(a)+', and multiply by 100.'},
+    why:'('+fmt(b)+' − '+fmt(a)+') ÷ '+fmt(a)+' × 100 = <b>'+r+'%</b>.'};
+}
+function perCapitaQ(){
+  var pop=pick([4,5,8,10,20,25,40,50]), pc=ri(8,60)*1000, gdp=pop*pc/1000;
+  var nm=pick(['Country M','Country T','Westland','Country V','Pine Republic']);
+  return {sec:'7.3',kind:'calc',tag:'PER CAPITA MATH',html:'<div class="q">'+nm+' has a real GDP of <b>$'+fmt(gdp)+' billion</b> and a population of <b>'+pop+' million</b> people.<br>What is its real GDP per capita?</div>',txt:nm+' has real GDP of $'+fmt(gdp)+' billion and '+pop+' million people. What is real GDP per capita?',
+    calc:{ans:pc,tol:1,unit:'$',pre:true,work:'Real GDP per capita = real GDP ÷ population.<br>Write both as full numbers first:<br>$'+fmt(gdp)+' billion = <b>$'+fmt(gdp*1e9)+'</b><br>'+pop+' million = <b>'+fmt(pop*1e6)+'</b><br>Now divide the first number by the second.'},
+    why:'$'+fmt(gdp*1e9)+' ÷ '+fmt(pop*1e6)+' = <b>'+money(pc)+'</b> per person.'};
+}
+function compareGrowthQ(){
+  var g=pick([1,2,3,4,5,6]), p=pick([0,1,2,3,4,5]); if(g===p) p=g+1;
+  var nm=pick(['Country Q','Country L','Bayland','Country S']);
+  var right=g>p?'Real GDP per capita rose, so the average standard of living likely improved.':'Real GDP per capita fell, so the average standard of living likely declined.';
+  var wrongs=[g>p?'Real GDP per capita fell, so the average standard of living likely declined.':'Real GDP per capita rose, so the average standard of living likely improved.','Nominal GDP must have fallen.','Standard of living cannot change in one year.'];
+  return {sec:'7.3',kind:'mc',tag:'STANDARD OF LIVING',html:'<div class="q">Over one year, '+nm+'\'s real GDP grew <b>'+g+' percent</b> and its population grew <b>'+p+' percent</b>. Which conclusion is most accurate?</div>',txt:nm+'\'s real GDP grew '+g+'% while its population grew '+p+'%.',
+    opts:shuffle([right].concat(wrongs)),ans:right,layout:'list',why:'Real GDP per capita changes by about '+g+' − '+p+' = <b>'+(g-p>0?'+':'−')+Math.abs(g-p)+' percent</b>. Output must grow <b>faster than population</b> for each person\'s share to rise.'};
+}
+function utypeQ(){
+  var t=pick(['frictional','seasonal','structural','cyclical']), s=pick(UTYPE[t]);
+  return {sec:'7.4',kind:'mc',tag:'NAME THAT TYPE',html:'<div class="q">Which type of unemployment is this?</div><div class="data">'+esc(s)+'</div>',txt:s,
+    opts:['FRICTIONAL','SEASONAL','STRUCTURAL','CYCLICAL'],fixed:true,ans:t.toUpperCase(),layout:'two',why:UWHY[t]};
+}
+function uRateQ(){
+  var lf=ri(8,60)*1000, r=pick([4,5,6,7.5,8,10,12.5]), u=lf*r/100, e=lf-u;
+  var town=pick(['Maple Falls','Riverside','Cedar Point','Lakewood','Oak Hill','Granite City']);
+  return {sec:'7.4',kind:'calc',tag:'RATE MATH',html:'<div class="q">In '+town+', <b>'+fmt(e)+'</b> people have jobs and <b>'+fmt(u)+'</b> people are unemployed and actively looking for work.<br>What is the unemployment rate?</div>',txt:'In '+town+', '+fmt(e)+' people are employed and '+fmt(u)+' are unemployed. What is the unemployment rate?',
+    calc:{ans:r,tol:0.15,unit:'%',work:'Step 1: Labor force = employed + unemployed = '+fmt(e)+' + '+fmt(u)+' = <b>'+fmt(lf)+'</b>.<br>Step 2: Unemployment rate = unemployed ÷ labor force × 100.<br>Now divide '+fmt(u)+' by '+fmt(lf)+' and multiply by 100.',note:'Round to one decimal place if needed.'},
+    why:fmt(u)+' ÷ '+fmt(lf)+' × 100 = <b>'+r+'%</b>. Watch out: divide by the <b>labor force</b>, not just the employed.'};
+}
+function discouragedQ(){
+  var lf=ri(10,40)*1000, r=pick([8,10,12]), u=lf*r/100, e=lf-u, d=Math.round(u*pick([0.2,0.25,0.3,0.4])/10)*10;
+  var nr=Math.round((u-d)/(lf-d)*1000)/10;
+  return {sec:'7.4',kind:'calc',tag:'DISCOURAGED',html:'<div class="q">A town has <b>'+fmt(e)+'</b> employed people and <b>'+fmt(u)+'</b> unemployed people who are looking for work. That makes the rate '+r+'%.<br>Next month, nobody finds a job, but <b>'+fmt(d)+'</b> of the unemployed give up and stop looking.<br>What is the new reported unemployment rate?</div>',txt:fmt(e)+' employed and '+fmt(u)+' unemployed, then '+fmt(d)+' give up looking. What is the new rate?',
+    calc:{ans:nr,tol:0.15,unit:'%',note:'Round to one decimal place.',work:'Discouraged workers leave the labor force, so they come out of <b>both</b> numbers.<br>New unemployed = '+fmt(u)+' − '+fmt(d)+' = <b>'+fmt(u-d)+'</b><br>New labor force = '+fmt(lf)+' − '+fmt(d)+' = <b>'+fmt(lf-d)+'</b><br>Now divide and multiply by 100.'},
+    why:fmt(u-d)+' ÷ '+fmt(lf-d)+' × 100 ≈ <b>'+nr+'%</b>. The rate <b>fell</b> even though nobody found a job. That is why the unemployment rate can be misleading.'};
+}
+function cpiQ(){
+  var b=ri(6,25)*20, c=ri(22,52)*5, n=b*c/100;
+  return {sec:'7.5',kind:'calc',tag:'CPI MATH',html:'<div class="q">A market basket of goods cost <b>'+money(b)+'</b> in the base period. The same basket costs <b>'+money(n)+'</b> today.<br>What is the CPI today?</div>',txt:'A basket cost '+money(b)+' in the base period and '+money(n)+' today. What is the CPI?',
+    calc:{ans:c,tol:0.5,unit:'',work:'CPI = cost of the basket today ÷ cost in the base period × 100.<br>Set it up: '+money(n)+' ÷ '+money(b)+' × 100.<br>Now do the division first, then multiply by 100.'},
+    why:money(n)+' ÷ '+money(b)+' × 100 = <b>'+c+'</b>. Prices are '+(c-100)+' percent higher than in the base period.'};
+}
+function inflRateQ(){
+  var a, r, tries=0;
+  do{ a=pick([120,140,150,160,180,200,220,240,250,260,280,300,320,400]); r=pick([-5,-4,-3,-2,2,3,4,5,6,8,10]); tries++; }while((a*r)%100!==0 && tries<200);
+  var b=a+a*r/100;
+  return {sec:'7.5',kind:'calc',tag:'INFLATION MATH',html:'<div class="q">The CPI was <b>'+a+'</b> last year and <b>'+b+'</b> this year.<br>What is the inflation rate?</div>',txt:'The CPI went from '+a+' to '+b+'. What is the inflation rate?',
+    calc:{ans:r,tol:0.15,unit:'%',note:'If prices fell, type a minus sign (example: -2).',work:'Inflation rate = (this year\'s CPI − last year\'s CPI) ÷ last year\'s CPI × 100.<br>Change = '+b+' − '+a+' = <b>'+(b-a)+'</b>.<br>Now divide '+(b-a)+' by '+a+' and multiply by 100.'},
+    why:'('+b+' − '+a+') ÷ '+a+' × 100 = <b>'+num1(r)+'%</b>.'+(r<0?' A negative inflation rate means <b>deflation</b>.':'')};
+}
+function savingsQ(){
+  var i=pick([1,2,3,4,5,6,7]), f=pick([1,2,3,4,5,6,8]); if(i===f) f=i+2;
+  var nm=pick(['Jada','Luis','Priyanka','Owen','Mei','Andre']), amt=pick([1000,2500,4000,5000,8000]);
+  return {sec:'7.5',kind:'calc',tag:'SAVINGS MATH',html:'<div class="q">'+nm+' keeps <b>'+money(amt)+'</b> in a savings account that pays <b>'+i+' percent</b> interest. This year inflation is <b>'+f+' percent</b>.<br>By what percent did the purchasing power of the savings change?</div>',txt:nm+'\'s savings earn '+i+'% interest while inflation is '+f+'%. How did purchasing power change?',
+    calc:{ans:i-f,tol:0.05,unit:'%',note:'If purchasing power went down, type a minus sign (example: -3).',work:'Change in purchasing power = interest rate − inflation rate.<br>Set it up: '+i+' − '+f+'.<br>If inflation is bigger than the interest rate, your answer will be negative.'},
+    why:i+' − '+f+' = <b>'+num1(i-f)+'%</b>. '+(i<f?'Inflation ate up more than the interest earned, so the savings <b>lost</b> purchasing power.':'The interest beat inflation, so the savings <b>gained</b> purchasing power.')};
+}
+function vocabQ(){
+  var t=pick(TERMS);
+  var same=shuffle(TERMS.filter(function(x){return x!==t&&x.s===t.s;})), any=shuffle(TERMS.filter(function(x){return x!==t;}));
+  var others=same.slice(0,2); for(var i=0;i<any.length&&others.length<3;i++) if(others.indexOf(any[i])<0) others.push(any[i]);
+  if(Math.random()<0.5){
+    return {sec:t.s,kind:'mc',tag:'VOCAB '+t.s,fast:true,html:'<div class="q" style="font-weight:normal">Which term matches?</div><div class="q" style="margin-top:8px">'+esc(t.d)+'</div>',txt:t.d,
+      opts:shuffle([t.t].concat(others.map(function(o){return o.t;}))),ans:t.t,layout:'four',why:'<b>'+esc(t.t)+':</b> '+esc(t.d)};
+  }
+  return {sec:t.s,kind:'mc',tag:'VOCAB '+t.s,fast:true,html:'<div class="q" style="font-weight:normal">What does this term mean?</div><div class="term">'+esc(t.t)+'</div>',txt:t.t,
+    opts:shuffle([t.d].concat(others.map(function(o){return o.d;}))),ans:t.d,layout:'list',why:'<b>'+esc(t.t)+':</b> '+esc(t.d)};
+}
+
+/* Build a set of questions from one section's pool with no repeated bank items */
+function sectionPool(sec){
+  var bank=shuffle(BANK[sec]).map(function(r){return function(){return mcFrom(sec,r);};});
+  var gens={
+    '7.1':[gdpSortQ,gdpSortQ,gdpSortQ,gdpCalcQ,gdpCalcQ,gdpInterpretQ],
+    '7.2':[cycleGraphQ,cycleGraphQ,phaseOrderQ],
+    '7.3':[growthRateQ,perCapitaQ,compareGrowthQ],
+    '7.4':[utypeQ,utypeQ,utypeQ,uRateQ,discouragedQ],
+    '7.5':[cpiQ,inflRateQ,inflRateQ,savingsQ],
+    'MIX':[]
+  }[sec];
+  return {bank:bank,gens:gens};
+}
+function collector(){
+  var out=[], seen={};
+  return {out:out, add:function(q){ if(seen[q.txt]) return false; seen[q.txt]=1; out.push(q); return true; },
+          gen:function(g){ for(var t=0;t<12;t++){ if(this.add(g())) return; } }};
+}
+function stationRound(sec){
+  var P=sectionPool(sec), C=collector(), i, guard=0;
+  P.gens.forEach(function(g){C.gen(g);});
+  for(i=0;C.out.length<12&&i<P.bank.length;i++) C.add(P.bank[i]());
+  while(C.out.length<12&&guard++<200) C.add(pick(P.gens)());
+  return shuffle(C.out);
+}
+function vocabRound(){ var out=[], seen={}; while(out.length<15){ var q=vocabQ(); if(!seen[q.txt]){seen[q.txt]=1; out.push(q);} } return out; }
+function simRound(){
+  var plan={'7.1':[[gdpCalcQ,gdpSortQ,gdpInterpretQ],1],'7.2':[[cycleGraphQ,phaseOrderQ],3],'7.3':[[growthRateQ,perCapitaQ,compareGrowthQ],1],'7.4':[[uRateQ,discouragedQ,utypeQ,utypeQ],2],'7.5':[[cpiQ,inflRateQ,savingsQ],3]};
+  var C=collector();
+  Object.keys(plan).forEach(function(sec){
+    var gens=plan[sec][0], nb=plan[sec][1];
+    gens.forEach(function(g){C.gen(g);});
+    shuffle(BANK[sec]).slice(0,nb).forEach(function(r){C.add(mcFrom(sec,r));});
+  });
+  shuffle(BANK.MIX).slice(0,5).forEach(function(r){C.add(mcFrom('MIX',r,'BIG PICTURE'));});
+  return shuffle(C.out);
+}
+
+/* =====================================================================
+   SAVE DATA
+   ===================================================================== */
+var STORE_KEY='hse-u5-review-quest-v1', mem=null;
+function blank(){return {name:'',xp:0,mute:false,st:{},sim:null,troph:{},calcFirst:0,bestStreak:0};}
+function load(){
+  var raw=null; try{raw=window.localStorage.getItem(STORE_KEY);}catch(e){raw=mem;}
+  if(!raw) return blank();
+  try{var o=JSON.parse(raw), b=blank(); for(var k in b) if(!(k in o)) o[k]=b[k]; return o;}catch(e){return blank();}
+}
+function save(){var raw=JSON.stringify(S); try{window.localStorage.setItem(STORE_KEY,raw);}catch(e){mem=raw;}}
+var S=load();
+
+/* =====================================================================
+   SOUND (same palette as the Vocab Arcade)
+   ===================================================================== */
+var AC=null;
+function ac(){
+  if(S.mute) return null;
+  try{ if(!AC){var C=window.AudioContext||window.webkitAudioContext; if(!C) return null; AC=new C();}
+       if(AC.state==='suspended') AC.resume(); }catch(e){return null;}
+  return AC;
+}
+function tone(freq,dur,type,vol,delay,slide){
+  var a=ac(); if(!a) return;
+  var t=a.currentTime+(delay||0), o=a.createOscillator(), g=a.createGain();
+  o.type=type||'square'; o.frequency.setValueAtTime(freq,t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  g.gain.setValueAtTime(vol||0.08,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+0.02);
+}
+var SFX={
+  click:function(){tone(660,.05,'square',.04);},
+  right:function(m){var b=520+Math.min(m,6)*40; tone(b,.08,'square',.07); tone(b*1.5,.12,'square',.07,.07);},
+  wrong:function(){tone(180,.28,'sawtooth',.08,0,90);},
+  streak:function(){[660,880,1100,1320].forEach(function(f,i){tone(f,.07,'square',.06,i*.05);});},
+  star:function(i){tone(700+i*220,.18,'triangle',.12);},
+  troph:function(){[523,659,784,1047,784,1047].forEach(function(f,i){tone(f,.12,'square',.06,i*.09);});},
+  rank:function(){[392,523,659,784,1047].forEach(function(f,i){tone(f,.16,'triangle',.11,i*.12);});},
+  go:function(){tone(880,.25,'square',.08);},
+  count:function(){tone(440,.12,'square',.07);},
+  hand:function(){[330,262].forEach(function(f,i){tone(f,.18,'triangle',.08,i*.15);});}
+};
+
+/* =====================================================================
+   RANKS AND TROPHIES
+   ===================================================================== */
+var RANKS=[{xp:0,name:'Intern',ic:'📋'},{xp:5000,name:'Research Analyst',ic:'📊'},{xp:12000,name:'Associate Economist',ic:'📈'},{xp:25000,name:'Senior Economist',ic:'🧮'},{xp:45000,name:'Chief Economist',ic:'🏛️'},{xp:75000,name:'Fed Chair',ic:'🦅'}];
+function rankOf(xp){var r=RANKS[0]; RANKS.forEach(function(x){if(xp>=x.xp) r=x;}); return r;}
+function nextRank(xp){for(var i=0;i<RANKS.length;i++) if(RANKS[i].xp>xp) return RANKS[i]; return null;}
+var TROPHIES=[
+ {id:'first',ic:'🎟️',name:'Clocked In',desc:'Finish your first review station.'},
+ {id:'perfect',ic:'💯',name:'Flawless',desc:'Get every question right on the first try in a station.'},
+ {id:'streak10',ic:'🔥',name:'On a Roll',desc:'Get 10 questions in a row right on the first try.'},
+ {id:'calc10',ic:'🧮',name:'Human Calculator',desc:'Solve 10 calculation questions on the first try.'},
+ {id:'calc30',ic:'📟',name:'Spreadsheet Brain',desc:'Solve 30 calculation questions on the first try.'},
+ {id:'all5',ic:'🗺️',name:'Full Coverage',desc:'Earn at least 1 star on all five content stations.'},
+ {id:'gold5',ic:'🌟',name:'Gold Standard',desc:'Earn 3 stars on all five content stations.'},
+ {id:'vocab',ic:'⚡',name:'Word Wizard',desc:'Earn 3 stars in Vocab Lightning.'},
+ {id:'simdone',ic:'📝',name:'Test Drive',desc:'Finish the Exam Simulator.'},
+ {id:'sim80',ic:'✅',name:'Exam Ready',desc:'Score 80% or higher on the Exam Simulator.'},
+ {id:'sim95',ic:'🏆',name:'Fed Chair Material',desc:'Score 95% or higher on the Exam Simulator.'},
+ {id:'comeback',ic:'💪',name:'Comeback',desc:'Raise your score on a station you already played.'}
+];
+var newTroph=[];
+function award(id){
+  if(S.troph[id]) return;
+  S.troph[id]=new Date().toISOString(); newTroph.push(id); save();
+  var t=TROPHIES.filter(function(x){return x.id===id;})[0]; if(!t) return;
+  toastQ.push(t); if(!toastBusy) nextToast();
+}
+var toastQ=[], toastBusy=false;
+function nextToast(){
+  var t=toastQ.shift(); if(!t){toastBusy=false; return;}
+  toastBusy=true; $('toastIc').textContent=t.ic; $('toastTxt').textContent=t.name; $('toast').classList.add('show'); SFX.troph();
+  setTimeout(function(){$('toast').classList.remove('show'); setTimeout(nextToast,400);},2600);
+}
+
+/* =====================================================================
+   SCREENS
+   ===================================================================== */
+var SCREENS=['scrTitle','scrHub','scrPlay','scrResults','scrTrophies','scrFinish'];
+function show(id){SCREENS.forEach(function(s){$(s).classList.toggle('on',s===id);}); window.scrollTo(0,0);}
+function starsHTML(n,max){var h=''; for(var i=0;i<(max||3);i++) h+='<span class="star'+(i<n?' on':'')+'">★</span>'; return h;}
+function stInfo(id){return S.st[id]||{stars:0,best:-1,plays:0};}
+function contentStarsDone(){return SECS.every(function(s){return stInfo(s.id).stars>=1;});}
+function totalStars(){var t=0; SECS.forEach(function(s){t+=stInfo(s.id).stars;}); t+=stInfo('vocab').stars; return t;}
+
+function renderHub(){
+  var r=rankOf(S.xp), nx=nextRank(S.xp);
+  $('hubBadge').textContent=r.ic; $('hubName').textContent=S.name; $('hubRank').textContent=r.name.toUpperCase();
+  var base=r.xp, top=nx?nx.xp:r.xp; $('hubXpBar').style.width=(nx?Math.min(100,(S.xp-base)/(top-base)*100):100)+'%';
+  $('hubXpNums').textContent=fmt(S.xp)+' XP'+(nx?' · '+fmt(nx.xp-S.xp)+' to '+nx.name:' · MAX RANK');
+  $('hubStars').textContent=totalStars()+'/18';
+  $('hubTroph').textContent=Object.keys(S.troph).length+'/'+TROPHIES.length;
+  $('hubSim').textContent=S.sim?S.sim.best+'%':'--';
+  var tiles=SECS.map(function(s){var st=stInfo(s.id);
+    return '<button class="stn" type="button" data-go-st="'+s.id+'"><div class="num">'+s.id+'</div><div class="ic">'+s.ic+'</div><div class="nm">'+esc(s.name)+'</div><div class="ds">'+esc(s.ds)+'</div><div class="stars">'+starsHTML(st.stars)+'</div><div class="best">'+(st.best>=0?'Best: '+st.best+'% first try':'12 questions · not played yet')+'</div></button>';});
+  var v=stInfo('vocab');
+  tiles.push('<button class="stn vocab" type="button" data-go-st="vocab"><div class="num">⚡</div><div class="ic">🔤</div><div class="nm">Vocab Lightning</div><div class="ds">All 49 terms from 7.1 to 7.5. Fast round, bigger speed bonus.</div><div class="stars">'+starsHTML(v.stars)+'</div><div class="best">'+(v.best>=0?'Best: '+v.best+'% first try':'15 questions · not played yet')+'</div></button>');
+  $('stationGrid').innerHTML=tiles.join('');
+  var open=contentStarsDone(), done=SECS.filter(function(s){return stInfo(s.id).stars>=1;}).length;
+  var bt=$('bossTile'); bt.classList.toggle('locked',!open);
+  bt.innerHTML='<h3>👑 EXAM SIMULATOR</h3><p>30 mixed questions weighted like the real Unit 5 exam, including Big Picture questions that combine sections. You get a score by section so you know exactly what to study.</p><div class="req">'+(open?(S.sim?'Best score: '+S.sim.best+'% · Play again anytime':'Unlocked! Your finish screen fills in when you complete it.'):'🔒 Earn at least 1 star on all five content stations to unlock ('+done+' of 5 done)')+'</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go-st]'),function(b){b.onclick=function(){SFX.click(); startRound(b.getAttribute('data-go-st'));};});
+}
+
+/* =====================================================================
+   ROUND ENGINE
+   ===================================================================== */
+var R=null, bonusTimer=null;
+function startRound(mode){
+  if(mode==='sim'&&!contentStarsDone()) return;
+  var qs=mode==='vocab'?vocabRound():(mode==='sim'?simRound():stationRound(mode));
+  R={mode:mode,qs:qs,i:0,score:0,streak:0,best:0,mult:1,first:0,calcN:0,calcFirst:0,missed:[],bySec:{},helpN:0};
+  show('scrPlay'); countdown(function(){renderQ();});
+}
+function countdown(done){
+  var el=$('countdown'), n=3; el.classList.add('on'); el.textContent=n; SFX.count();
+  var iv=setInterval(function(){n--; if(n>0){el.textContent=n; SFX.count();} else if(n===0){el.textContent='GO!'; SFX.go();} else {clearInterval(iv); el.classList.remove('on'); done();}},550);
+}
+function modeLabel(){return R.mode==='vocab'?'VOCAB LIGHTNING':(R.mode==='sim'?'EXAM SIMULATOR':R.mode+' '+SECS.filter(function(s){return s.id===R.mode;})[0].name.toUpperCase());}
+function hud(){
+  $('hudMode').textContent=modeLabel(); $('hudProg').textContent=(R.i+1)+' / '+R.qs.length;
+  $('hudScore').textContent=fmt(R.score); var m=$('hudMult'); m.textContent='x'+R.mult; m.classList.toggle('hot',R.mult>=3);
+  $('hudStreak').textContent='STREAK '+R.streak; $('hudFirst').textContent='FIRST TRY '+R.first;
+}
+function bonusWindow(q){return q.kind==='calc'?60:(q.fast?10:20);}
+function startBonus(){
+  stopBonus(); var q=R.qs[R.i], win=bonusWindow(q)*1000, t0=Date.now(); R.qStart=t0;
+  var fill=$('timerFill'), tm=$('timer'); tm.className='timer'; fill.style.width='100%';
+  bonusTimer=setInterval(function(){
+    if($('modal').classList.contains('on')){t0+=100; R.qStart=t0; return;}
+    var f=Math.max(0,1-(Date.now()-t0)/win); fill.style.width=(f*100)+'%';
+    tm.className='timer'+(f===0?' empty':(f<0.35?' warn':''));
+    if(f===0) stopBonus();
+  },100);
+}
+function stopBonus(){if(bonusTimer){clearInterval(bonusTimer); bonusTimer=null;}}
+function speedBonus(q){var win=bonusWindow(q)*1000, f=Math.max(0,1-(Date.now()-R.qStart)/win); return Math.round((q.fast?80:50)*f);}
+
+function renderQ(){
+  var q=R.qs[R.i]; q.tries=0; q.done=false; hud();
+  $('prompt').innerHTML='<span class="tag">'+esc(q.tag)+'</span><span class="qn">'+esc(SECNAME[q.sec]||q.sec)+'</span>'+q.html;
+  $('fbArea').innerHTML=''; $('nextRow').style.display='none';
+  var area=$('answerArea');
+  if(q.kind==='mc'){
+    var keys='ABCD';
+    area.innerHTML='<div class="opts '+q.layout+'">'+q.opts.map(function(o,i){return '<button class="opt" type="button" data-i="'+i+'"><span class="k">'+keys[i]+'</span>'+esc(o)+'</button>';}).join('')+'</div>';
+    Array.prototype.forEach.call(area.querySelectorAll('.opt'),function(b){b.onclick=function(){answerMC(b);};});
+  } else {
+    var c=q.calc, pre=c.unit==='$'?'<span class="unit">$</span>':'', post=c.unit==='%'?'<span class="unit">%</span>':'';
+    area.innerHTML='<div class="calcbox">'+pre+'<input class="calcin" id="calcIn" inputmode="decimal" autocomplete="off" placeholder="Answer">'+post+'<button class="big" id="calcGo" type="button">CHECK</button></div><div class="calcnote">Work it out on scratch paper. '+(c.note?esc(c.note):'')+'</div>';
+    $('calcGo').onclick=answerCalc;
+    $('calcIn').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault(); answerCalc();}};
+  }
+  startBonus();
+}
+function popAt(el,txt){
+  var r=el.getBoundingClientRect(), p=document.createElement('div'); p.className='pop'; p.textContent=txt;
+  p.style.left=(r.left+r.width/2)+'px'; p.style.top=(r.top)+'px'; document.body.appendChild(p); setTimeout(function(){p.remove();},950);
+}
+function track(q,firstTry){
+  var k=q.sec; R.bySec[k]=R.bySec[k]||{n:0,r:0}; R.bySec[k].n++; if(firstTry) R.bySec[k].r++;
+}
+function onCorrect(q,el){
+  stopBonus(); q.done=true;
+  var firstTry=q.tries===0, pts;
+  if(firstTry){
+    R.first++; R.streak++; if(R.streak>R.best) R.best=R.streak; if(R.streak>S.bestStreak) S.bestStreak=R.streak;
+    R.mult=Math.min(4,1+Math.floor(R.streak/3));
+    pts=(100+speedBonus(q))*R.mult; if(R.streak>0&&R.streak%3===0) SFX.streak(); else SFX.right(R.mult);
+    if(q.kind==='calc'){R.calcFirst++; S.calcFirst++;}
+  } else { pts=q.tries===1?25:0; SFX.right(1); }
+  if(q.kind==='calc') R.calcN++;
+  R.score+=pts; track(q,firstTry);
+  if(!firstTry) R.missed.push(q);
+  if(R.streak>=10) award('streak10');
+  if(S.calcFirst>=10) award('calc10'); if(S.calcFirst>=30) award('calc30');
+  hud(); if(pts) popAt(el,'+'+pts);
+  var head=firstTry?'CORRECT!':(q.tries===1?'GOT IT ON TRY 2':'GOT IT');
+  $('fbArea').innerHTML='<div class="fbbox ok"><span class="h">✔ '+head+'</span>'+q.why+'</div>';
+  $('nextRow').style.display='block'; $('btnNext').textContent=R.i+1>=R.qs.length?'SEE RESULTS ▶':'NEXT ▶';
+  setTimeout(function(){$('btnNext').scrollIntoView({behavior:'smooth',block:'nearest'});},60);
+}
+function onMiss(q){
+  q.tries++; R.streak=0; R.mult=1; hud(); SFX.wrong();
+}
+function answerMC(b){
+  var q=R.qs[R.i]; if(q.done) return;
+  var choice=q.opts[+b.getAttribute('data-i')];
+  if(choice===q.ans){
+    b.classList.add('right');
+    Array.prototype.forEach.call($('answerArea').querySelectorAll('.opt'),function(x){x.disabled=true; if(x!==b&&!x.classList.contains('wrong')) x.classList.add('dim');});
+    onCorrect(q,b);
+  } else {
+    b.classList.add('wrong','shake'); b.disabled=true; onMiss(q);
+    $('fbArea').innerHTML='<div class="fbbox no"><span class="h">✖ NOT QUITE</span>Reread the question and try another answer. Your streak reset, but you can still earn points.</div>';
+  }
+}
+function parseNum(s){
+  s=String(s).replace(/[−–—]/g,'-').replace(/[$,%\s]/g,'');
+  if(!/^-?\d*\.?\d+$/.test(s)) return NaN; return parseFloat(s);
+}
+function answerCalc(){
+  var q=R.qs[R.i]; if(q.done) return;
+  var inp=$('calcIn'), v=parseNum(inp.value);
+  if(isNaN(v)){ $('fbArea').innerHTML='<div class="fbbox no"><span class="h">TYPE A NUMBER</span>Use digits only, like 12500 or 4.5. Use a minus sign for a negative answer.</div>'; inp.focus(); return; }
+  if(Math.abs(v-q.calc.ans)<=q.calc.tol){
+    inp.disabled=true; $('calcGo').disabled=true; onCorrect(q,inp);
+    return;
+  }
+  onMiss(q); inp.classList.add('shake'); setTimeout(function(){inp.classList.remove('shake');},400); inp.select();
+  var h='<div class="fbbox no"><span class="h">✖ NOT YET</span>That is not it. '+(q.tries===1?'Here is how to set it up. Then try again.':'Check your math with the steps below.')+'</div>';
+  h+='<div class="fbbox work"><span class="h">HOW TO DO IT</span>'+q.calc.work+'</div>';
+  if(q.tries>=2){
+    if(q.tries===2){R.helpN++; SFX.hand();}
+    h+='<div class="hand"><b class="big2">✋ TIME TO GET HELP</b>Raise your hand so <b>Mr. Moon</b> can come over, or ask a classmate to explain the steps. You cannot move on until you get this one right.</div>';
+  }
+  $('fbArea').innerHTML=h;
+}
+function nextQ(){
+  SFX.click(); R.i++;
+  if(R.i>=R.qs.length) return endRound();
+  renderQ(); window.scrollTo(0,0);
+}
+
+/* =====================================================================
+   RESULTS
+   ===================================================================== */
+function starsFor(pct){return pct>=92?3:(pct>=80?2:(pct>=60?1:0));}
+function secBars(bySec,light){
+  var order=['7.1','7.2','7.3','7.4','7.5','MIX'];
+  return '<div class="secbars">'+order.filter(function(k){return bySec[k];}).map(function(k){
+    var b=bySec[k], p=Math.round(b.r/b.n*100);
+    return '<div class="secrow"><span>'+esc(SECNAME[k])+'</span><div class="bar"><i style="width:'+p+'%;'+(p<70?'background:linear-gradient(90deg,#C8102E,#ff3355)':'')+'"></i></div><span class="pct">'+b.r+'/'+b.n+'</span></div>';}).join('')+'</div>';
+}
+function weakest(bySec){
+  var w=null, wp=101; Object.keys(bySec).forEach(function(k){var p=bySec[k].r/bySec[k].n*100; if(p<wp){wp=p; w=k;}}); return wp<80?w:null;
+}
+function endRound(){
+  stopBonus(); newTroph=[];
+  var n=R.qs.length, pct=Math.round(R.first/n*100), stars=starsFor(pct), banners='';
+  var oldRank=rankOf(S.xp);
+  S.xp+=R.score;
+  var key=R.mode, prev=null;
+  if(key!=='sim'){
+    var st=stInfo(key); prev=st.best;
+    st.plays++; if(stars>st.stars) st.stars=stars; if(pct>st.best) st.best=pct; S.st[key]=st;
+    if(key!=='vocab') award('first');
+    if(pct===100) award('perfect');
+    if(key==='vocab'&&stars===3) award('vocab');
+    if(contentStarsDone()) award('all5');
+    if(SECS.every(function(s){return stInfo(s.id).stars===3;})) award('gold5');
+    if(prev>=0&&pct>prev) award('comeback');
+  } else {
+    var at=new Date().toISOString();
+    var rec={pct:pct,bySec:R.bySec,at:at,first:R.first,n:n};
+    if(!S.sim) S.sim={best:pct,last:rec,bestRec:rec}; else { S.sim.last=rec; if(pct>=S.sim.best){S.sim.best=pct; S.sim.bestRec=rec;} }
+    award('simdone'); if(pct>=80) award('sim80'); if(pct>=95) award('sim95');
+  }
+  save();
+  var newRank=rankOf(S.xp);
+  if(newRank.name!==oldRank.name){banners+='<div class="banner rank">RANK UP! '+newRank.ic+' '+newRank.name.toUpperCase()+'</div>'; setTimeout(SFX.rank,900);}
+  if(key!=='sim'&&prev>=0&&pct>prev) banners+='<div class="banner info">NEW PERSONAL BEST! Up from '+prev+'% to '+pct+'%</div>';
+  if(key!=='sim'&&contentStarsDone()&&!S.sim) banners+='<div class="banner troph">👑 THE EXAM SIMULATOR IS UNLOCKED!</div>';
+
+  if(key==='sim'){
+    $('resTitle').textContent='EXAM SIMULATOR: '+pct+'%';
+    $('resStars').innerHTML=''; $('resCrit').innerHTML=pct>=80?'You are on track for the exam. Keep it sharp.':'Use the section scores below to decide what to review before the exam.';
+  } else {
+    $('resTitle').textContent=key==='vocab'?'VOCAB LIGHTNING COMPLETE':'STATION '+key+' COMPLETE';
+    $('resStars').innerHTML=starsHTML(stars); $('resCrit').textContent='★ 60%   ★★ 80%   ★★★ 92% right on the first try';
+    Array.prototype.forEach.call($('resStars').querySelectorAll('.star'),function(s,i){setTimeout(function(){s.classList.add('show'); if(i<stars) SFX.star(i);},300+i*350);});
+  }
+  $('resStats').innerHTML=[['Score',fmt(R.score)],['First try',R.first+'/'+n],['Best streak',R.best],['Calc first try',R.calcFirst+'/'+R.calcN]].map(function(s){return '<div class="stat"><span>'+s[0]+'</span><b>'+s[1]+'</b></div>';}).join('');
+  var secHTML='';
+  if(key==='sim'||key==='vocab'){
+    secHTML='<div class="review"><h4>SCORE BY SECTION</h4></div>'+secBars(R.bySec);
+    var w=weakest(R.bySec); if(w) secHTML+='<div class="banner info">STUDY TIP: Your lowest section was '+esc(SECNAME[w])+'.'+(w!=='MIX'?' Replay that station before the exam.':' Replay the stations, then try the simulator again.')+'</div>';
+  }
+  $('resSecs').innerHTML=secHTML;
+  $('resBanners').innerHTML=banners;
+  $('resReview').innerHTML=R.missed.length?'<h4>REVIEW THESE ('+R.missed.length+')</h4>'+R.missed.map(function(q){
+    return '<div class="rv"><span class="s">'+esc(SECNAME[q.sec]||q.sec)+'</span>'+esc(q.txt.length>170?q.txt.slice(0,167)+'...':q.txt)+'<br>'+q.why+'</div>';}).join(''):'<h4 style="color:var(--good)">NO MISSES. PERFECT ROUND!</h4>';
+  var btns='<button class="big" type="button" id="btnAgain">PLAY AGAIN</button><button class="big blue" type="button" id="btnBack">BACK TO MAP</button>';
+  if(key==='sim') btns+='<button class="big gold" type="button" id="btnToFinish">FINISH SCREEN</button>';
+  $('resBtns').innerHTML=btns;
+  $('btnAgain').onclick=function(){startRound(key);};
+  $('btnBack').onclick=function(){renderHub(); show('scrHub');};
+  if($('btnToFinish')) $('btnToFinish').onclick=function(){renderFinish(); show('scrFinish');};
+  show('scrResults');
+  if(stars===3||pct>=95) confetti();
+}
+function confetti(){
+  var cols=['#004AA0','#C8102E','#ffcc33','#ffffff','#2a7bff'];
+  for(var i=0;i<60;i++){var c=document.createElement('div'); c.className='confetti'; c.style.left=Math.random()*100+'vw'; c.style.background=pick(cols); c.style.animationDuration=(1.6+Math.random()*1.8)+'s'; c.style.animationDelay=(Math.random()*.6)+'s'; document.body.appendChild(c); (function(el){setTimeout(function(){el.remove();},4200);})(c);}
+}
+
+/* =====================================================================
+   FINISH SCREEN
+   ===================================================================== */
+function stamp(iso){var d=iso?new Date(iso):new Date(); return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' at '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
+function renderFinish(){
+  var done=!!S.sim, r=rankOf(S.xp);
+  var rows=SECS.map(function(s){var st=stInfo(s.id); return '<div class="rowx"><span>'+s.id+' '+esc(s.name)+'</span><span>'+(st.best>=0?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.best+'%':'Not played')+'</span></div>';}).join('');
+  var v=stInfo('vocab');
+  rows+='<div class="rowx"><span>Vocab Lightning</span><span>'+(v.best>=0?'★'.repeat(v.stars)+'☆'.repeat(3-v.stars)+'  '+v.best+'%':'Not played')+'</span></div>';
+  var h='<div class="who">'+esc(S.name||'Student')+'</div>';
+  h+=done?'<div class="stamp">REVIEW COMPLETE</div>':'<div class="stamp pend">IN PROGRESS</div>';
+  h+='<div class="rowx"><span>Rank</span><span>'+r.ic+' '+r.name+' · '+fmt(S.xp)+' XP</span></div>';
+  h+='<div class="rowx"><span>Stars earned</span><span>'+totalStars()+' of 18</span></div>';
+  h+='<div class="rowx"><span>Trophies</span><span>'+Object.keys(S.troph).length+' of '+TROPHIES.length+'</span></div>';
+  h+='<div class="rowx"><span>Calculations solved on the first try</span><span>'+S.calcFirst+'</span></div>';
+  h+='<h3 style="font-family:Georgia,serif;color:#003B80;margin:18px 0 4px">Stations (best first-try score)</h3>'+rows;
+  if(done){
+    var b=S.sim.bestRec||S.sim.last;
+    h+='<h3 style="font-family:Georgia,serif;color:#003B80;margin:18px 0 4px">Exam Simulator</h3>';
+    h+='<div class="rowx"><span>Best score</span><span>'+S.sim.best+'% ('+b.first+' of '+b.n+')</span></div>';
+    h+='<div class="rowx"><span>Most recent score</span><span>'+S.sim.last.pct+'% on '+stamp(S.sim.last.at)+'</span></div>';
+    h+='<p style="margin:10px 0 0;font-weight:bold">Best attempt by section:</p>'+secBars(b.bySec,true);
+    var w=weakest(b.bySec); if(w) h+='<p><b>Study before the exam:</b> '+esc(SECNAME[w])+'</p>';
+  } else {
+    h+='<p style="margin-top:16px"><b>Almost there.</b> Finish the <b>Exam Simulator</b> to complete your review. It unlocks after you earn a star on all five content stations.</p>';
+  }
+  h+='<p class="note">Ungraded practice. Screen shown '+stamp()+'.</p>';
+  $('finishBody').innerHTML=h;
+}
+
+/* =====================================================================
+   MODALS
+   ===================================================================== */
+function modal(html){$('modalBody').innerHTML=html; $('modal').classList.add('on');}
+function closeModal(){$('modal').classList.remove('on');}
+$('modal').addEventListener('click',function(e){if(e.target===$('modal')) closeModal();});
+function wordHelp(){
+  var h='<div class="res-title" style="font-size:16px">WORD HELP</div><p class="muted" style="text-align:center;margin-top:-6px">The speed bonus pauses while this is open.</p><div class="gl">';
+  SECS.forEach(function(s){
+    h+='<h4>'+s.id+' '+esc(s.name.toUpperCase())+'</h4><dl>'+TERMS.filter(function(t){return t.s===s.id;}).map(function(t){return '<dt>'+esc(t.t)+'</dt><dd>'+esc(t.d)+'</dd>';}).join('')+'</dl>';
+  });
+  h+='<h4>FORMULAS</h4><dl>'+
+   '<dt>Nominal GDP</dt><dd>Add up quantity × price for every good, using that year\'s prices.</dd>'+
+   '<dt>Real GDP</dt><dd>Add up quantity × price using base-year prices.</dd>'+
+   '<dt>Growth rate</dt><dd>(new − old) ÷ old × 100</dd>'+
+   '<dt>Real GDP per capita</dt><dd>real GDP ÷ population</dd>'+
+   '<dt>Labor force</dt><dd>employed + unemployed (people actively looking)</dd>'+
+   '<dt>Unemployment rate</dt><dd>unemployed ÷ labor force × 100</dd>'+
+   '<dt>CPI</dt><dd>cost of basket today ÷ cost in base period × 100</dd>'+
+   '<dt>Inflation rate</dt><dd>(this year\'s CPI − last year\'s CPI) ÷ last year\'s CPI × 100</dd>'+
+   '<dt>Change in purchasing power of savings</dt><dd>interest rate − inflation rate</dd></dl>';
+  h+='</div><div class="btnrow"><button class="big blue" type="button" id="mClose">CLOSE</button></div>';
+  modal(h); $('mClose').onclick=closeModal;
+}
+
+/* =====================================================================
+   WIRING
+   ===================================================================== */
+function muteLabel(){$('btnMute').textContent='Sound: '+(S.mute?'Off':'On');}
+muteLabel();
+$('btnMute').onclick=function(){S.mute=!S.mute; save(); muteLabel(); SFX.click();};
+$('btnHelp').onclick=wordHelp;
+$('btnStart').onclick=function(){
+  var n=$('nameInput').value.trim();
+  if(!S.name&&!n){$('startMsg').textContent='Type your first and last name to start.'; $('nameInput').focus(); return;}
+  if(n) S.name=n; save(); SFX.go(); renderHub(); show('scrHub');
+};
+$('nameInput').onkeydown=function(e){if(e.key==='Enter') $('btnStart').click();};
+$('bossTile').onclick=function(){ if(!contentStarsDone()){SFX.wrong(); return;} SFX.click(); startRound('sim'); };
+$('btnNext').onclick=nextQ;
+$('btnQuit').onclick=function(){
+  modal('<div class="res-title" style="font-size:15px">QUIT THIS ROUND?</div><p style="text-align:center">You will lose your progress in this round.</p><div class="btnrow"><button class="big" type="button" id="qYes">QUIT</button><button class="big blue" type="button" id="qNo">KEEP PLAYING</button></div>');
+  $('qYes').onclick=function(){closeModal(); stopBonus(); R=null; renderHub(); show('scrHub');};
+  $('qNo').onclick=closeModal;
+};
+$('btnTrophies').onclick=function(){
+  $('trophCount').textContent=Object.keys(S.troph).length+' of '+TROPHIES.length+' unlocked';
+  $('trophGrid').innerHTML=TROPHIES.map(function(t){var got=!!S.troph[t.id]; return '<div class="troph'+(got?' got':'')+'"><div class="ic">'+t.ic+'</div><div><h5>'+esc(t.name)+'</h5><p>'+esc(t.desc)+'</p></div></div>';}).join('');
+  show('scrTrophies');
+};
+$('btnFinish').onclick=function(){renderFinish(); show('scrFinish');};
+$('btnHow').onclick=function(){
+  modal('<div class="res-title" style="font-size:15px">HOW SCORING WORKS</div><div style="line-height:1.6;font-size:15px">'+
+   '<p><b>Right on the first try:</b> 100 points plus a speed bonus, times your multiplier.</p>'+
+   '<p><b>Multiplier:</b> every 3 first-try answers in a row raises it (up to x4). A miss resets it.</p>'+
+   '<p><b>Right on the second try:</b> 25 points.</p>'+
+   '<p><b>Calculations</b> lock until you get them right. Miss once and you see how to set it up. Miss twice and it is time to raise your hand or ask a classmate.</p>'+
+   '<p><b>Stars</b> come from your first-try percent: 60% = ★, 80% = ★★, 92% = ★★★.</p>'+
+   '<p>The <b>Exam Simulator</b> unlocks when all five content stations have at least one star.</p></div>'+
+   '<div class="btnrow"><button class="big blue" type="button" id="mClose">GOT IT</button></div>');
+  $('mClose').onclick=closeModal;
+};
+$('btnReset').onclick=function(){
+  modal('<div class="res-title" style="font-size:15px">ERASE ALL PROGRESS?</div><p style="text-align:center">Stars, XP, trophies, and exam scores on this device will be erased.</p><div class="btnrow"><button class="big" type="button" id="rYes">ERASE</button><button class="big blue" type="button" id="rNo">CANCEL</button></div>');
+  $('rYes').onclick=function(){var m=S.mute; S=blank(); S.mute=m; save(); closeModal(); $('nameInput').value=''; $('nameBox').style.display=''; show('scrTitle');};
+  $('rNo').onclick=closeModal;
+};
+Array.prototype.forEach.call(document.querySelectorAll('[data-go="hub"]'),function(b){b.onclick=function(){renderHub(); show('scrHub');};});
+
+/* first screen */
+if(S.name){ $('nameBox').style.display='none'; $('startMsg').textContent='Welcome back, '+S.name+'!'; }
+show('scrTitle');
+
+/* test hook for automated QA (harmless for students) */
+window.__u5rq={answerKey:function(){var q=R&&R.qs[R.i]; return q?(q.kind==='calc'?q.calc.ans:q.ans):null;},kind:function(){var q=R&&R.qs[R.i]; return q?q.kind:null;},all:function(){return {stationRound:stationRound,simRound:simRound,vocabRound:vocabRound};}};
+})();
+</script>
+</body>
+</html>
