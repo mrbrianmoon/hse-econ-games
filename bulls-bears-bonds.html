@@ -781,7 +781,7 @@ function renderStart() {
     '<label class="f" for="s-code">Market code <span class="muted" style="font-weight:normal">(optional)</span></label><input class="inp" id="s-code" maxlength="14" placeholder="Leave blank for a random market" style="text-transform:uppercase">' +
     '<p class="muted" style="font-size:13px;margin:6px 0 14px">If Mr. Moon gives the class a code, everyone plays the exact same market.</p>' +
     '<button class="btn big red" data-act="start" style="width:100%">Open the Market</button>' +
-    '<p class="center" style="margin:14px 0 0"><button class="btn sm ghost" data-act="teacher">Teacher: check a verification code</button></p></div>' +
+    '<p class="center" style="margin:14px 0 0"><button class="btn sm ghost" data-act="teacher">&#128274; Teacher panel</button></p></div>' +
     '<div class="card"><h2>How to play</h2><ol class="steps">' +
     '<li><b>Briefing.</b> Each month starts with news headlines plus the Fed interest rate, inflation, and the business cycle phase.</li>' +
     '<li><b>Analyst Question.</b> Answer a question about the news to unlock trading. Right on the first try earns an <b>Analyst Star</b>.</li>' +
@@ -1231,12 +1231,80 @@ function onReflect(el) {
 }
 
 /* ===== TEACHER CHECK ===== */
+/* recommended market codes; scenario and index result are computed live from the engine so they never go stale */
+var CODE_LIST = [
+  { year: 'The Overheating Economy', note: 'Fed raises rates again and again, inflation runs hot. Best year for teaching bonds.', codes: ['BOND-101', 'BEAR-102', 'COUPON-101', 'PAR-103', 'BULL-109'] },
+  { year: 'Recession and Rescue', note: 'Peak, contraction, bear market, rate cuts, recovery. Best year for the business cycle.', codes: ['BEAR-114', 'BOND-119', 'COUPON-110', 'PAR-100', 'BULL-100'] },
+  { year: 'The Oil Shock', note: 'Oil spikes, inflation, recession, recovery. Energy versus RVs.', codes: ['BEAR-101', 'BOND-103', 'YIELD-107', 'COUPON-105', 'BULL-105'] },
+  { year: 'The Long Climb', note: 'Bull market and tech boom. Forgiving year, good for a practice round.', codes: ['BEAR-100', 'BOND-102', 'COUPON-121', 'BULL-430'] }
+];
+function codeInfo(code) {
+  var mk = BBB.generate(code), sh = {}, cash = 0, def = false, dn = false;
+  BBB.STOCKS.forEach(function (s) { sh[s.id] = (START_CASH / BBB.STOCKS.length) / s.price; });
+  mk.months.forEach(function (mo) {
+    BBB.STOCKS.forEach(function (s) { if (mo.payouts[s.id]) cash += sh[s.id] * mo.payouts[s.id]; });
+    if (mo.split) sh[mo.split] *= 2;
+    if (mo.defaulted) def = true; if (mo.downgraded) dn = true;
+  });
+  var v = cash; BBB.STOCKS.forEach(function (s) { v += sh[s.id] * BBB.startPrice(mk, s.id, 12); });
+  return { year: mk.scenario, ret: v / START_CASH - 1, def: def, dn: dn };
+}
+function codeListHTML() {
+  return CODE_LIST.map(function (g) {
+    return '<div style="margin:12px 0"><b>' + esc(g.year) + '</b><div class="muted" style="font-size:13px">' + esc(g.note) + '</div>' +
+      g.codes.map(function (c) {
+        var i = codeInfo(c);
+        var ex = (i.def ? ', junk bond default' : '') + (i.dn ? ', bond downgrade' : '');
+        var warn = i.year !== g.year ? ' <span class="down">(now gives ' + esc(i.year) + ')</span>' : '';
+        return '<div class="mv"><span><b style="font-family:Courier New,monospace;letter-spacing:1px">' + c + '</b><span class="muted" style="font-size:13px">' + ex + '</span>' + warn + '</span><span class="' + cls(i.ret) + '">Index ' + pct(i.ret, true) + '</span></div>';
+      }).join('') + '</div>';
+  }).join('');
+}
+/* teacher PIN: only a salted SHA-256 hash is stored here, never the PIN itself */
+var PIN_SALT = 'HSE-BBB-teacher|';
+var PIN_HASH = 'bd061dbda1a64ccff754bc54f813dd80d5da55e8349ecb52471343ce9f1cecca';
+var pinFails = 0, pinLockUntil = 0;
+function teacherUnlocked() { try { return sessionStorage.getItem(KEY + '-teacher') === PIN_HASH; } catch (e) { return false; } }
+function pinModal() {
+  if (teacherUnlocked()) return teacherModal();
+  ovEl.innerHTML = '<div class="modal"><div class="box"><h2>Teacher access</h2><p class="muted" style="margin-top:0">Enter the teacher PIN.</p>' +
+    '<input class="inp" id="t-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" style="font-size:22px;letter-spacing:6px;text-align:center">' +
+    '<div id="t-pinmsg" class="down" style="min-height:22px;margin-top:8px;font-weight:bold"></div>' +
+    '<div style="margin-top:8px;display:flex;gap:8px"><button class="btn" data-act="pinok">Unlock</button><button class="btn ghost" data-act="tclose">Cancel</button></div></div></div>';
+  var el = document.getElementById('t-pin'); el.focus();
+  el.addEventListener('keydown', function (e) { if (e.key === 'Enter') checkPin(); });
+}
+function sha256hex(str) {
+  if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.reject(new Error('no crypto'));
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function (buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+  });
+}
+function checkPin() {
+  var msg = document.getElementById('t-pinmsg'), el = document.getElementById('t-pin');
+  var now = Date.now();
+  if (now < pinLockUntil) { msg.textContent = 'Too many tries. Wait ' + Math.ceil((pinLockUntil - now) / 1000) + ' seconds.'; return; }
+  sha256hex(PIN_SALT + el.value.trim()).then(function (h) {
+    if (h === PIN_HASH) {
+      pinFails = 0;
+      try { sessionStorage.setItem(KEY + '-teacher', PIN_HASH); } catch (e) { }
+      teacherModal();
+    } else {
+      pinFails++; el.value = ''; SFX.wrong();
+      if (pinFails >= 5) { pinLockUntil = Date.now() + 30000; pinFails = 0; msg.textContent = 'Too many tries. Wait 30 seconds.'; }
+      else msg.textContent = 'Incorrect PIN.';
+    }
+  }, function () { msg.textContent = 'This browser cannot check the PIN. Open the game from the hse-econ-games website.'; });
+}
 function teacherModal() {
   ovEl.innerHTML = '<div class="modal"><div class="box"><h2>Check a verification code</h2><p class="muted" style="margin-top:0">Type exactly what the student\'s screenshot shows. A matching code means the final value and stars were not edited.</p>' +
     '<label class="f">Student name</label><input class="inp" id="t-n"><label class="f">Period</label><input class="inp" id="t-p">' +
     '<label class="f">Market code</label><input class="inp" id="t-c" style="text-transform:uppercase"><label class="f">Final value (dollars and cents)</label><input class="inp" id="t-v" inputmode="decimal" placeholder="12345.67">' +
     '<label class="f">Analyst Stars</label><input class="inp" id="t-s" inputmode="numeric">' +
-    '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" data-act="tcheck">Get code</button><button class="btn ghost" data-act="tclose">Close</button></div><div id="t-out" style="margin-top:14px"></div></div></div>';
+    '<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="tcheck">Get code</button><button class="btn ghost" data-act="tclose">Close</button><button class="btn ghost" data-act="tlock">Lock teacher panel</button></div><div id="t-out" style="margin-top:14px"></div>' +
+    '<details style="margin-top:18px;border-top:2px solid var(--line);padding-top:12px"><summary style="font-weight:bold;cursor:pointer;color:var(--royal-dark)">Market code list</summary>' +
+    '<p class="muted" style="font-size:13px">Any code works, and the same code always makes the same market. Use a different code for each period from the same year so earlier periods cannot tip off later ones. "Index" is the Class Index result students try to beat.</p>' +
+    codeListHTML() + '</details></div></div>';
 }
 function teacherCheck() {
   var v = Number(String(document.getElementById('t-v').value).replace(/[$,\s]/g, ''));
@@ -1251,8 +1319,10 @@ document.addEventListener('click', function (ev) {
   if (act === 'mute') { muted = !muted; try { localStorage.setItem(KEY + '-mute', muted ? '1' : '0'); } catch (e) { } renderTop(); return; }
   if (act === 'start') return startGame();
   if (act === 'continue') { S = loadSave(); M = BBB.generate(S.code); buildIndex(); window.scrollTo(0, 0); return show(); }
-  if (act === 'teacher') return teacherModal();
+  if (act === 'teacher') return pinModal();
+  if (act === 'pinok') return checkPin();
   if (act === 'tclose') { ovEl.innerHTML = ''; return; }
+  if (act === 'tlock') { try { sessionStorage.removeItem(KEY + '-teacher'); } catch (e) { } ovEl.innerHTML = ''; flash('Teacher panel locked.'); return; }
   if (act === 'tcheck') return teacherCheck();
   if (act === 'answer') return answer(Number(b.getAttribute('data-i')));
   if (act === 'todesk') { S.phase = 'trade'; tab = 'stocks'; save(); SFX.click(); window.scrollTo(0, 0); return show(); }
