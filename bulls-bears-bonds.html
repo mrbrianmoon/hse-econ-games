@@ -995,7 +995,7 @@ function startRun() {
   run = { t: 0, speed: run && run.speed ? run.speed : 1, last: 0, toastI: 0, start: S.cash + holdValueAt(S.month, 0), val: 0, done: false };
   run.val = run.start;
   var ids = BBB.STOCKS.map(function (s) { return s.id; }).concat(BBB.BONDS.map(function (b) { return b.id; }));
-  appEl.innerHTML = '<div class="card" style="margin-top:18px"><div class="runhead"><div><div class="muted" style="letter-spacing:2px;text-transform:uppercase;font-size:12px">' + MONTHS[S.month] + ' is live</div>' +
+  appEl.innerHTML = '<div class="card" style="margin-top:18px"><div class="runhead"><div><div class="muted" style="letter-spacing:2px;text-transform:uppercase;font-size:12px" id="r-lab">' + MONTHS[S.month] + ' is live</div>' +
     '<div class="bigval" id="r-val">' + money(run.start) + '</div><div id="r-chg" class="muted">+$0.00 this month</div></div>' +
     '<div style="margin-left:auto" class="speed"><span class="muted">Speed</span><button class="btn sm' + (run.speed === 1 ? '' : ' ghost') + '" data-act="speed" data-s="1">1x</button><button class="btn sm' + (run.speed === 2 ? '' : ' ghost') + '" data-act="speed" data-s="2">2x</button><button class="btn sm' + (run.speed === 4 ? '' : ' ghost') + '" data-act="speed" data-s="4">4x</button></div></div>' +
     '<div class="prog"><div id="r-prog"></div></div><div class="muted" style="font-size:13px" id="r-day">' + MONTHS[S.month] + ' 1</div>' +
@@ -1017,7 +1017,7 @@ function tickLoop(ts) {
     run.last = ts;
     run.t++;
     updateRunView();
-    if (run.t >= N) { run.done = true; setTimeout(finishMonth, 700); return; }
+    if (run.t >= N) { run.done = true; endOfMonth(); return; }
   }
   requestAnimationFrame(tickLoop);
 }
@@ -1086,7 +1086,23 @@ function drawLines(c, w, h, series, totalPts) {
     c.stroke(); c.setLineDash([]);
   });
 }
+function endOfMonth() {
+  // month is over: stay on this screen so students can study the chart, feed, and board
+  var mo = M.months[S.month], d = run.val - run.start;
+  var paid = Object.keys(S.hold).some(function (id) { return S.hold[id] && mo.payouts[id]; });
+  feed('CLOSING BELL: ' + MONTHS[S.month] + ' is over. Your portfolio ' + (d >= 0 ? 'gained ' : 'lost ') + money(Math.abs(d)) + ' this month.', d >= 0 ? 'pay' : 'alarm');
+  if (paid) feed('Payday: your dividends and bond interest will be added at the wrap-up.', 'pay');
+  if (mo.split && S.hold[mo.split]) feed('Stock split: your ' + asset(mo.split).name + ' shares double at the wrap-up.', 'surprise');
+  document.getElementById('r-day').textContent = MONTHS[S.month] + ' is closed. Take your time: study the chart, the news feed, and the market board.';
+  var lb = document.getElementById('r-lab'); if (lb) lb.textContent = MONTHS[S.month] + ' is closed';
+  var sp = document.querySelector('.speed'); if (sp) sp.classList.add('hide');
+  drawRunChart();
+  setDock('<div class="m">Market closed<b>' + money(run.val) + '</b></div><div class="m">This month<b class="' + cls(d) + '">' + (d >= 0 ? '+' : '') + money(d) + '</b></div>' +
+    '<button class="btn big red go" data-act="towrap">Continue to Wrap-Up &#10148;</button>');
+  SFX.bell();
+}
 function finishMonth() {
+  if (!run || !run.done || S.phase !== 'run') return;
   var mo = M.months[S.month], m = S.month;
   var startVal = S.cash + holdValueAt(m, 0);
   // record the curve for this month
@@ -1253,6 +1269,7 @@ document.addEventListener('click', function (ev) {
     S.phase = 'run'; save(); return show();
   }
   if (act === 'speed') { if (run) { run.speed = Number(b.getAttribute('data-s')); document.querySelectorAll('[data-act=speed]').forEach(function (x) { x.classList.toggle('ghost', x !== b); }); } return; }
+  if (act === 'towrap') { setDock(''); return finishMonth(); }
   if (act === 'next') return nextMonth();
   if (act === 'again') { if (confirm('Start a brand new year? Take your screenshot first!')) { clearSave(); S = null; M = null; window.scrollTo(0, 0); show(); } return; }
 });
