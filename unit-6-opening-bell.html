@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Unit 6 Opening Bell Arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#004AA0; --blue-hi:#2a7bff; --navy:#00142e; --navy2:#001f47; --red:#C8102E; --red-hi:#ff3355;
+  --gray:#C6C8CE; --white:#ffffff; --gold:#ffcc33; --good:#22d36b; --bad:#ff3355;
+  --pix:'Press Start 2P','Courier New',monospace; --body:'Trebuchet MS','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--navy);color:var(--white);font-family:var(--body);overflow-x:hidden;
+  background-image:radial-gradient(ellipse at 50% -10%,rgba(42,123,255,.35),transparent 60%),
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:100% 100%,32px 32px,32px 32px;background-attachment:fixed;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer;color:inherit}
+.wrap{max-width:960px;margin:0 auto;padding:16px 16px 40px}
+.screen{display:none;animation:fadeIn .25s ease}
+.screen.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pix{font-family:var(--pix);letter-spacing:.5px}
+/* top bar */
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{font-family:var(--pix);font-size:10px;color:var(--gray);letter-spacing:2px}
+.spacer{flex:1}
+.iconbtn{background:var(--navy2);border:2px solid var(--blue);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:bold}
+.iconbtn:hover{border-color:var(--blue-hi)}
+.iconbtn.on{background:var(--blue)}
+/* title */
+.title-card{text-align:center;padding:40px 16px}
+.logo{font-family:var(--pix);font-size:clamp(22px,5vw,42px);line-height:1.35;text-shadow:0 0 18px var(--blue-hi),4px 4px 0 var(--red)}
+.logo small{display:block;font-size:.38em;color:var(--gold);text-shadow:none;margin-top:14px;letter-spacing:3px}
+.blink{animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+input.name{font-family:var(--body);font-size:20px;padding:12px 16px;border-radius:12px;border:3px solid var(--blue-hi);background:#fff;color:#111;width:min(340px,90%);text-align:center;margin:18px 0 6px;-webkit-user-select:text;user-select:text}
+.big{font-family:var(--pix);font-size:14px;padding:16px 26px;border-radius:14px;border:none;background:var(--red);color:#fff;box-shadow:0 6px 0 #7d0a1c,0 0 24px rgba(200,16,46,.5);transition:transform .08s}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #7d0a1c}
+.big.blue{background:var(--blue);box-shadow:0 6px 0 #002a5c,0 0 24px rgba(42,123,255,.45)}
+.big.gray{background:#3a4560;box-shadow:0 6px 0 #1d2335}
+.muted{color:var(--gray);font-size:14px}
+/* player panel */
+.player{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(135deg,var(--navy2),#002b63);border:3px solid var(--blue);border-radius:18px;padding:14px 16px;box-shadow:0 0 30px rgba(0,74,160,.45)}
+.badge{width:62px;height:62px;border-radius:14px;background:var(--red);display:grid;place-items:center;font-size:30px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
+.pname{font-weight:bold;font-size:20px}
+.prank{font-family:var(--pix);font-size:10px;color:var(--gold);margin:6px 0 8px}
+.bar{height:14px;background:#0a1630;border:2px solid #33446a;border-radius:8px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-hi),#7fb3ff);width:0;transition:width .8s ease}
+.bar.red>i{background:linear-gradient(90deg,var(--red),var(--red-hi))}
+.bar.gold>i{background:linear-gradient(90deg,#e0a400,var(--gold))}
+.xpnums{font-size:12px;color:var(--gray);margin-top:4px}
+.pstats{text-align:right;font-size:13px;color:var(--gray);line-height:1.7}
+.pstats b{color:#fff;font-size:16px}
+/* map */
+.sectionlabel{font-family:var(--pix);font-size:11px;color:var(--gray);margin:22px 4px 10px;letter-spacing:2px}
+.stages{display:grid;grid-template-columns:1fr 64px 1fr 64px 1fr 64px 1fr;gap:8px;align-items:stretch}
+.otile{position:relative;border:3px dashed #33446a;border-radius:14px;background:#0a1630;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 2px;text-align:center;font-family:var(--pix);font-size:7px;line-height:1.5;color:var(--gray)}
+.otile .oi{font-size:24px;line-height:1}
+.otile.ready{border:3px solid var(--gold);color:var(--gold);animation:glowGold .9s ease infinite alternate}
+.otile.done{border:3px solid var(--good);color:#bff5d4}
+.otile.skipped{border:3px solid #6b7690;color:#aab3c6}
+.otile.locked{opacity:.4;cursor:not-allowed}
+.otile .ost{font-size:11px;letter-spacing:0}
+@keyframes glowGold{to{box-shadow:0 0 18px rgba(255,204,51,.7)}}
+/* office screen */
+.ohud{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.olvl{font-family:var(--pix);font-size:11px;color:var(--gold)}
+.ohearts{font-size:18px;letter-spacing:2px}
+.ostat{font-size:14px;color:var(--gray)} .ostat b{color:#fff;font-family:var(--pix);font-size:11px}
+.odead{font-family:var(--pix);font-size:10px;color:var(--red-hi)}
+.owrap{position:relative;border:3px solid var(--blue);border-radius:16px;overflow:hidden;background:#070d1a;touch-action:none;max-width:min(100%,calc((100vh - 150px)*1.6));margin:0 auto;box-shadow:0 0 30px rgba(0,74,160,.45)}
+#offCanvas{display:block;width:100%;height:auto;touch-action:none}
+.otouch{position:absolute;left:0;top:0;width:58%;height:100%;display:none;touch-action:none}
+.joy{position:absolute;left:84px;top:calc(100% - 84px);width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.28);pointer-events:none}
+.joy.live{background:rgba(255,255,255,.14)}
+.joy .knob{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.55);transform:translate(-50%,-50%)}
+.odash{position:absolute;right:20px;bottom:20px;width:88px;height:88px;border-radius:50%;border:3px solid #fff;background:var(--red);font-family:var(--pix);font-size:11px;display:none;touch-action:none;box-shadow:0 5px 0 #7d0a1c}
+.odash.cool{background:#5a2a35;opacity:.7}
+body.touch .otouch,body.touch .odash{display:block}
+body.touch .ohelp{display:none}
+.oover{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,10,25,.74);padding:14px;overflow:auto}
+.oover.on{display:grid}
+.ocard{background:var(--navy2);border:3px solid var(--blue);border-radius:16px;padding:16px 18px;max-width:560px;width:100%}
+.ocard h2{font-family:var(--pix);font-size:15px;line-height:1.5;margin:6px 0 10px}
+.ocard p,.ocard li{font-size:14px;line-height:1.45}
+.ocard ul{margin:6px 0 8px;padding-left:20px}
+.otag{display:inline-block;font-family:var(--pix);font-size:8px;background:var(--red);padding:6px 8px;border-radius:6px}
+.ofine{font-size:12.5px!important;color:var(--gray)}
+.bigstars.sm{font-size:40px}
+.bigstars.sm .star{transform:none}
+.ocard .big{font-size:10px;padding:13px 16px}
+.ocard .statgrid{grid-template-columns:repeat(4,1fr)}
+.ohelp{text-align:center;font-size:13px;margin-top:8px}
+/* wardrobe */
+.wgrid{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:start}
+.wprev{background:radial-gradient(circle at 50% 40%,#0c3a7a,#00142e 70%);border:3px solid var(--blue);border-radius:16px;display:grid;place-items:center;padding:10px}
+.wrow{margin-bottom:12px}
+.wlab{font-family:var(--pix);font-size:9px;color:var(--gray);margin-bottom:6px}
+.wsw{display:flex;flex-wrap:wrap;gap:8px}
+.sw{position:relative;width:40px;height:40px;border-radius:10px;border:3px solid #33446a;padding:0}
+.sw.txt{width:auto;padding:0 12px;background:#0a1630;font-size:13px;font-weight:bold}
+.sw.sel{border-color:var(--gold);box-shadow:0 0 12px rgba(255,204,51,.6)}
+.sw.lock{opacity:.55}
+.sw i{position:absolute;right:-6px;bottom:-6px;font-style:normal;font-size:13px}
+.stage{position:relative;background:var(--navy2);border:3px solid var(--blue);border-radius:16px;padding:14px 12px 12px;text-align:left;min-height:150px;transition:transform .12s,box-shadow .12s}
+.stage:not(.locked):hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(42,123,255,.35)}
+.stage .num{font-family:var(--pix);font-size:18px;color:var(--red-hi);text-shadow:2px 2px 0 #000}
+.stage .nm{font-weight:bold;font-size:15px;margin:8px 0 6px;min-height:38px}
+.stage .stars{font-size:22px;letter-spacing:2px}
+.stage .best{font-size:12px;color:var(--gray);margin-top:4px}
+.stage .mast{font-size:11px;color:var(--gray);margin-top:6px}
+.stage.locked{opacity:.45;filter:grayscale(.8);cursor:not-allowed}
+.stage.locked::after{content:"LOCKED";position:absolute;right:10px;top:12px;font-family:var(--pix);font-size:8px;color:var(--gray)}
+.star{color:#33446a}.star.on{color:var(--gold);text-shadow:0 0 8px rgba(255,204,51,.7)}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mode{background:linear-gradient(160deg,#2a0610,#5a0b1d);border:3px solid var(--red);border-radius:16px;padding:14px;text-align:left;min-height:118px;position:relative}
+.mode.bossm{background:linear-gradient(160deg,#1c1400,#4a3500);border-color:var(--gold)}
+.mode.weak{background:linear-gradient(160deg,#071a3a,#0c2f66);border-color:var(--blue-hi)}
+.mode h3{font-family:var(--pix);font-size:12px;margin:0 0 8px;line-height:1.5}
+.mode p{margin:0;font-size:13px;color:#dfe4ee;line-height:1.35}
+.mode .req{font-size:11px;color:var(--gold);margin-top:8px}
+.mode.locked{opacity:.45;filter:grayscale(.7);cursor:not-allowed}
+.navrow{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.navrow .big{flex:1;min-width:200px;font-size:11px}
+/* play */
+.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin-bottom:10px}
+.hud .l{font-family:var(--pix);font-size:10px;color:var(--gray);line-height:1.8}
+.hud .c{text-align:center}
+.hud .r{text-align:right}
+.score{font-family:var(--pix);font-size:22px;color:#fff;text-shadow:0 0 10px var(--blue-hi)}
+.mult{display:inline-block;font-family:var(--pix);font-size:12px;padding:6px 8px;border-radius:8px;background:#33446a;margin-top:6px}
+.mult.hot{background:var(--red);animation:pulse .6s ease infinite alternate}
+@keyframes pulse{to{transform:scale(1.12);box-shadow:0 0 16px var(--red-hi)}}
+.lives{font-size:20px;letter-spacing:3px}
+.timer{height:16px;background:#0a1630;border:2px solid #33446a;border-radius:10px;overflow:hidden;margin:6px 0 14px}
+.timer>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--good),#8dffb8);transform-origin:left}
+.timer.warn>i{background:linear-gradient(90deg,#e0a400,var(--gold))}
+.timer.danger>i{background:linear-gradient(90deg,var(--red),var(--red-hi))}
+.combo{height:8px;display:flex;gap:4px;margin:-6px 0 12px}
+.combo span{flex:1;background:#1a2645;border-radius:4px}
+.combo span.on{background:var(--red-hi);box-shadow:0 0 8px var(--red-hi)}
+.prompt{position:relative;background:#fff;color:#0b1a33;border-radius:18px;padding:22px 22px;min-height:120px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:4px solid var(--blue);box-shadow:0 8px 0 #002a5c,0 0 34px rgba(42,123,255,.4)}
+.prompt .tag{position:absolute;top:-14px;left:18px;font-family:var(--pix);font-size:9px;background:var(--red);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .qn{position:absolute;top:-14px;right:18px;font-family:var(--pix);font-size:9px;background:var(--blue);color:#fff;padding:7px 10px;border-radius:8px}
+.prompt .term{font-family:Georgia,serif;font-weight:bold;font-size:clamp(26px,4.4vw,40px);color:var(--blue)}
+.prompt .def{font-size:clamp(18px,2.6vw,23px);line-height:1.4;font-weight:bold}
+.opts{display:grid;gap:12px;margin-top:18px}
+.opts.three{grid-template-columns:1fr}
+.opts.four{grid-template-columns:1fr 1fr}
+.opt{position:relative;background:var(--navy2);border:3px solid var(--blue);border-radius:14px;padding:14px 14px 14px 52px;text-align:left;font-size:17px;line-height:1.35;min-height:62px;font-weight:bold;transition:transform .08s,background .15s,border-color .15s}
+.opts.four .opt{font-size:19px;font-family:Georgia,serif}
+.opt .k{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:8px;background:var(--blue);display:grid;place-items:center;font-family:var(--pix);font-size:10px}
+.opt:hover:not(:disabled){border-color:var(--blue-hi);background:#062a5e}
+.opt:active:not(:disabled){transform:scale(.98)}
+.opt:disabled{cursor:default}
+.opt.right{background:#0f5a32;border-color:var(--good);box-shadow:0 0 18px rgba(34,211,107,.6)}
+.opt.right .k{background:var(--good)}
+.opt.wrong{background:#5a0b1d;border-color:var(--bad)}
+.opt.wrong .k{background:var(--bad)}
+.opt.dim{opacity:.4}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.pop{position:fixed;font-family:var(--pix);font-size:18px;color:var(--gold);text-shadow:2px 2px 0 #000;pointer-events:none;animation:popup .9s ease-out forwards;z-index:50}
+@keyframes popup{from{opacity:1;transform:translate(-50%,0) scale(.8)}to{opacity:0;transform:translate(-50%,-70px) scale(1.25)}}
+.feedback{min-height:28px;margin-top:12px;text-align:center;font-family:var(--pix);font-size:11px}
+.quitrow{text-align:center;margin-top:16px}
+.linkbtn{background:none;border:none;color:var(--gray);text-decoration:underline;font-size:13px}
+/* results */
+.panel{background:var(--navy2);border:3px solid var(--blue);border-radius:18px;padding:20px}
+.res-title{font-family:var(--pix);font-size:clamp(16px,3vw,24px);text-align:center;margin:6px 0 14px;line-height:1.4}
+.bigstars{text-align:center;font-size:56px;letter-spacing:10px;margin:4px 0}
+.bigstars .star{display:inline-block;transform:scale(0)}
+.bigstars .star.show{animation:starIn .45s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes starIn{to{transform:scale(1)}}
+.crit{text-align:center;font-size:12px;color:var(--gray);margin-bottom:14px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.stat{background:#0a1630;border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-family:var(--pix);font-size:15px;margin-top:8px;color:#fff}
+.stat span{font-size:12px;color:var(--gray)}
+.banner{text-align:center;font-family:var(--pix);font-size:12px;padding:12px;border-radius:12px;margin:10px 0;line-height:1.6}
+.banner.rank{background:var(--red);animation:glow .7s ease infinite alternate}
+@keyframes glow{to{box-shadow:0 0 22px var(--red-hi)}}
+.banner.troph{background:#3d2e00;border:2px solid var(--gold);color:var(--gold)}
+.review h4{font-family:var(--pix);font-size:11px;margin:18px 0 10px;color:var(--red-hi)}
+.rv{background:#0a1630;border-left:5px solid var(--red);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:15px;line-height:1.4}
+.rv b{color:#8fb9ff;font-family:Georgia,serif;font-size:17px}
+.btnrow{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+/* trophies */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.troph{background:#0a1630;border:3px solid #33446a;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.troph .ic{font-size:34px;line-height:1;filter:grayscale(1) brightness(.35)}
+.troph.got{border-color:var(--gold);background:linear-gradient(160deg,#241b00,#0a1630)}
+.troph.got .ic{filter:none;text-shadow:0 0 12px rgba(255,204,51,.6)}
+.troph h5{margin:0 0 4px;font-size:15px}
+.troph p{margin:0;font-size:12.5px;color:var(--gray);line-height:1.35}
+.troph .when{font-size:11px;color:var(--gold);margin-top:5px}
+/* report */
+.report{background:#fff;color:#0b1a33;border-radius:16px;overflow:hidden;border:4px solid var(--blue)}
+.report .rh{background:var(--blue);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.report .rh .t{font-family:Georgia,serif;font-size:24px;font-weight:bold}
+.report .rh .u{background:var(--red);font-family:var(--pix);font-size:12px;padding:10px 12px;border-radius:8px}
+.report .rb{padding:16px 20px;font-size:15px;line-height:1.7}
+.report table{width:100%;border-collapse:collapse;margin-top:6px}
+.report td{padding:6px 4px;border-bottom:1px solid #e1e4ea}
+.report td:last-child{text-align:right;font-weight:bold}
+/* toast */
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:linear-gradient(135deg,#3d2e00,#6a5000);border:3px solid var(--gold);border-radius:14px;padding:12px 18px;display:flex;gap:12px;align-items:center;z-index:60;transition:transform .35s cubic-bezier(.2,1.4,.4,1);max-width:92vw}
+.toast.show{transform:translate(-50%,0)}
+.toast .ic{font-size:30px}
+.toast small{display:block;font-family:var(--pix);font-size:8px;color:var(--gold);margin-bottom:5px}
+.toast b{font-size:16px}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,10,25,.8);display:none;place-items:center;z-index:70;padding:16px}
+.modal.on{display:grid}
+.modal .panel{max-width:440px;width:100%}
+.confetti{position:fixed;width:10px;height:14px;top:-20px;z-index:55;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.countdown{position:fixed;inset:0;display:none;place-items:center;z-index:65;background:rgba(0,10,25,.75);font-family:var(--pix);font-size:80px;color:#fff;text-shadow:0 0 30px var(--blue-hi),6px 6px 0 var(--red)}
+.countdown.on{display:grid}
+@media (max-width:760px){
+  .stages{grid-template-columns:1fr}
+  .otile{flex-direction:row;padding:10px;font-size:9px;gap:10px}
+  .wgrid{grid-template-columns:1fr}
+  .ocard .statgrid{grid-template-columns:1fr 1fr}
+  .modes{grid-template-columns:1fr}
+  .statgrid{grid-template-columns:1fr 1fr}
+  .opts.four{grid-template-columns:1fr}
+  .player{grid-template-columns:auto 1fr}
+  .pstats{grid-column:1/-1;text-align:left;display:flex;gap:16px;flex-wrap:wrap}
+  .opt{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+/* ---------- Unit 6 additions ---------- */
+.ticker{overflow:hidden;white-space:nowrap;background:#000;border-top:2px solid var(--red);border-bottom:2px solid var(--red);font-family:var(--pix);font-size:10px;padding:8px 0;margin:0 -16px 14px;color:#8dffb8}
+.ticker span{display:inline-block;padding-left:100%;animation:tick 38s linear infinite}
+.ticker b{color:#ff6680;font-weight:normal}
+@keyframes tick{to{transform:translateX(-100%)}}
+.modes{grid-template-columns:repeat(2,1fr)}
+.mode.test{background:linear-gradient(160deg,#071a3a,#0c2f66);border-color:var(--blue-hi)}
+.mode.pol{background:linear-gradient(160deg,#0b2a1a,#0f4a2c);border-color:var(--good)}
+.mode .big2{font-size:24px;float:right}
+.stage .ic{position:absolute;right:10px;top:10px;font-size:24px}
+.stage .ls{font-size:11px;color:#8fb9ff;margin-top:-2px}
+.opts.list{grid-template-columns:1fr}
+.opts.fixed .opt{font-size:17px}
+.opt.reveal{background:#0f5a32;border-color:var(--good);box-shadow:0 0 22px rgba(34,211,107,.8);animation:revealGlow .6s ease 4 alternate}
+@keyframes revealGlow{from{box-shadow:0 0 6px rgba(34,211,107,.4)}to{box-shadow:0 0 30px rgba(34,211,107,1)}}
+.opt.reveal .k{background:var(--good)}
+.opt.wrong{text-decoration:line-through;opacity:.75}
+.prompt .q{font-size:clamp(18px,2.5vw,22px);line-height:1.45;font-weight:bold}
+.prompt .bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px}
+.prompt .bank span{background:#e8eef8;border:2px solid #c9d3e6;border-radius:8px;padding:5px 9px;font-size:14px;font-weight:bold;color:#003B80}
+.prompt .clue{display:inline-block;text-align:left;background:#f2f6fc;border-left:6px solid var(--red);border-radius:8px;padding:10px 14px;font-size:clamp(17px,2.3vw,20px);line-height:1.5;font-weight:bold}
+.prompt .gnum{font-size:13px;color:#5b6472;margin-bottom:6px}
+.fbbox{margin-top:14px;border-radius:14px;padding:14px 16px;line-height:1.5;font-size:16px;text-align:left}
+.fbbox.ok{background:#0f3d24;border:3px solid var(--good)}
+.fbbox.no{background:#3d0a16;border:3px solid var(--bad)}
+.fbbox.try{background:#3d2e00;border:3px solid var(--gold)}
+.fbbox .h{font-family:var(--pix);font-size:10px;display:block;margin-bottom:8px;letter-spacing:1px;line-height:1.6}
+.fbbox.ok .h{color:var(--good)} .fbbox.no .h{color:var(--red-hi)} .fbbox.try .h{color:var(--gold)}
+.fbbox b{color:#ffe28a}
+.nextrow{text-align:center;margin-top:16px;display:none}
+.bonuslbl{font-family:var(--pix);font-size:8px;color:var(--gray);letter-spacing:1px}
+#flash{position:fixed;inset:0;pointer-events:none;z-index:58;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(255,30,60,.28),rgba(200,16,46,.82))}
+#flash.go{animation:flashR .55s ease-out}
+@keyframes flashR{0%{opacity:1}100%{opacity:0}}
+.secbars{margin:10px 0}
+.secrow{display:grid;grid-template-columns:180px 1fr 70px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.secrow .bar>i{transition:none}
+.secrow .pct{text-align:right;font-family:var(--pix);font-size:10px}
+.banner.info{background:#0a1630;border:2px solid var(--blue-hi);color:#cfe0ff}
+.rv .s{font-family:var(--pix);font-size:8px;color:var(--gold);display:block;margin-bottom:6px;line-height:1.6}
+.rv .a{color:#8dffb8;font-weight:bold}
+.rv b{font-family:inherit;font-size:inherit}
+.report .rowx{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #e1e4ea;padding:7px 2px}
+.report .rowx span:last-child{font-weight:bold;text-align:right}
+.report h3{font-family:Georgia,serif;color:#003B80;margin:16px 0 4px}
+.report .secrow{color:#0b1a33}
+.report .secrow .bar{background:#e8eef8;border-color:#c9d3e6}
+.report .stamp{display:inline-block;border:3px solid var(--red);color:var(--red);font-family:var(--pix);font-size:11px;padding:8px 10px;border-radius:8px;transform:rotate(-3deg);margin:8px 0}
+.report .stamp.pend{border-color:#8b94a3;color:#5b6472}
+.report .note{font-size:13px;color:#5b6472;margin-top:12px}
+.gl h4{font-family:var(--pix);font-size:10px;color:var(--gold);margin:16px 0 8px;line-height:1.6}
+.gl dt{font-weight:bold;color:#8fb9ff;margin-top:8px}
+.gl dd{margin:2px 0 0;line-height:1.4;color:#e6ebf5}
+.modal .panel.wide{max-width:640px;max-height:86vh;overflow:auto}
+@media (max-width:760px){.modes{grid-template-columns:1fr}.secrow{grid-template-columns:120px 1fr 56px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">HSE INDIANA ECONOMICS · UNIT 6</div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="btnWords" type="button">Word List</button>
+    <button class="iconbtn" id="btnRelax" type="button" title="5 hearts and slower hazards in the NYSE levels">Relaxed Levels: Off</button>
+    <button class="iconbtn" id="btnMute" type="button">Sound: On</button>
+  </div>
+
+  <!-- TITLE -->
+  <section class="screen" id="scrTitle">
+    <div class="title-card">
+      <div class="logo">OPENING<br>BELL<small>UNIT 6 · MONEY, BANKING, AND FINANCIAL MARKETS</small></div>
+      <p class="muted" style="margin-top:28px;line-height:1.6">You just got hired as a floor runner at the New York Stock Exchange.<br>Clear 4 practice test stages, survive 3 levels inside the NYSE, and ring the Opening Bell.</p>
+      <div id="nameBox">
+        <input class="name" id="nameInput" maxlength="30" placeholder="First and last name" autocomplete="off">
+        <p class="muted" style="font-size:12px;margin:4px 0 18px">Your progress saves on this device.</p>
+      </div>
+      <button class="big" id="btnStart" type="button"><span class="blink">PRESS START</span></button>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen" id="scrHub">
+    <div class="ticker"><span id="tickerTxt"></span></div>
+    <div class="player">
+      <div class="badge" id="hubBadge">🏃</div>
+      <div>
+        <div class="pname" id="hubName">Player</div>
+        <div class="prank" id="hubRank">FLOOR RUNNER</div>
+        <div class="bar"><i id="hubXpBar"></i></div>
+        <div class="xpnums" id="hubXpNums">0 XP</div>
+      </div>
+      <div class="pstats">
+        <div>Stars <b id="hubStars">0/12</b></div>
+        <div>Practice test best <b id="hubTest">--</b></div>
+        <div>Trophies <b id="hubTroph">0</b></div>
+      </div>
+    </div>
+    <div class="sectionlabel">PRACTICE TEST STAGES · 10 QUESTIONS EACH · EARN A STAR TO REACH THE NEXT NYSE LEVEL</div>
+    <div class="stages" id="stageGrid"></div>
+    <div class="sectionlabel">TEST PREP MODES · ALWAYS OPEN</div>
+    <div class="modes" id="modeGrid"></div>
+    <div class="navrow">
+      <button class="big blue" id="btnTrophies" type="button">TROPHY CASE</button>
+      <button class="big gray" id="btnWardrobe" type="button">WARDROBE</button>
+      <button class="big gray" id="btnReport" type="button">PROGRESS REPORT</button>
+    </div>
+    <div class="quitrow"><button class="linkbtn" id="btnHelp" type="button">How it works</button> · <button class="linkbtn" id="btnReset" type="button">Reset my progress</button></div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="scrPlay">
+    <div class="hud">
+      <div class="l"><div id="hudMode">STAGE</div><div id="hudProg">1 / 10</div></div>
+      <div class="c"><div class="score" id="hudScore">0</div><div class="mult" id="hudMult">x1</div></div>
+      <div class="r"><div class="l" id="hudStreak">STREAK 0</div><div class="l" id="hudFirst">FIRST TRY 0</div></div>
+    </div>
+    <div class="bonuslbl">SPEED BONUS · NO TIME LIMIT</div>
+    <div class="timer" id="timer"><i id="timerFill"></i></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="opts list" id="opts"></div>
+    <div id="fbArea"></div>
+    <div class="nextrow" id="nextRow"><button class="big blue" id="btnNext" type="button">NEXT ▶</button></div>
+    <div class="quitrow"><button class="linkbtn" id="btnQuit" type="button">Quit round</button></div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen" id="scrResults">
+    <div class="panel">
+      <div class="res-title" id="resTitle">ROUND COMPLETE</div>
+      <div class="bigstars" id="resStars"></div>
+      <div class="crit" id="resCrit"></div>
+      <div class="statgrid" id="resStats"></div>
+      <div id="resXp" style="margin:12px 0"></div>
+      <div id="resSecs"></div>
+      <div id="resBanners"></div>
+      <div class="review" id="resReview"></div>
+      <div class="btnrow">
+        <button class="big" id="btnRetry" type="button">PLAY AGAIN</button>
+        <button class="big blue" id="btnToHub" type="button">BACK TO MAP</button>
+        <button class="big" id="btnNextUp" type="button" style="display:none"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NYSE LEVEL -->
+  <section class="screen" id="scrOffice">
+    <div class="ohud">
+      <div class="olvl" id="oLvl">NYSE</div>
+      <div class="ohearts" id="oHearts"></div>
+      <div class="ostat">Time <b id="oTime">0:00.0</b></div>
+      <div class="ostat">💰 <b id="oClips">0/0</b></div>
+      <div class="odead" id="oDead"></div>
+      <div class="spacer"></div>
+      <button class="iconbtn" id="oPause" type="button">Pause</button>
+    </div>
+    <div class="owrap">
+      <canvas id="offCanvas" width="800" height="500"></canvas>
+      <div class="otouch" id="oTouch"><div class="joy" id="oJoy"><div class="knob" id="oKnob"></div></div></div>
+      <button class="odash" id="oDash" type="button">DASH</button>
+      <div class="oover" id="oOver"></div>
+    </div>
+    <div class="ohelp muted">Move: arrow keys or WASD · Dash: Space · Pause: Esc</div>
+  </section>
+
+  <!-- WARDROBE -->
+  <section class="screen" id="scrWardrobe">
+    <div class="res-title">YOUR FLOOR RUNNER</div>
+    <div class="wgrid">
+      <div class="wprev"><canvas id="wardCanvas" width="240" height="250"></canvas></div>
+      <div id="wardRows"></div>
+    </div>
+    <div class="btnrow"><button class="big" id="btnWardDone" type="button">LOOKS SHARP</button></div>
+  </section>
+
+  <!-- TROPHIES -->
+  <section class="screen" id="scrTrophies">
+    <div class="res-title">TROPHY CASE</div>
+    <p class="muted" style="text-align:center;margin-top:-6px" id="trophCount"></p>
+    <div class="tgrid" id="trophGrid"></div>
+    <div class="btnrow"><button class="big blue" type="button" data-go="hub">BACK TO MAP</button></div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="screen" id="scrReport">
+    <div class="report">
+      <div class="rh"><div><div style="font-size:12px;letter-spacing:2px;opacity:.85">HSE INDIANA ECONOMICS · MR. MOON</div><div class="t">Unit 6 Opening Bell Progress</div></div><div class="u">UNIT 06</div></div>
+      <div class="rb" id="reportBody"></div>
+    </div>
+    <div class="btnrow"><button class="big blue" type="button" data-go="hub">BACK TO MAP</button></div>
+  </section>
+</div>
+
+<div id="flash"></div>
+<div class="toast" id="toast"><div class="ic" id="toastIc">🏆</div><div><small>TROPHY UNLOCKED</small><b id="toastTxt"></b></div></div>
+<div class="countdown" id="countdown"></div>
+<div class="modal" id="modal"><div class="panel" id="modalBody"></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =====================================================================
+   CONTENT
+   Source of truth: Unit 6 Test (Final Version) plus the Day 33 to 36
+   slide decks. Every question is original wording. None is copied from
+   the test; each one practices the same idea in a new situation.
+   ===================================================================== */
+var STAGES=[
+  {id:'D33',name:'Money and Central Banks',ls:'Day 33 · 6.1, 6.2',ic:'💵'},
+  {id:'D34',name:'Banks and the Fed',ls:'Day 34 · 6.3, 6.4',ic:'🏦'},
+  {id:'D35',name:'Bonds and the FOMC',ls:'Day 35 · 6.3, 6.6',ic:'📜'},
+  {id:'D36',name:'Investing',ls:'Day 36 · 6.5, 6.6, 6.7',ic:'📈'}
+];
+var SECTIONS=STAGES;
+
+/* [stage index, question, correct answer, [wrong answers], why] */
+var MC=[
+ /* ---------- Day 33: Money and Central Banks ---------- */
+ [0,'Economists say money does three jobs in an economy. Which list names those three jobs?','medium of exchange, unit of account, and store of value',['durable, portable, and divisible','commodity money, representative money, and fiat money','coins, paper bills, and debit cards'],'Money is used to <b>trade</b> (medium of exchange), to <b>compare prices</b> (unit of account), and to <b>save for later</b> (store of value). Durable, portable, and divisible are <i>characteristics</i> of money, not its jobs.'],
+ [0,'In a country where prices double every few months, which job of money breaks down the most?','store of value, because money buys less the longer you hold it',['medium of exchange, because stores stop giving change','unit of account, because prices are no longer written in dollars','durability, because the bills wear out faster'],'When prices rise fast, money you save today buys much less later. Money stops working as a <b>store of value</b>, which is why rapid inflation hurts savers.'],
+ [0,'You cannot trade a $20 bill at a bank for gold or silver. So why will every store still take it?','The government made it legal tender, and people trust that others will accept it.',['Each bill is printed on special paper and ink that are worth about $20 by themselves.','The Federal Reserve keeps $20 of gold in a vault for every bill.','Every bank must trade it for silver coins if you ask.'],'Today\'s dollar is <b>fiat money</b>. Its value comes from the government declaring it legal tender and from all of us agreeing to accept it. Most of our economy is an agreement.'],
+ [0,'A video game uses rare gems as money. A glitch lets every player make unlimited gems, and soon nobody will trade anything for them. Which characteristic of money did the gems lose?','limited supply',['durability','portability','uniformity'],'Money only holds its value when it is <b>scarce</b>. When anyone can make as much as they want, each unit becomes nearly worthless.'],
+ [0,'A haircut costs $17. You pay with a $10 bill, a $5 bill, and two $1 bills. Which characteristic of money lets you pay the exact price?','divisible',['durable','portable','limited supply'],'Money is <b>divisible</b> when it breaks into smaller units so you can pay exact amounts.'],
+ [0,'Mr. Moon prints his own "Moon Dollars" and tries to pay for lunch with them at a restaurant. Which characteristic of money fails first?','acceptable, because the restaurant will not take them as payment',['portable, because paper bills are too heavy and bulky to carry around town','divisible, because they cannot be split','durable, because the paper wears out'],'Money only works if people <b>accept</b> it. A currency that only one person trusts is not really money.'],
+ [0,'Under the gold standard, what controlled how much paper money the government could put into circulation?','the amount of gold the government held to back it',['how many votes Congress had for new spending that year','how fast stock prices were rising','how many banks agreed to accept it'],'Under the <b>gold standard</b>, every paper dollar had to be backed by a set amount of gold. No extra gold meant no extra money.'],
+ [0,'For many years, some U.S. bills said "Silver Certificate" and could be traded at a bank for silver. What type of money were they?','representative money',['commodity money','fiat money','barter'],'<b>Representative money</b> has value because you can trade it in for something valuable, like silver or gold. The paper itself is not worth much.'],
+ [0,'During the American Revolution, Congress printed paper money called Continentals. Congress had no gold or silver to back them and no power to collect taxes. Soon people said something useless was "not worth a Continental." What went wrong?','Too many were printed with nothing backing them, so people stopped accepting them.',['They were printed on cloth and fell apart too quickly.','They came in so many different amounts that nobody could make change correctly.','Every bill looked exactly alike, so people got confused.'],'Continentals failed the tests of <b>limited supply</b> and <b>acceptability</b>. With nothing backing them and too many printed, they lost their value.'],
+ [0,'In 1933 the United States began moving away from the gold standard toward fiat money. Which statement best describes the trade-off?','Gold kept the money supply in check, but it also made it hard for the money supply to grow with the economy.',['The gold standard caused every bank failure in history, so leaving it had no cost.','Fiat money is backed by even more gold than before, so it can never lose any of its value.','Under the gold standard the Fed could print unlimited money, and fiat money stopped that.'],'Gold limits printing, which protects the value of money. But money can only grow as fast as the gold supply, which can hold back growth. Fiat money is more flexible, but it depends on trust and careful management.'],
+
+ /* ---------- Day 34: Banks and the Fed ---------- */
+ [1,'Using the textbook definitions, which of these counts in M2 but NOT in M1?','money in a savings account',['coins in your pocket','money in a checking account','paper currency'],'<b>M1</b> is cash plus checking accounts (demand deposits). <b>M2</b> is all of M1 plus near money like savings accounts. (Since 2020 the Fed counts savings in M1, but use the book definition on the exam.)'],
+ [1,'During the Free Banking Era (1837 to 1863), people panicked and rushed their banks all the time. Why do depositors today have much less reason to panic when they hear a rumor about their bank?','The FDIC insures deposits, the Fed can lend banks emergency cash, and examiners check on banks.',['Banks now keep 100 percent of deposits in the vault and never lend.','Every dollar can now be traded in for gold at any bank, so paper money is always safe.','The SEC repays depositors out of stock market profits.'],'In the Free Banking Era, thousands of banks printed their own money and nothing protected depositors. Today <b>FDIC insurance</b>, the Fed as <b>lender of last resort</b>, and <b>bank examiners</b> all work to stop runs.'],
+ [1,'River City Bank pays savers 2 percent interest and charges car buyers 8 percent on loans. How does this keep the bank in business?','It earns more interest on its loans than it pays to savers, and the difference covers its costs and profit.',['The 2 percent it pays savers is a fee sent to the Federal Reserve.','It keeps every deposit locked in its vault, so it earns the 2 percent plus the 8 percent, or 10 percent total.','Car buyers pay the bank\'s FDIC insurance with their 8 percent.'],'Banks make money on the <b>spread</b>: the gap between the interest they charge borrowers and the interest they pay savers.'],
+ [1,'Your bank suddenly fails and closes its doors. Which agency makes sure you get your insured deposits back?','the Federal Deposit Insurance Corporation (FDIC)',['the Securities and Exchange Commission (SEC)','the Federal Open Market Committee (FOMC)','the U.S. Mint'],'The <b>FDIC</b> insures bank deposits. It was created in 1933 after thousands of banks failed during the Great Depression.'],
+ [1,'During a financial panic, a large commercial bank runs low on cash. Where can it turn to borrow as the lender of last resort?','the Federal Reserve',['the U.S. Congress','the Securities and Exchange Commission','its own customers\' savings accounts'],'The Fed is the <b>banks\' bank</b>. A bank that runs short can borrow from the Fed and pay the <b>discount rate</b>. Every bank needs a bank.'],
+ [1,'A rumor says your local bank is about to fail, and a long line of customers forms to pull out their money. Based on the 1930s Minnesota story, what would calm the crowd the fastest?','showing the customers that the bank has plenty of cash on hand',['closing the bank early so the line goes home','raising the interest rate on new loans so fewer people want to borrow','telling customers their money was already lent out'],'Bank runs are driven by <b>consumer expectations</b>. When the Fed stacked cash at the teller windows, people saw their money was safe, regained confidence, and the run stopped.'],
+ [1,'Members of the Fed\'s Board of Governors serve 14-year terms, and one term ends every two years. Why are the terms set up this way?','so that no single President can appoint the whole board',['so every governor can finish an economics degree first','so each district bank can pick a new governor every year','so Congress can remove governors after every election'],'With <b>staggered terms</b>, a President usually appoints only two governors in a four-year term. This keeps the Fed <b>independent</b> from day-to-day politics.'],
+ [1,'A candidate for President promises to replace every Fed governor on day one with people who will cut interest rates right before the next election. What is the strongest argument against this plan?','The Fed was built to be independent, so its decisions are based on the economy and not on winning elections.',['The President is never allowed to appoint anyone to the Fed, under any plan Congress could pass.','The FOMC would have to start meeting in public.','The district banks would have to stop clearing checks.'],'Congress gave governors long, <b>staggered terms</b> to protect the Fed from political pressure. Rate cuts timed for an election could feed inflation.'],
+ [1,'Bank A only lends to customers with excellent credit and charges low rates. Bank B lends to almost anyone and charges high rates. Which statement is most accurate?','Bank B may earn more interest, but more of its borrowers may not pay back, which could put it out of business.',['Bank B is completely safe, because FDIC insurance pays the bank back for every loan that goes bad.','Bank A will always earn more profit than Bank B.','The Fed guarantees that every loan Bank B makes will be repaid.'],'Lending to risky borrowers is a <b>trade-off</b>: more possible profit, but a bigger chance of defaults. FDIC insurance protects depositors, not a bank\'s bad loans.'],
+ [1,'The Federal Reserve is split into 12 districts. Which district bank serves Fishers, Indiana?','the 7th District, the Federal Reserve Bank of Chicago',['the 8th District, the Federal Reserve Bank of St. Louis','the 4th District, the Federal Reserve Bank of Cleveland','the 2nd District, the Federal Reserve Bank of New York'],'Fishers is in the <b>7th District</b>, served by the <b>Chicago Fed</b>. (Southern Indiana belongs to the St. Louis Fed.)'],
+
+ /* ---------- Day 35: Bonds and the FOMC ---------- */
+ [2,'Banks start paying 6 percent interest on savings instead of 1 percent. What happens to the demand for money (the cash people want to hold)?','It falls, because people move cash into savings to earn interest and take out fewer loans.',['It rises, because people want to hold more cash when banks are paying them higher interest.','It stays the same, because interest rates never affect money.','It rises, because banks stop paying interest.'],'Higher interest rates make <b>holding cash</b> costly, because that cash could be earning interest. People save more, borrow less, and the demand for money <b>falls</b>.'],
+ [2,'When you buy a bond from the city of Fishers, you are...','lending money to the city, and it promises to pay you back with interest',['buying part ownership of the city','paying a tax that you get back next year','opening an insured savings account that you can withdraw from at any time'],'A <b>bond is an IOU</b>. You are the lender. The issuer pays you interest (the coupon) and repays the par value at maturity.'],
+ [2,'Hoosier Hardware sells you a $1,000 bond with a 3 percent coupon rate and a 5-year maturity. How much interest does it pay you each year?','$30',['$3','$150','$300'],'$1,000 × 0.03 = <b>$30 a year</b>. Over 5 years that is $150 in interest, and you also get the $1,000 par value back at maturity.'],
+ [2,'Jalen owns a $1,000 bond that pays 5 percent. A year later, new bonds only pay 2 percent. If Jalen sells his bond now, what is most likely?','He can sell it for more than $1,000, because his bond pays more than the new ones.',['He must sell it for less than $1,000, because older bonds are always worth less.','He cannot sell it until it reaches maturity.','The issuer will lower his coupon rate to 2 percent.'],'Interest rates and bond prices move like a <b>seesaw</b>. When rates fall, older bonds with higher coupons are worth <b>more</b>. When rates rise, older bonds are worth <b>less</b>.'],
+ [2,'A U.S. Treasury bond pays 4 percent. A junk bond from a struggling company pays 11 percent. Why does the junk bond pay so much more?','It has a much higher risk of default, so it must pay more to attract investors.',['It is backed by the FDIC, so investors are guaranteed to be paid back first.','It also pays dividends to stockholders.','It can never be resold.'],'The riskier the borrower, the more interest it must offer. Government bonds are the safest. <b>Junk bonds</b> are the riskiest, so investors who pick safer bonds trade a lower rate for more safety.'],
+ [2,'Who votes on the Federal Open Market Committee (FOMC)?','the 7 members of the Board of Governors plus 5 of the 12 district bank presidents',['all 535 members of Congress','the President, the Vice President, and the members of the Cabinet','the presidents of the 50 largest commercial banks in the country'],'The <b>FOMC</b> has 12 voting members and meets in private about 8 times a year to set interest rate policy.'],
+ [2,'The economy is in a deep recession and unemployment is rising. Why would it be a mistake for the Fed to keep interest rates high?','Borrowing stays expensive, so businesses and families keep cutting spending and the downturn drags on.',['High rates force the country back onto the gold standard.','High rates make the stock market grow too fast, which leads straight to a bubble.','High rates give regional banks too much money, which causes inflation.'],'In a recession the Fed wants <b>loose (expansionary)</b> policy: lower rates so people borrow and spend. When the Fed failed to act after 1929, the Depression got worse.'],
+ [2,'The Federal Reserve sells billions of dollars of government bonds to banks. What happens next?','Banks have less money to lend, interest rates rise, and the money supply shrinks.',['Banks have more money to lend, interest rates fall, and the money supply grows.','The federal government collects more taxes.','Every bank must raise its reserves to 100 percent.'],'In <b>open market operations</b>, when the Fed <b>sells</b> bonds, banks pay the Fed cash, so less money moves through the economy. When the Fed <b>buys</b> bonds, it does the opposite.'],
+ [2,'To fight high inflation, the FOMC raises interest rates. Which pair of results is most likely?','New savings accounts and CDs pay more interest, and older low-rate bonds lose value.',['Savings accounts pay less interest, and older bonds gain value.','Nothing changes for savers, because the FOMC only affects the government.','All stocks and bonds become insured by the FDIC.'],'Higher rates reward savers, push down the price of older bonds (the seesaw), and make borrowing costlier, which can also shrink company profits and pull stock prices down.'],
+ [2,'Which of these is an example of FISCAL policy instead of monetary policy?','Congress and the President cut income taxes.',['The Fed lowers the discount rate.','The FOMC buys government bonds from banks.','The Fed raises reserve requirements.'],'<b>Fiscal policy</b> is taxing and spending by Congress and the President. <b>Monetary policy</b> is the Fed changing interest rates and the money supply.'],
+
+ /* ---------- Day 36: Investing ---------- */
+ [3,'In general, an investment with a LOWER risk will also have...','a lower potential return',['a higher potential return','a guaranteed return of at least 10 percent','no liquidity at all'],'Risk and return go together. To get a chance at a bigger return, you have to accept more risk.'],
+ [3,'Maria buys one share of a shoe company\'s stock. Her brother buys one of the same company\'s bonds. What is the main difference?','Maria owns a small part of the company, while her brother has lent the company money.',['Her brother owns a small part of the company, while Maria has lent the company money.','Maria gets a fixed interest payment, while her brother gets dividends.','Only Maria\'s investment can be sold to someone else.'],'<b>Stocks: you own.</b> <b>Bonds: you lend.</b>'],
+ [3,'A company goes bankrupt. Its bondholders are paid back before its stockholders get anything. What does this tell you about stocks?','Stockholders take on more risk, so they expect a higher potential return.',['Stocks are insured by the federal government.','Stockholders always receive a fixed dividend, even when the company loses money.','Bonds are riskier than stocks.'],'Because <b>bondholders are paid first</b>, stockholders carry more risk. That extra risk is why stocks usually offer higher returns over time.'],
+ [3,'Diego has $400 to invest. His cousin wants all of it for a new phone repair shop. Why might a mutual fund be a smarter choice?','It spreads his money across many companies, so one business failing will not wipe him out.',['It is insured by the FDIC, so Diego can never lose any of the money he puts in.','It always earns a higher return than any single small business could.','It makes Diego the owner of the repair shop.'],'A <b>mutual fund</b> pools money from many savers to buy many stocks and bonds. That is <b>diversification</b> made easy.'],
+ [3,'Compared with a regular savings account, what is the main drawback of a 3-year certificate of deposit (CD)?','You give up liquidity, because you pay a penalty if you take the money out early.',['It always pays less interest than a savings account, even though it locks up your money.','It is not insured by the FDIC.','You have to buy it on the stock exchange.'],'A <b>CD</b> usually pays more interest, but your money is locked up until maturity. A savings account pays less but lets you withdraw any time.'],
+ [3,'Lena needs her money in a few weeks for a car repair. Omar will not need his money for three years. Which plan fits each person best?','Lena uses a savings account for liquidity, and Omar buys a 3-year CD for a higher return.',['Lena buys a 3-year CD for a higher return, and Omar uses a savings account for liquidity.','Both buy 3-year CDs, because CDs are the most liquid.','Both put everything into one new company\'s stock.'],'Money you may need soon belongs somewhere <b>liquid</b>. Money you can lock away can earn a <b>higher return</b>.'],
+ [3,'Grandpa Joe is 75, retired, and pays his bills from his savings. Kayla is 16 and just opened a retirement account. Which advice fits best?','Grandpa Joe sticks with insured savings and government bonds, while Kayla buys diversified stock funds because she has decades to recover.',['Both should put everything in a single growth stock, because stocks have the highest return.','Grandpa Joe should buy junk bonds for high income, while Kayla keeps everything in a checking account to stay safe.','Kayla should buy only savings bonds, while Grandpa Joe day trades.'],'The more <b>time</b> you have, the more <b>risk</b> you can handle. People who need their money soon should choose <b>safety and liquidity</b>.'],
+ [3,'Ava bought shares of a company for $30 each and sold them for $42. While she owned them, the company also paid her $1 per share from its profits. What are the $12 and the $1?','The $12 is a capital gain, and the $1 is a dividend.',['The $12 is a dividend, and the $1 is a capital gain.','Both are interest payments.','The $12 is the par value, and the $1 is the coupon rate.'],'A <b>capital gain</b> comes from selling for more than you paid. A <b>dividend</b> is a slice of company profits paid to stockholders.'],
+ [3,'A pension fund collects money from thousands of teachers and invests it in companies that want to grow. What role is the pension fund playing?','a financial intermediary',['a central bank','a stock exchange','the FOMC'],'A <b>financial intermediary</b> channels money from savers to borrowers. Banks, mutual funds, pension funds, and insurance companies all do this.'],
+ [3,'Stock prices have climbed steadily for two years, and investors feel confident. What kind of market is this?','a bull market',['a bear market','a bank run','a recession'],'A <b>bull market</b> is a long stretch of rising stock prices. A <b>bear market</b> is a long stretch of falling or flat prices.']
+];
+
+/* Policy Desk: [type A=classify the action, S=pick the policy, text, answer index, who, direction] */
+var POL_OPTS=['Expansionary Fiscal Policy','Contractionary Fiscal Policy','Expansionary Monetary Policy','Contractionary Monetary Policy'];
+var POL=[
+ ['A','Congress sends every taxpayer a $1,000 rebate check.',0,'Congress is changing taxes, so this is <b>fiscal</b>.','Putting money in people\'s pockets speeds up spending: <b>expansionary</b>.'],
+ ['A','Congress votes to raise the federal gas tax by 10 cents a gallon.',1,'Congress is changing a tax, so this is <b>fiscal</b>.','A higher tax takes money away from spenders: <b>contractionary</b>.'],
+ ['A','The Federal Reserve buys $60 billion of Treasury bonds from banks.',2,'Buying bonds is open market operations, a Fed tool: <b>monetary</b>.','Banks get cash and can lend more: <b>expansionary</b>.'],
+ ['A','The Federal Reserve sells $25 billion of government bonds on the open market.',3,'Selling bonds is open market operations, a Fed tool: <b>monetary</b>.','Banks hand cash to the Fed and lend less: <b>contractionary</b>.'],
+ ['A','The FOMC raises its target for the federal funds rate from 3.5 percent to 4 percent.',3,'The FOMC is part of the Fed: <b>monetary</b>.','Higher rates make borrowing cost more: <b>contractionary</b>.'],
+ ['A','The Federal Reserve cuts the discount rate it charges banks.',2,'The discount rate is a Fed tool: <b>monetary</b>.','Cheaper loans from the Fed let banks lend more: <b>expansionary</b>.'],
+ ['A','The Federal Reserve raises the reserve requirement from 10 percent to 12 percent.',3,'Reserve requirements are a Fed tool: <b>monetary</b>.','Banks must keep more of each deposit and can lend less: <b>contractionary</b>.'],
+ ['A','Congress cuts $50 billion from next year\'s federal agency budgets.',1,'Congress controls government spending: <b>fiscal</b>.','Less government spending slows the economy: <b>contractionary</b>.'],
+ ['A','The President signs a bill to spend $150 billion building new schools and bridges.',0,'Congress and the President control spending: <b>fiscal</b>.','More spending pumps money into the economy: <b>expansionary</b>.'],
+ ['A','Congress lowers the tax rate that corporations pay.',0,'Congress is changing a tax: <b>fiscal</b>.','Businesses keep more money to spend and hire: <b>expansionary</b>.'],
+ ['A','The FOMC lowers its target for the federal funds rate by half a percent.',2,'The FOMC is part of the Fed: <b>monetary</b>.','Lower rates make borrowing cheaper: <b>expansionary</b>.'],
+ ['A','The Federal Reserve raises the discount rate.',3,'The discount rate is a Fed tool: <b>monetary</b>.','Borrowing from the Fed costs banks more, so they lend less: <b>contractionary</b>.'],
+ ['A','Congress votes to hire 20,000 new workers to repair national parks.',0,'Congress controls government spending: <b>fiscal</b>.','New government jobs and spending speed up the economy: <b>expansionary</b>.'],
+ ['A','The Federal Reserve lowers the reserve requirement so banks can lend out more of each deposit.',2,'Reserve requirements are a Fed tool: <b>monetary</b>.','Banks can lend more: <b>expansionary</b>.'],
+ ['A','Congress and the President agree to raise income tax rates for every household.',1,'Congress and the President are changing taxes: <b>fiscal</b>.','Families have less to spend: <b>contractionary</b>.'],
+ ['S','Unemployment has climbed to 7.5 percent and keeps rising. Congress wants to help.',0,'Congress is the one acting: <b>fiscal</b>.','Rising unemployment means the economy needs the gas pedal: <b>expansionary</b>.'],
+ ['S','Prices are rising 6 percent a year and almost everyone has a job. The FOMC meets tomorrow.',3,'The FOMC is the Fed: <b>monetary</b>.','High inflation means the economy needs the brakes: <b>contractionary</b>.'],
+ ['S','Real GDP has fallen for two quarters in a row. The Federal Reserve wants borrowing to be cheaper.',2,'The Federal Reserve is acting: <b>monetary</b>.','A recession needs the gas pedal: <b>expansionary</b>.'],
+ ['S','The economy is overheating and prices are climbing fast. Congress wants to cool things down without waiting for the Fed.',1,'Congress is acting on its own: <b>fiscal</b>.','Cooling an overheated economy is the brakes: <b>contractionary</b>.'],
+ ['S','Layoffs are spreading. The President and Congress want families to have more money to spend right away.',0,'The President and Congress are acting: <b>fiscal</b>.','More money to spend is the gas pedal: <b>expansionary</b>.'],
+ ['S','Inflation has reached 7 percent, and Congress worries that its own spending is making it worse.',1,'Congress is changing its own spending: <b>fiscal</b>.','Spending less fights inflation: <b>contractionary</b>.'],
+ ['S','Home prices are soaring, borrowing is booming, and inflation is above the target. The Fed wants banks to lend less.',3,'The Fed is acting: <b>monetary</b>.','Less lending is the brakes: <b>contractionary</b>.'],
+ ['S','After a stock market crash, banks are afraid to lend. The Fed wants to pump more money into the banking system.',2,'The Fed is acting: <b>monetary</b>.','More money in the banking system is the gas pedal: <b>expansionary</b>.'],
+ ['S','Unemployment is 9 percent and stores report weak sales. Lawmakers in Congress want to create jobs.',0,'Lawmakers in Congress are acting: <b>fiscal</b>.','Creating jobs and boosting demand is the gas pedal: <b>expansionary</b>.'],
+ ['S','Factories cannot keep up with demand, and prices are up 5 percent. Congress decides it has to act.',1,'Congress is acting: <b>fiscal</b>.','Too much demand pushing prices up needs the brakes: <b>contractionary</b>.'],
+ ['S','Businesses have stopped investing and the economy is slowing down. The Federal Reserve meets to respond.',2,'The Federal Reserve is acting: <b>monetary</b>.','A slowing economy needs the gas pedal: <b>expansionary</b>.'],
+ ['S','Inflation is well above 2 percent, and the Fed wants to pull money out of the economy.',3,'The Fed is acting: <b>monetary</b>.','Pulling money out is the brakes: <b>contractionary</b>.']
+];
+
+/* Word Bank Blitz: same format as Part 1 of the test (groups of 4, word bank).
+   [terms in A to D order, [clue, answer index] x4] */
+var WB=[
+ [['central bank','fiat money','medium of exchange','unit of account'],[
+   ['The Federal Reserve is this kind of bank, because it serves the government and lends to other banks.',0],
+   ['A $5 bill has value because the government says it must be accepted to pay debts, not because of what it is made of.',1],
+   ['You hand the cashier $4 and walk out with a smoothie.',2],
+   ['Menu prices let you see that a $12 burger costs three times as much as a $4 drink.',3]]],
+ [['discount rate','federal funds rate','monetary policy','reserves'],[
+   ['The interest a bank pays when it borrows straight from the Federal Reserve.',0],
+   ['The interest one bank charges another bank for an overnight loan.',1],
+   ['Everything the Fed does with interest rates and the money supply to steer GDP and inflation.',2],
+   ['The part of your deposit the bank keeps on hand instead of lending it out.',3]]],
+ [['demand deposits','M1','M2','money supply'],[
+   ['The money in your checking account that you can spend any time with a debit card.',0],
+   ['The narrow measure of money: cash plus checking accounts.',1],
+   ['The broad measure of money: cash, checking, plus savings accounts.',2],
+   ['Every dollar available in the entire U.S. economy.',3]]],
+ [['diversification','maturity','portfolio','yield'],[
+   ['Owning stocks, bonds, and savings so one bad investment cannot sink you.',0],
+   ['The date a bond is due and the borrower must pay you back.',1],
+   ['Everything you have invested, all added together.',2],
+   ['The yearly rate of return you earn on a bond if you keep it until it is due.',3]]],
+ [['bull market','capital gain','dividend','share'],[
+   ['Stock prices keep climbing for months and investors feel confident.',0],
+   ['The profit you make when you sell a stock for more than you paid.',1],
+   ['A payment a company sends its stockholders out of its profits.',2],
+   ['One single unit of ownership in a corporation.',3]]],
+ [['barter','commodity money','representative money','store of value'],[
+   ['Trading your old bike for a friend\'s guitar, with no money involved.',0],
+   ['Salt, cattle, or tobacco used as money because each is useful by itself.',1],
+   ['A paper note you can trade in at the bank for a set amount of gold.',2],
+   ['Tucking your paycheck in a drawer so you can spend it next summer.',3]]],
+ [['bank run','gold standard','interest','liquidity'],[
+   ['A crowd rushes to pull out its money because people fear the bank will fail.',0],
+   ['A system where each paper dollar can be traded in for a set amount of gold.',1],
+   ['The price you pay to borrow money.',2],
+   ['How quickly something can be turned into cash.',3]]],
+ [['reserve requirements','open market operations','Federal Open Market Committee','Federal Reserve System'],[
+   ['The Fed\'s rule for how much of each deposit a bank must keep on hand.',0],
+   ['The Fed buying or selling government bonds to change the money supply.',1],
+   ['The 12-member group that meets about 8 times a year to set interest rate policy.',2],
+   ['The central bank of the United States: a Board of Governors plus 12 regional banks, created in 1913.',3]]],
+ [['coupon rate','par value','return','mutual fund'],[
+   ['The interest rate a bond issuer promises to pay the bondholder.',0],
+   ['The face value of a bond, paid back to you at maturity.',1],
+   ['What you earn on an investment beyond the money you first put in.',2],
+   ['A pool of many people\'s money used to buy hundreds of stocks and bonds.',3]]],
+ [['bear market','stock exchange','financial intermediary','fractional reserve banking'],[
+   ['Stock prices slide or stay flat for a long stretch of time.',0],
+   ['A market like the NYSE or Nasdaq where shares are bought and sold.',1],
+   ['A bank or pension fund that moves money from savers to borrowers.',2],
+   ['Banks keep only part of each deposit and lend out the rest.',3]]]
+];
+
+/* Glossary for the Word List (Mr. Moon's approved Unit 6 definitions) */
+var GLOSS=[
+ ['Day 33 · Money and Central Banks',[['barter','the direct exchange of one set of goods or services for another'],['medium of exchange','anything that is used to determine value during the exchange of goods and services'],['unit of account','a means for comparing the values of goods'],['store of value','to keep value when held onto, or stored, instead of spending'],['commodity money','objects that have value in and of themselves and that are also used as money'],['representative money','objects that have value solely because the holder can exchange them for something else of value'],['fiat money','money, also called legal tender, that has value because a government has decreed that it is an acceptable means to pay debts'],['central bank','a bank that can lend to other banks in times of need'],['bank run','a widespread panic in which great numbers of people try to redeem their paper money at the same time'],['gold standard','a monetary system in which paper money and coins had the value of certain amounts of gold']]],
+ ['Day 34 · Banks and the Fed',[['money supply','all the money available in the United States economy'],['M1','money people can access easily and immediately, such as currency and checking account deposits'],['M2','all the assets in M1 plus assets that can be converted to cash fairly easily, such as savings accounts'],['liquidity','the ability to be used as, or directly converted into, cash'],['demand deposits','money in a checking account that can be paid "on demand," or at any time'],['fractional reserve banking','a banking system that keeps only a fraction of its funds on hand and lends out the remainder'],['interest','the price paid for the use of borrowed money'],['Federal Reserve System','the central bank of the United States, created in 1913: 12 regional banks supervised by a Board of Governors'],['reserves','deposits that a bank keeps readily available as opposed to lending them out'],['reserve requirements','the amount of reserves that banks are required to keep on hand']]],
+ ['Day 35 · Bonds and the FOMC',[['monetary policy','the actions the Federal Reserve takes to influence the level of real GDP and the rate of inflation'],['Federal Open Market Committee','the Fed committee that makes key decisions about interest rates and the growth of the money supply'],['discount rate','the interest rate that the Federal Reserve charges commercial banks for loans'],['federal funds rate','the interest rate that banks charge each other for loans'],['open market operations','the buying and selling of government securities in order to alter the supply of money'],['coupon rate','the interest rate that a bond issuer will pay to the bondholder'],['maturity','the time at which payment to a bondholder is due'],['par value','a bond\'s stated value, to be paid to the bondholder at maturity'],['yield','the annual rate of return on a bond if the bond is held to maturity']]],
+ ['Day 36 · Investing',[['financial intermediary','an institution that helps channel funds from savers to borrowers'],['mutual fund','an organization that pools the savings of many individuals and invests it in a variety of stocks, bonds, and other assets'],['diversification','the strategy of spreading out investments to reduce risk'],['portfolio','a collection of financial assets'],['return','the money an investor receives above and beyond the sum of money initially invested'],['share','a portion of stock'],['dividend','the portion of corporate profits paid out to stockholders'],['capital gain','the difference between the selling price and purchase price that results in a financial gain for the seller'],['stock exchange','a market for buying and selling stock'],['bull market','a steady rise in stock prices in general over a period of time'],['bear market','a steady drop or stagnation in stock prices in general over a period of time']]]
+];
+
+var RANKS=[
+  {xp:0,name:'Floor Runner',ic:'🏃'},
+  {xp:800,name:'Clerk',ic:'📋'},
+  {xp:2000,name:'Broker',ic:'📞'},
+  {xp:4000,name:'Trader',ic:'📈'},
+  {xp:7000,name:'Specialist',ic:'🧮'},
+  {xp:11000,name:'Market Maker',ic:'🏛️'},
+  {xp:16000,name:'Fed Governor',ic:'🦅'},
+  {xp:22000,name:'Fed Chair',ic:'👑'}
+];
+
+var TROPHIES=[
+  {id:'first',ic:'🔔',n:'Opening Bell',h:'Finish your first round.'},
+  {id:'stars4',ic:'🧺',n:'Diversified',h:'Earn at least 1 star on all four stages.'},
+  {id:'three4',ic:'💎',n:'Blue Chip',h:'Earn 3 stars on all four stages.'},
+  {id:'perfect',ic:'💯',n:'Flawless Trade',h:'Get every question right on the first try in a stage.'},
+  {id:'streak10',ic:'🐂',n:'Bull Run',h:'Get 10 questions in a row right on the first try.'},
+  {id:'streak25',ic:'🚀',n:'Raging Bull',h:'Get 25 questions in a row right on the first try.'},
+  {id:'testdone',ic:'📝',n:'Full Session',h:'Finish the 40-question Practice Test.'},
+  {id:'test80',ic:'✅',n:'Market Ready',h:'Score 80% or better on the Practice Test.'},
+  {id:'test95',ic:'🏆',n:'Fed Chair Material',h:'Score 95% or better on the Practice Test.'},
+  {id:'policy10',ic:'🎛️',n:'Policy Pro',h:'Get 10 of 12 right on the first try at the Policy Desk.'},
+  {id:'policy12',ic:'🧊',n:'Steady Hand',h:'Get all 12 right on the first try at the Policy Desk.'},
+  {id:'match',ic:'🔤',n:'Word Bank Wizard',h:'Get every Word Bank Blitz clue right on the first try.'},
+  {id:'weak',ic:'🔧',n:'Comeback Rally',h:'Finish a Missed Questions round with 100%.'},
+  {id:'ofirst',ic:'🪪',n:'Floor Pass',h:'Clear your first NYSE level.'},
+  {id:'oclean',ic:'🧼',n:'Clean Books',h:'Clear an NYSE level without getting hit.'},
+  {id:'ofast',ic:'⚡',n:'High Frequency',h:'Earn 3 stars on an NYSE level.'},
+  {id:'oclips',ic:'💰',n:'Coin Collector',h:'Grab every coin in an NYSE level.'},
+  {id:'oall',ic:'🛎️',n:'Ring the Bell',h:'Clear all three NYSE levels without skipping.'},
+  {id:'record',ic:'📊',n:'Record High',h:'Score 4,000 points in a single round.'},
+  {id:'rounds25',ic:'⏳',n:'Long-Term Investor',h:'Play 25 rounds.'},
+  {id:'economist',ic:'📈',n:'Promoted',h:'Reach the rank of Trader.'},
+  {id:'chair',ic:'👑',n:'Fed Chair',h:'Reach the rank of Fed Chair.'}
+];
+
+var STORE_KEY='hse-u6-opening-bell-v1';
+
+/* ---------------- SAVE ---------------- */
+var mem=null;
+function blankSave(){
+  var s={v:1,name:'',xp:0,rounds:0,mute:false,relaxed:false,stages:{},test:{best:-1,last:null,bestRec:null},pol:{best:-1},wb:{best:-1},
+    qs:{},trophies:{},bestStreak:0,totalFirst:0,totalAnswered:0,
+    office:{floor:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0},bond:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0},bell:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0}},
+    look:{suit:'Navy',tie:'HSE Red',hair:'Dark Brown',hairStyle:'Short',skin:'Medium'},lookSet:false};
+  STAGES.forEach(function(x){s.stages[x.id]={stars:0,best:0,pct:-1};});
+  return s;
+}
+function load(){
+  var s=blankSave(),raw=null;
+  try{raw=window.localStorage.getItem(STORE_KEY);}catch(e){raw=mem;}
+  if(raw){try{var o=JSON.parse(raw);
+    Object.keys(s).forEach(function(k){ if(o[k]!==undefined&&o[k]!==null){
+      if(k==='stages'){Object.keys(s.stages).forEach(function(kk){ if(o.stages[kk]) s.stages[kk]=o.stages[kk]; });}
+      else if(k==='office'){Object.keys(s.office).forEach(function(kk){ if(o.office[kk]) Object.keys(s.office[kk]).forEach(function(f){ if(o.office[kk][f]!==undefined) s.office[kk][f]=o.office[kk][f]; }); });}
+      else if(k==='look'){Object.keys(s.look).forEach(function(f){ if(o.look[f]) s.look[f]=o.look[f]; });}
+      else s[k]=o[k]; }});
+  }catch(e){}}
+  return s;
+}
+function persist(){
+  var raw=JSON.stringify(S);
+  try{window.localStorage.setItem(STORE_KEY,raw);}catch(e){mem=raw;}
+}
+var S=load();
+
+/* ---------------- SOUND ---------------- */
+var AC=null;
+function ac(){
+  if(S.mute) return null;
+  try{ if(!AC){var C=window.AudioContext||window.webkitAudioContext; if(!C) return null; AC=new C();}
+       if(AC.state==='suspended') AC.resume(); }catch(e){return null;}
+  return AC;
+}
+function tone(freq,dur,type,vol,delay,slide){
+  var a=ac(); if(!a) return;
+  var t=a.currentTime+(delay||0), o=a.createOscillator(), g=a.createGain();
+  o.type=type||'square'; o.frequency.setValueAtTime(freq,t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  g.gain.setValueAtTime(vol||0.08,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+0.02);
+}
+var SFX={
+  click:function(){tone(660,.05,'square',.04);},
+  right:function(m){var b=520+Math.min(m,6)*40; tone(b,.08,'square',.07); tone(b*1.5,.12,'square',.07,.07);},
+  wrong:function(){tone(180,.28,'sawtooth',.08,0,90);},
+  tick:function(){tone(1000,.03,'square',.03);},
+  streak:function(){[660,880,1100,1320].forEach(function(f,i){tone(f,.07,'square',.06,i*.05);});},
+  star:function(i){tone(700+i*220,.18,'triangle',.12);},
+  troph:function(){[523,659,784,1047,784,1047].forEach(function(f,i){tone(f,.12,'square',.06,i*.09);});},
+  rank:function(){[392,523,659,784,1047].forEach(function(f,i){tone(f,.16,'triangle',.11,i*.12);});},
+  go:function(){tone(880,.25,'square',.08);},
+  count:function(){tone(440,.12,'square',.07);},
+  ohit:function(){tone(240,.16,'sawtooth',.09,0,70);tone(120,.2,'square',.05,.05);},
+  odash:function(){tone(260,.12,'triangle',.07,0,950);},
+  oclip:function(){tone(1320,.05,'square',.045);tone(1760,.07,'square',.045,.05);},
+  oheal:function(){[660,880,1320].forEach(function(f,i){tone(f,.09,'triangle',.08,i*.07);});},
+  ocp:function(){[523,784,1047].forEach(function(f,i){tone(f,.12,'square',.06,i*.09);});},
+  oslam:function(){tone(95,.14,'square',.09,0,55);},
+  oshoot:function(){tone(1500,.03,'square',.02,0,900);},
+  oland:function(){tone(150,.12,'triangle',.08,0,60);},
+  ostun:function(){tone(520,.35,'sine',.08,0,180);tone(560,.35,'sine',.05,.08,200);},
+  over:function(){[400,330,260,200].forEach(function(f,i){tone(f,.2,'sawtooth',.06,i*.16);});}
+};
+
+SFX.bell=function(){[1568,1568,1568,1568].forEach(function(f,i){tone(f,.5,'triangle',.11,i*.32);tone(f*2.01,.35,'sine',.04,i*.32);});};
+
+/* ---------------- HELPERS ---------------- */
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+function fmt(n){return Math.round(n).toLocaleString('en-US');}
+function show(id){
+  ['scrTitle','scrHub','scrPlay','scrResults','scrTrophies','scrReport','scrOffice','scrWardrobe'].forEach(function(s){$(s).classList.toggle('on',s===id);});
+  window.scrollTo(0,0);
+}
+function rankFor(xp){var r=RANKS[0];for(var i=0;i<RANKS.length;i++) if(xp>=RANKS[i].xp) r=RANKS[i];return r;}
+function rankIndex(xp){var k=0;for(var i=0;i<RANKS.length;i++) if(xp>=RANKS[i].xp) k=i;return k;}
+function totalStars(){var n=0;STAGES.forEach(function(x){n+=S.stages[x.id].stars;});return n;}
+function officeDone(k){var o=S.office[OFFICE[k].id],nx=S.stages[STAGES[k+1].id];return o.cleared||o.skipped||nx.best>0||nx.stars>0;}
+function officeOpen(k){return S.stages[STAGES[k].id].stars>=1;}
+function stageUnlocked(i){return i===0||(S.stages[STAGES[i-1].id].stars>=1&&officeDone(i-1));}
+function allStagesAtLeast(n){return STAGES.every(function(x){return S.stages[x.id].stars>=n;});}
+function trophyCount(){return Object.keys(S.trophies).length;}
+function stripTags(h){var d=document.createElement('div');d.innerHTML=h;return (d.textContent||'').replace(/\s+/g,' ').trim();}
+
+/* ---------------- QUESTION BUILDERS ---------------- */
+function mcQ(i){
+  var r=MC[i], st=STAGES[r[0]];
+  return {key:'m'+i,sec:st.id,secName:st.name,tag:'PRACTICE TEST',html:'<div class="q">'+esc(r[1])+'</div>',txt:r[1],
+    opts:shuffle([r[2]].concat(r[3])),ans:r[2],why:r[4],layout:'list'};
+}
+function polQ(i){
+  var r=POL[i];
+  var stem=r[0]==='A'?'<div class="gnum">Is this fiscal or monetary policy, AND is it expansionary or contractionary?</div>':'<div class="gnum">Look at who is acting and what the economy needs. Which policy should they use?</div>';
+  return {key:'p'+i,sec:r[0]==='A'?'PA':'PS',secName:r[0]==='A'?'Name the policy':'Pick the policy',tag:r[0]==='A'?'NAME THE POLICY':'PICK THE POLICY',
+    html:stem+'<div class="clue">'+esc(r[1])+'</div>',txt:r[1],opts:POL_OPTS.slice(),ans:POL_OPTS[r[2]],fixed:true,layout:'list',
+    why:'<b>Who?</b> '+r[3]+'<br><b>Which way?</b> '+r[4]};
+}
+function wbQ(g,j){
+  var G0=WB[g], terms=G0[0], c=G0[1][j], L='ABCD';
+  return {key:'w'+g+'_'+j,sec:'WB',secName:'Word Bank',tag:'WORD BANK · GROUP '+(g+1),
+    html:'<div class="bank">'+terms.map(function(t,k){return '<span>'+L[k]+') '+esc(t)+'</span>';}).join('')+'</div><div class="clue">'+esc(c[0])+'</div>',
+    txt:c[0],opts:terms.slice(),ans:terms[c[1]],fixed:true,layout:'list',
+    why:'<b>'+esc(terms[c[1]])+'</b>: '+esc(defOf(terms[c[1]]))+'.'};
+}
+function defOf(t){for(var i=0;i<GLOSS.length;i++) for(var j=0;j<GLOSS[i][1].length;j++) if(GLOSS[i][1][j][0]===t) return GLOSS[i][1][j][1]; return '';}
+function qFromKey(k){
+  if(k.charAt(0)==='m') return mcQ(+k.slice(1));
+  if(k.charAt(0)==='p') return polQ(+k.slice(1));
+  var p=k.slice(1).split('_'); return wbQ(+p[0],+p[1]);
+}
+function weakKeys(){return Object.keys(S.qs).filter(function(k){var r=S.qs[k];return r.m>0&&!r.ok;});}
+
+function makeQueue(mode,sec){
+  var out=[];
+  if(mode==='stage'){
+    var si=STAGES.map(function(x){return x.id;}).indexOf(sec);
+    MC.forEach(function(r,i){ if(r[0]===si) out.push(mcQ(i)); });
+    return shuffle(out);
+  }
+  if(mode==='test'){ MC.forEach(function(r,i){out.push(mcQ(i));}); return shuffle(out); }
+  if(mode==='policy'){
+    var a=shuffle(POL.map(function(r,i){return i;}).filter(function(i){return POL[i][0]==='A';})).slice(0,6);
+    var b=shuffle(POL.map(function(r,i){return i;}).filter(function(i){return POL[i][0]==='S';})).slice(0,6);
+    return shuffle(a.concat(b)).map(polQ);
+  }
+  if(mode==='match'){
+    shuffle(WB.map(function(x,i){return i;})).slice(0,5).forEach(function(g){ shuffle([0,1,2,3]).forEach(function(j){out.push(wbQ(g,j));}); });
+    return out;
+  }
+  if(mode==='weak'){ return shuffle(weakKeys()).slice(0,12).map(qFromKey); }
+  return out;
+}
+
+/* ---------------- TOAST / FX ---------------- */
+var toastQ=[],toastBusy=false;
+function toast(ic,txt){toastQ.push([ic,txt]);if(!toastBusy) nextToast();}
+function nextToast(){
+  var t=toastQ.shift(); if(!t){toastBusy=false;return;}
+  toastBusy=true; $('toastIc').textContent=t[0]; $('toastTxt').textContent=t[1];
+  $('toast').classList.add('show'); SFX.troph();
+  setTimeout(function(){$('toast').classList.remove('show');setTimeout(nextToast,400);},2600);
+}
+function award(id){
+  if(S.trophies[id]) return false;
+  S.trophies[id]=Date.now();
+  var t=TROPHIES.filter(function(x){return x.id===id;})[0];
+  if(t) toast(t.ic,t.n);
+  return true;
+}
+function confetti(n){
+  var cols=['#004AA0','#C8102E','#ffcc33','#ffffff','#2a7bff'];
+  for(var i=0;i<n;i++){
+    var c=document.createElement('div'); c.className='confetti';
+    c.style.left=(Math.random()*100)+'vw'; c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(1.6+Math.random()*1.6)+'s'; c.style.animationDelay=(Math.random()*.4)+'s';
+    document.body.appendChild(c); (function(el){setTimeout(function(){el.remove();},3800);})(c);
+  }
+}
+function popAt(el,txt){
+  var r=el.getBoundingClientRect(), p=document.createElement('div');
+  p.className='pop'; p.textContent=txt; p.style.left=(r.left+r.width/2)+'px'; p.style.top=(r.top)+'px';
+  document.body.appendChild(p); setTimeout(function(){p.remove();},950);
+}
+function flashRed(){var f=$('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');}
+
+/* ---------------- TOP BAR ---------------- */
+function syncToggles(){
+  $('btnMute').textContent='Sound: '+(S.mute?'Off':'On'); $('btnMute').classList.toggle('on',!S.mute);
+  $('btnRelax').textContent='Relaxed Levels: '+(S.relaxed?'On':'Off'); $('btnRelax').classList.toggle('on',S.relaxed);
+}
+$('btnMute').onclick=function(){S.mute=!S.mute;persist();syncToggles();SFX.click();};
+$('btnRelax').onclick=function(){ if(OF&&OF.state==='play') return; S.relaxed=!S.relaxed;persist();syncToggles();SFX.click();};
+$('btnWords').onclick=function(){
+  if(G&&G.active) return;
+  var h='<div class="res-title" style="font-size:15px">UNIT 6 WORD LIST</div><div class="gl">';
+  GLOSS.forEach(function(d){h+='<h4>'+esc(d[0].toUpperCase())+'</h4><dl>'+d[1].map(function(t){return '<dt>'+esc(t[0])+'</dt><dd>'+esc(t[1])+'</dd>';}).join('')+'</dl>';});
+  h+='</div><div class="btnrow"><button class="big blue" id="modalOk" type="button">CLOSE</button></div>';
+  $('modalBody').className='panel wide'; $('modalBody').innerHTML=h; $('modal').classList.add('on'); $('modalOk').onclick=closeModal;
+};
+
+/* ---------------- TITLE ---------------- */
+function startTitle(){
+  if(S.name){ $('nameBox').innerHTML='<p style="font-size:20px;margin:26px 0 22px">Welcome back, <b>'+esc(S.name)+'</b>.</p>'; }
+  show('scrTitle');
+}
+$('btnStart').onclick=function(){
+  var inp=$('nameInput');
+  if(inp&&!S.name){var v=inp.value.trim().replace(/\s+/g,' ');
+    if(!v){inp.focus();inp.style.borderColor='#C8102E';return;}
+    S.name=v.slice(0,30);persist();}
+  ac(); SFX.go(); renderHub(); show('scrHub');
+};
+if($('nameInput')) $('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter') $('btnStart').click();});
+
+/* ---------------- HUB ---------------- */
+var TICKS=[['FIAT','▲ TRUST'],['GOLD STD','▼ 1933'],['FDIC','▲ INSURED'],['FOMC','8 MTGS/YR'],['M1','CASH+CHECKING'],['M2','M1+SAVINGS'],['BONDS','▼ WHEN RATES ▲'],['STOCKS','YOU OWN'],['BONDS','YOU LEND'],['JUNK','▲ RISK ▲ RATE'],['FED','LENDER OF LAST RESORT'],['FISHERS','7TH DISTRICT']];
+function starsHtml(n,max){var h='';for(var i=0;i<(max||3);i++) h+='<span class="star'+(i<n?' on':'')+'">★</span>';return h;}
+function renderHub(){
+  $('tickerTxt').innerHTML=TICKS.concat(TICKS).map(function(t){return esc(t[0])+' <b>'+esc(t[1])+'</b>';}).join(' &nbsp;·&nbsp; ');
+  var r=rankFor(S.xp),ri=rankIndex(S.xp),next=RANKS[ri+1];
+  $('hubBadge').textContent=r.ic; $('hubName').textContent=S.name||'Player'; $('hubRank').textContent=r.name.toUpperCase();
+  if(next){$('hubXpBar').style.width=((S.xp-r.xp)/(next.xp-r.xp)*100)+'%';
+    $('hubXpNums').textContent=fmt(S.xp)+' XP · '+fmt(next.xp-S.xp)+' XP to '+next.name;}
+  else{$('hubXpBar').style.width='100%';$('hubXpNums').textContent=fmt(S.xp)+' XP · Top rank reached';}
+  $('hubStars').textContent=totalStars()+'/12';
+  $('hubTest').textContent=S.test.best>=0?S.test.best+'%':'--';
+  $('hubTroph').textContent=trophyCount()+'/'+TROPHIES.length;
+  var g=$('stageGrid'); g.innerHTML='';
+  STAGES.forEach(function(sec,i){
+    var st=S.stages[sec.id],un=stageUnlocked(i);
+    var b=document.createElement('button'); b.type='button'; b.className='stage'+(un?'':' locked');
+    b.innerHTML='<div class="num">'+(i+1)+'</div>'+(un?'<div class="ic">'+sec.ic+'</div>':'')+'<div class="nm">'+esc(sec.name)+'</div><div class="ls">'+esc(sec.ls)+'</div><div class="stars">'+starsHtml(st.stars)+'</div>'+
+      '<div class="best">'+(st.pct>=0?'Best: '+st.pct+'% first try':'10 questions · not played')+'</div>';
+    b.onclick=function(){ if(!un){SFX.wrong();
+        if(S.stages[STAGES[i-1].id].stars<1) modalMsg('Locked','Earn at least 1 star on Stage '+i+' to unlock this stage.');
+        else modalMsg('Locked','Clear (or skip) '+OFFICE[i-1].name+' to unlock this stage.');
+        return;} startRound('stage',sec.id); };
+    g.appendChild(b);
+    if(i<OFFICE.length){
+      var od=OFFICE[i], rec=S.office[od.id], open=officeOpen(i), t=document.createElement('button'); t.type='button';
+      var cls=!open?'locked':rec.cleared?'done':rec.skipped?'skipped':officeDone(i)?'done':'ready';
+      t.className='otile '+cls;
+      t.innerHTML='<div class="oi">'+(open?od.ic:'🔒')+'</div><div>NYSE<br>LVL '+(i+1)+'</div>'+
+        (rec.cleared?'<div class="ost">'+starsHtml(rec.stars)+'</div>':rec.skipped?'<div>SKIPPED</div>':(open?'<div>PLAY</div>':''));
+      t.title=od.name;
+      (function(k,open){t.onclick=function(){ if(!open){SFX.wrong();modalMsg('Locked','Earn at least 1 star on Stage '+(k+1)+' to reach '+OFFICE[k].name+'.');return;} SFX.click(); openOffice(k); };})(i,open);
+      g.appendChild(t);
+    }
+  });
+  var mg=$('modeGrid'); mg.innerHTML='';
+  var weak=weakKeys();
+  var modes=[
+    {k:'test',cls:'test',ic:'📝',t:'FULL PRACTICE TEST',p:'All 40 practice questions in one sitting, mixed like the real exam. You get a score for each lesson so you know what to study.',
+      un:true,req:S.test.best>=0?('Best: '+S.test.best+'% first try'):'Not taken yet'},
+    {k:'policy',cls:'pol',ic:'🎛️',t:'POLICY DESK',p:'Fiscal or monetary? Expansionary or contractionary? 12 scenarios just like Parts 3 and 4 of the exam.',
+      un:true,req:S.pol.best>=0?('Best: '+S.pol.best+' of 12 first try'):'Not played yet'},
+    {k:'match',cls:'',ic:'🔤',t:'WORD BANK BLITZ',p:'5 word bank groups, 20 clues. Same setup as the vocabulary matching on Part 1 of the exam.',
+      un:true,req:S.wb.best>=0?('Best: '+S.wb.best+'% first try'):'Not played yet'},
+    {k:'weak',cls:'bossm',ic:'🔧',t:'MISSED QUESTIONS',p:'Replay every question you missed on the first try, from any mode, until you get it right.',
+      un:weak.length>0,req:weak.length?(weak.length+' question'+(weak.length===1?'':'s')+' to fix'):'Unlocks when you miss a question'}
+  ];
+  modes.forEach(function(md){
+    var b=document.createElement('button'); b.type='button'; b.className='mode '+md.cls+(md.un?'':' locked');
+    b.innerHTML='<span class="big2">'+md.ic+'</span><h3>'+md.t+'</h3><p>'+md.p+'</p><div class="req">'+md.req+'</div>';
+    b.onclick=function(){ if(!md.un){SFX.wrong();modalMsg(md.t,md.req+'.');return;} startRound(md.k); };
+    mg.appendChild(b);
+  });
+}
+$('btnTrophies').onclick=function(){SFX.click();renderTrophies();show('scrTrophies');};
+$('btnWardrobe').onclick=function(){SFX.click();pendingOffice=null;openWardrobe();};
+$('btnWardDone').onclick=function(){SFX.click();S.lookSet=true;persist();
+  if(pendingOffice!==null){var k=pendingOffice;pendingOffice=null;openOffice(k);} else {renderHub();show('scrHub');}};
+$('btnReport').onclick=function(){SFX.click();renderReport();show('scrReport');};
+Array.prototype.forEach.call(document.querySelectorAll('[data-go="hub"]'),function(b){b.onclick=function(){SFX.click();renderHub();show('scrHub');};});
+$('btnHelp').onclick=function(){
+  modalMsg('How it works',
+   '<p><b>Two chances:</b> miss a question and the screen flashes red. Take another look and try again. Miss it twice and the correct answer is shown with an explanation.</p>'+
+   '<p><b>Points:</b> right on the first try = 100 points plus a speed bonus, times your multiplier. Right on the second try = 40 points. There is no time limit.</p>'+
+   '<p><b>Multiplier:</b> every 3 first-try answers in a row raises it, up to x3. A miss resets it.</p>'+
+   '<p><b>Stars:</b> 60% first try = ★, 80% = ★★, 90% = ★★★.</p>'+
+   '<p><b>NYSE levels:</b> after each stage, survive a level inside the New York Stock Exchange to unlock the next stage. Fail a level 3 times and a Skip button appears. The Practice Test, Policy Desk, and Word Bank Blitz are always open.</p>'+
+   '<p>Keyboard: press 1 to 4 to answer, Enter for next.</p>',true);
+};
+$('btnReset').onclick=function(){
+  modalMsg('Reset progress?','<p>This erases your XP, stars, trophies, and scores on this device. It cannot be undone.</p>'+
+   '<div class="btnrow"><button class="big" id="confirmReset" type="button">ERASE</button><button class="big gray" id="cancelReset" type="button">CANCEL</button></div>',true,true);
+  $('confirmReset').onclick=function(){var m=S.mute;S=blankSave();S.mute=m;persist();closeModal();syncToggles();location.reload();};
+  $('cancelReset').onclick=closeModal;
+};
+function modalMsg(title,html,isHtml,noBtn){
+  $('modalBody').className='panel';
+  $('modalBody').innerHTML='<div class="res-title" style="font-size:15px">'+esc(title)+'</div><div style="font-size:15px;line-height:1.5">'+(isHtml?html:'<p>'+esc(html)+'</p>')+'</div>'+
+    (noBtn?'':'<div class="btnrow"><button class="big blue" id="modalOk" type="button">OK</button></div>');
+  $('modal').classList.add('on');
+  if(!noBtn) $('modalOk').onclick=closeModal;
+}
+function closeModal(){$('modal').classList.remove('on');}
+$('modal').addEventListener('click',function(e){ if(e.target===$('modal')&&$('modalOk')) closeModal(); });
+
+/* ---------------- ROUND ENGINE ---------------- */
+var G=null, bonusRaf=null;
+var MODE_LABEL={test:'PRACTICE TEST',policy:'POLICY DESK',match:'WORD BANK BLITZ',weak:'MISSED QUESTIONS'};
+function startRound(mode,sec){
+  ac();
+  var q=makeQueue(mode,sec); if(!q.length){renderHub();show('scrHub');return;}
+  G={active:false,mode:mode,sec:sec||null,q:q,idx:0,score:0,streak:0,bestStreak:0,first:0,answered:0,times:[],missed:[],bySec:{},paused:false};
+  var st=STAGES.filter(function(s){return s.id===sec;})[0];
+  $('hudMode').textContent=mode==='stage'?('STAGE '+(STAGES.indexOf(st)+1)+' · '+st.name.toUpperCase()):MODE_LABEL[mode];
+  show('scrPlay'); $('prompt').innerHTML=''; $('opts').innerHTML=''; $('fbArea').innerHTML=''; $('nextRow').style.display='none'; updHud();
+  countdown(3,function(){ if(!G) return; G.active=true; ask(); });
+}
+function countdown(n,cb){
+  var el=$('countdown'); el.classList.add('on');
+  (function step(k){
+    if(k===0){el.textContent='GO!';SFX.go();setTimeout(function(){el.classList.remove('on');cb();},450);return;}
+    el.textContent=k;SFX.count();setTimeout(function(){step(k-1);},650);
+  })(n);
+}
+function multFor(s){return Math.min(3,1+Math.floor(s/3)*0.5);}
+function updHud(){
+  $('hudScore').textContent=fmt(G.score);
+  var m=multFor(G.streak); $('hudMult').textContent='x'+m; $('hudMult').classList.toggle('hot',m>=2);
+  $('hudStreak').textContent='STREAK '+G.streak; $('hudFirst').textContent='FIRST TRY '+G.first;
+  $('hudProg').textContent=Math.min(G.idx+1,G.q.length)+' / '+G.q.length;
+}
+var BONUS_MS=25000, qStart=0, cur=null;
+function bonusLoop(now){
+  if(!G||!G.active||!cur||cur.done) return;
+  if(G.paused){bonusRaf=requestAnimationFrame(bonusLoop);return;}
+  var f=Math.max(0,1-(now-qStart)/BONUS_MS);
+  $('timerFill').style.transform='scaleX('+f+')';
+  $('timer').className='timer'+(f===0?' danger':f<.35?' warn':'');
+  if(f>0) bonusRaf=requestAnimationFrame(bonusLoop);
+}
+function ask(){
+  cur=G.q[G.idx]; cur.tries=0; cur.done=false;
+  var pr=$('prompt'), op=$('opts');
+  pr.classList.remove('shake');
+  pr.innerHTML='<span class="tag">'+esc(cur.tag)+'</span><span class="qn">'+esc(cur.secName)+'</span>'+cur.html;
+  op.className='opts list'+(cur.fixed?' fixed':''); op.innerHTML='';
+  cur.opts.forEach(function(o,k){
+    var b=document.createElement('button'); b.type='button'; b.className='opt';
+    b.innerHTML='<span class="k">'+'ABCD'.charAt(k)+'</span>'+esc(o);
+    b.onclick=function(){answer(k);};
+    op.appendChild(b);
+  });
+  $('fbArea').innerHTML=''; $('nextRow').style.display='none';
+  qStart=performance.now(); cancelAnimationFrame(bonusRaf); bonusRaf=requestAnimationFrame(bonusLoop);
+  updHud();
+}
+function track(q,firstTry){
+  var k=q.sec; G.bySec[k]=G.bySec[k]||{n:0,r:0,name:q.secName}; G.bySec[k].n++; if(firstTry) G.bySec[k].r++;
+  var rec=S.qs[q.key]||{m:0,ok:false};
+  if(firstTry){ if(rec.m>0||G.mode==='weak') rec.ok=true; } else { rec.m++; rec.ok=false; }
+  if(rec.m>0) S.qs[q.key]=rec;
+}
+function answer(k){
+  if(!G||!G.active||G.paused||!cur||cur.done) return;
+  var btns=$('opts').children, b=btns[k]; if(!b||b.disabled) return;
+  var right=cur.opts[k]===cur.ans, ci=cur.opts.indexOf(cur.ans);
+  if(right){
+    cur.done=true; cancelAnimationFrame(bonusRaf);
+    var el=performance.now()-qStart, firstTry=cur.tries===0, pts;
+    for(var i=0;i<btns.length;i++){btns[i].disabled=true; if(i!==k&&!btns[i].classList.contains('wrong')) btns[i].classList.add('dim');}
+    b.classList.add('right');
+    G.answered++; S.totalAnswered++;
+    if(firstTry){
+      G.first++; S.totalFirst++; G.streak++; G.times.push(el);
+      if(G.streak>G.bestStreak) G.bestStreak=G.streak; if(G.streak>S.bestStreak) S.bestStreak=G.streak;
+      var speed=Math.round(100*Math.max(0,1-el/BONUS_MS)); pts=Math.round((100+speed)*multFor(G.streak));
+      SFX.right(G.streak); if(G.streak%3===0) setTimeout(SFX.streak,120);
+      if(G.streak>=10) award('streak10'); if(G.streak>=25) award('streak25');
+    } else { pts=40; SFX.right(1); }
+    G.score+=pts; popAt(b,'+'+pts); track(cur,firstTry);
+    $('fbArea').innerHTML='<div class="fbbox ok"><span class="h">✔ '+(firstTry?'CORRECT!':'GOT IT ON TRY 2')+'</span>'+cur.why+'</div>';
+    showNext();
+  } else {
+    cur.tries++; G.streak=0; b.classList.add('wrong'); b.disabled=true;
+    flashRed(); SFX.wrong(); var pr=$('prompt'); pr.classList.remove('shake'); void pr.offsetWidth; pr.classList.add('shake');
+    if(cur.tries===1){
+      $('fbArea').innerHTML='<div class="fbbox try"><span class="h">✖ NOT QUITE · ONE MORE TRY</span>Reread the question and think about which answer fits best. Your streak reset, but you can still earn points.</div>';
+    } else {
+      cur.done=true; cancelAnimationFrame(bonusRaf); G.answered++; S.totalAnswered++;
+      for(var j=0;j<btns.length;j++){btns[j].disabled=true; if(j===ci) btns[j].classList.add('reveal'); else if(!btns[j].classList.contains('wrong')) btns[j].classList.add('dim');}
+      track(cur,false); G.missed.push(cur);
+      $('fbArea').innerHTML='<div class="fbbox no"><span class="h">THE CORRECT ANSWER IS '+'ABCD'.charAt(ci)+'</span><p style="margin:0 0 8px;font-weight:bold;color:#8dffb8">'+esc(cur.ans)+'</p>'+cur.why+'</div>';
+      showNext();
+    }
+    updHud();
+  }
+  persist(); updHud();
+}
+function showNext(){
+  $('nextRow').style.display='block'; $('btnNext').textContent=G.idx+1>=G.q.length?'SEE RESULTS ▶':'NEXT ▶';
+  setTimeout(function(){var n=$('btnNext'); if(n&&n.scrollIntoView) n.scrollIntoView({behavior:'smooth',block:'nearest'});},60);
+}
+$('btnNext').onclick=function(){ if(!G||!G.active||!cur||!cur.done) return; SFX.click(); G.idx++; if(G.idx>=G.q.length){finish();return;} ask(); window.scrollTo(0,0); };
+$('btnQuit').onclick=function(){
+  if(!G||!G.active||G.paused) return;
+  G.paused=true; var t0=performance.now();
+  modalMsg('Quit this round?','<p>Missed questions are saved for the Missed Questions mode, but you will not earn stars or XP for this round.</p>'+
+    '<div class="btnrow"><button class="big" id="qYes" type="button">QUIT</button><button class="big gray" id="qNo" type="button">KEEP PLAYING</button></div>',true,true);
+  $('qYes').onclick=function(){closeModal();G.active=false;G=null;renderHub();show('scrHub');};
+  $('qNo').onclick=function(){closeModal(); qStart+=performance.now()-t0; G.paused=false;};
+};
+document.addEventListener('keydown',function(e){
+  if(!$('scrPlay').classList.contains('on')||$('modal').classList.contains('on')||!G||!G.active) return;
+  var n=parseInt(e.key,10);
+  if(n>=1&&n<=4&&cur&&!cur.done){answer(n-1);return;}
+  if((e.key==='Enter'||e.key===' ')&&cur&&cur.done){e.preventDefault();$('btnNext').click();}
+});
+
+/* ---------------- FINISH ---------------- */
+function secBars(bySec){
+  var ORD=['D33','D34','D35','D36','PA','PS','WB'];
+  return '<div class="secbars">'+Object.keys(bySec).sort(function(a,b){return ORD.indexOf(a)-ORD.indexOf(b);}).map(function(k){
+    var b=bySec[k], p=Math.round(b.r/b.n*100);
+    return '<div class="secrow"><span>'+esc(b.name)+'</span><div class="bar"><i style="width:'+p+'%;'+(p<70?'background:linear-gradient(90deg,#C8102E,#ff3355)':'')+'"></i></div><span class="pct">'+b.r+'/'+b.n+'</span></div>';}).join('')+'</div>';
+}
+function weakestSec(bySec){var w=null,wp=101;Object.keys(bySec).forEach(function(k){var p=bySec[k].r/bySec[k].n*100;if(p<wp){wp=p;w=bySec[k].name;}});return wp<80?w:null;}
+function finish(){
+  G.active=false; cancelAnimationFrame(bonusRaf);
+  var n=G.q.length, pct=Math.round(G.first/n*100), stars=pct>=90?3:pct>=80?2:pct>=60?1:0, bonus=0, title='ROUND COMPLETE', banners=[];
+  var oldRank=rankIndex(S.xp), m=G.mode;
+  if(m==='stage'){
+    var st=S.stages[G.sec];
+    if(stars>st.stars){bonus=(stars-st.stars)*100; st.stars=stars;}
+    if(G.score>st.best) st.best=G.score;
+    if(pct>st.pct){ if(st.pct>=0) banners.push('<div class="banner info">NEW PERSONAL BEST! UP FROM '+st.pct+'% TO '+pct+'%</div>'); st.pct=pct; }
+    if(pct===100) award('perfect');
+    if(allStagesAtLeast(1)) award('stars4'); if(allStagesAtLeast(3)) award('three4');
+    title=stars===3?'TRIPLE STAR!':stars>0?'STAGE CLEARED':'TRY AGAIN';
+  } else if(m==='test'){
+    var rec={pct:pct,bySec:G.bySec,at:Date.now(),first:G.first,n:n};
+    if(pct>S.test.best){ if(S.test.best>=0) banners.push('<div class="banner info">NEW BEST PRACTICE TEST: '+pct+'%</div>'); S.test.best=pct; S.test.bestRec=rec; bonus=200; }
+    S.test.last=rec; award('testdone'); if(pct>=80) award('test80'); if(pct>=95) award('test95');
+    title='PRACTICE TEST: '+pct+'%';
+  } else if(m==='policy'){
+    if(G.first>S.pol.best){S.pol.best=G.first;} if(G.first>=10) award('policy10'); if(G.first>=12) award('policy12');
+    title='POLICY DESK: '+G.first+' OF 12';
+  } else if(m==='match'){
+    if(pct>S.wb.best) S.wb.best=pct; if(pct===100) award('match');
+    title='WORD BANK BLITZ: '+pct+'%';
+  } else if(m==='weak'){
+    if(pct===100) award('weak'); title=pct===100?'ALL FIXED!':'KEEP AT IT';
+  }
+  if(G.score>=4000) award('record');
+  var xpGain=Math.round(G.score/10)+40+bonus, before=S.xp; S.xp+=xpGain; S.rounds++;
+  award('first'); if(S.rounds>=25) award('rounds25');
+  var newRank=rankIndex(S.xp); if(S.xp>=RANKS[3].xp) award('economist'); if(newRank===RANKS.length-1) award('chair');
+  persist();
+
+  $('resTitle').textContent=title;
+  if(m==='stage'){
+    $('resStars').innerHTML=starsHtml(stars); $('resCrit').textContent='★ 60%   ★★ 80%   ★★★ 90% right on the first try';
+    var ss=$('resStars').children;
+    for(var i=0;i<ss.length;i++)(function(k){setTimeout(function(){ss[k].classList.add('show'); if(k<stars) SFX.star(k);},300+k*350);})(i);
+    if(stars===3) setTimeout(function(){confetti(70);},1300);
+  } else {
+    $('resStars').innerHTML=''; $('resCrit').textContent=m==='test'?(pct>=80?'You are on track for the exam. Keep it sharp.':'Use the lesson scores below to decide what to study before the exam.'):'';
+    if(pct>=90) confetti(70);
+  }
+  $('resStats').innerHTML=[['Score',fmt(G.score)],['First try',G.first+'/'+n],['Best streak',G.bestStreak],['Missed twice',G.missed.length]].map(function(s){return '<div class="stat"><span>'+s[0]+'</span><b>'+s[1]+'</b></div>';}).join('');
+  var r=RANKS[newRank], nx=RANKS[newRank+1];
+  var p1=nx?((S.xp-r.xp)/(nx.xp-r.xp)*100):100, p0=nx&&newRank===oldRank?((before-r.xp)/(nx.xp-r.xp)*100):0;
+  $('resXp').innerHTML='<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><b>+'+fmt(xpGain)+' XP'+(bonus?' (includes '+bonus+' bonus)':'')+'</b><span class="muted">'+r.ic+' '+r.name+'</span></div>'+
+    '<div class="bar gold"><i id="resXpBar" style="width:'+p0+'%"></i></div><div class="xpnums">'+(nx?(fmt(nx.xp-S.xp)+' XP to '+nx.name):'Top rank reached')+'</div>';
+  setTimeout(function(){var bb=$('resXpBar'); if(bb) bb.style.width=p1+'%';},250);
+  if(newRank>oldRank){ banners.push('<div class="banner rank">PROMOTED! YOU ARE NOW: '+r.name.toUpperCase()+' '+r.ic+'</div>'); setTimeout(SFX.rank,900);
+    var ul=[]; for(var rr=oldRank+1;rr<=newRank;rr++) ul=ul.concat(unlocksAt(rr)); if(ul.length) banners.push('<div class="banner troph">NEW WARDROBE: '+esc(ul.join(', '))+'</div>'); }
+  var secHTML='';
+  if(m==='test'||m==='policy'||m==='weak'){
+    secHTML='<div class="review"><h4>SCORE BY '+(m==='policy'?'QUESTION TYPE':'SECTION')+'</h4></div>'+secBars(G.bySec);
+    var w=weakestSec(G.bySec); if(w&&m==='test') secHTML+='<div class="banner info">STUDY TIP: YOUR LOWEST LESSON WAS '+esc(w.toUpperCase())+'. REPLAY THAT STAGE BEFORE THE EXAM.</div>';
+  }
+  $('resSecs').innerHTML=secHTML;
+  $('resBanners').innerHTML=banners.join('');
+  var wrong=G.q.filter(function(q){return q.tries>0;});
+  $('resReview').innerHTML=wrong.length?'<h4>REVIEW THESE ('+wrong.length+')</h4>'+wrong.map(function(q){
+    return '<div class="rv"><span class="s">'+esc(q.secName.toUpperCase())+(q.tries>=2?' · MISSED TWICE':' · GOT IT ON TRY 2')+'</span>'+esc(q.txt)+'<br><span class="a">Answer: '+esc(q.ans)+'</span><br>'+q.why+'</div>';}).join(''):'<h4 style="color:#22d36b">NO MISSES. PERFECT ROUND!</h4>';
+  var sec=G.sec;
+  $('btnRetry').textContent=(m==='weak'&&!weakKeys().length)?'ALL FIXED':'PLAY AGAIN';
+  $('btnRetry').onclick=function(){SFX.click(); if(m==='weak'&&!weakKeys().length){renderHub();show('scrHub');return;} startRound(m,sec);};
+  var nb=$('btnNextUp'), ki=STAGES.map(function(x){return x.id;}).indexOf(sec);
+  nb.style.display='none';
+  if(m==='stage'&&stars>=1&&ki>=0){
+    if(ki<OFFICE.length&&!officeDone(ki)){nb.style.display='';nb.textContent='NEXT: '+OFFICE[ki].name.toUpperCase();nb.onclick=function(){SFX.click();openOffice(ki);};}
+    else if(ki<OFFICE.length&&stageUnlocked(ki+1)){nb.style.display='';nb.textContent='NEXT: STAGE '+(ki+2);nb.onclick=function(){SFX.click();startRound('stage',STAGES[ki+1].id);};}
+    else if(ki===STAGES.length-1){nb.style.display='';nb.textContent='TAKE THE PRACTICE TEST';nb.onclick=function(){SFX.click();startRound('test');};}
+  }
+  show('scrResults');
+}
+$('btnToHub').onclick=function(){SFX.click();G=null;renderHub();show('scrHub');};
+
+/* ---------------- TROPHIES / REPORT ---------------- */
+function renderTrophies(){
+  $('trophCount').textContent=trophyCount()+' of '+TROPHIES.length+' collected';
+  $('trophGrid').innerHTML=TROPHIES.map(function(t){
+    var got=S.trophies[t.id];
+    return '<div class="troph'+(got?' got':'')+'"><div class="ic">'+t.ic+'</div><div><h5>'+(got?esc(t.n):'???')+'</h5><p>'+esc(t.h)+'</p>'+
+      (got?'<div class="when">Earned '+new Date(got).toLocaleDateString()+'</div>':'')+'</div></div>';
+  }).join('');
+}
+function stampTime(ms){var d=ms?new Date(ms):new Date();return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' at '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
+function renderReport(){
+  var r=rankFor(S.xp), done=S.test.best>=0;
+  var h='<div style="font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#003B80">'+esc(S.name||'Student')+'</div>';
+  h+=done?'<div class="stamp">PRACTICE TEST COMPLETE</div>':'<div class="stamp pend">IN PROGRESS</div>';
+  h+='<div class="rowx"><span>Rank</span><span>'+r.ic+' '+esc(r.name)+' · '+fmt(S.xp)+' XP</span></div>';
+  h+='<div class="rowx"><span>Stars earned</span><span>'+totalStars()+' of 12</span></div>';
+  h+='<div class="rowx"><span>Trophies</span><span>'+trophyCount()+' of '+TROPHIES.length+'</span></div>';
+  h+='<div class="rowx"><span>Questions to fix (missed questions list)</span><span>'+weakKeys().length+'</span></div>';
+  h+='<h3>Practice test stages (best first-try score)</h3>';
+  STAGES.forEach(function(s,i){var st=S.stages[s.id];h+='<div class="rowx"><span>Stage '+(i+1)+': '+esc(s.name)+'</span><span>'+(st.pct>=0?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.pct+'%':'Not played')+'</span></div>';});
+  h+='<h3>Test prep modes</h3>';
+  h+='<div class="rowx"><span>Full Practice Test (40 questions)</span><span>'+(done?'Best '+S.test.best+'% · Last '+S.test.last.pct+'% on '+stampTime(S.test.last.at):'Not taken')+'</span></div>';
+  h+='<div class="rowx"><span>Policy Desk</span><span>'+(S.pol.best>=0?'Best '+S.pol.best+' of 12':'Not played')+'</span></div>';
+  h+='<div class="rowx"><span>Word Bank Blitz</span><span>'+(S.wb.best>=0?'Best '+S.wb.best+'%':'Not played')+'</span></div>';
+  if(done&&S.test.bestRec){ h+='<p style="margin:10px 0 0;font-weight:bold">Best practice test by lesson:</p>'+secBars(S.test.bestRec.bySec); var w=weakestSec(S.test.bestRec.bySec); if(w) h+='<p><b>Study before the exam:</b> '+esc(w)+'</p>'; }
+  h+='<h3>NYSE levels</h3>';
+  OFFICE.forEach(function(o){var rc=S.office[o.id];h+='<div class="rowx"><span>'+esc(o.name)+'</span><span>'+(rc.cleared?('★'.repeat(rc.stars)+'☆'.repeat(3-rc.stars)+'  best '+fmtTime(rc.best)):(rc.skipped?'Skipped':'Not cleared'))+'</span></div>';});
+  var acc=S.totalAnswered?Math.round(S.totalFirst/S.totalAnswered*100):0;
+  h+='<div class="rowx"><span>Lifetime first-try accuracy</span><span>'+acc+'%</span></div>';
+  h+='<div class="rowx"><span>Longest streak</span><span>'+S.bestStreak+'</span></div>';
+  h+='<p class="note">Saved on this device only. Screen shown '+stampTime()+'.</p>';
+  $('reportBody').innerHTML=h;
+}
+
+/* ---------------- OFFICE ENGINE ---------------- */
+/* =====================================================================
+   NYSE LEVELS: isometric action levels between practice test stages (engine from the Unit 5 Vocab Arcade)
+   ===================================================================== */
+var HW=32, HH=16, WALL_H=24, STEP=1/60;
+var P_SPEED=5.2, DASH_SPEED=15, P_RAD=0.26;
+
+/* ---------- shared sprite helpers (same look as Market Quest) ---------- */
+function shadeColor(hex,amount){
+  amount=amount||0.28;
+  var n=parseInt(hex.replace('#',''),16), r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return 'rgb('+Math.round(r*(1-amount))+','+Math.round(g*(1-amount))+','+Math.round(b*(1-amount))+')';
+}
+function drawShadedRect(ctx,x,y,w,h,color){
+  ctx.fillStyle=color; ctx.fillRect(x,y,w,h);
+  var sw=Math.max(1,w*0.35);
+  ctx.fillStyle=color.charAt(0)==='#'?shadeColor(color):color; ctx.fillRect(x+w-sw,y,sw,h);
+  ctx.strokeStyle='#14181C'; ctx.lineWidth=1; ctx.strokeRect(x+0.5,y+0.5,Math.max(0,w-1),Math.max(0,h-1));
+}
+
+/* ---------- wardrobe ---------- */
+var SUITS=[['Navy','#1F2E4D',0],['Charcoal','#3A3F47',0],['Black','#191B20',0],['Gray','#7D838C',0],['Royal Blue','#004AA0',0],
+  ['Maroon','#6B1A2A',1],['Forest','#1F4D36',2],['Pinstripe','#2B3240',3],['Tan','#B08A5A',4],['White','#E4E8EE',5],['HSE Red','#A80E27',6],['Gold','#C9A227',7]];
+var TIES=[['HSE Red','#C8102E',0],['Royal Blue','#2A64C8',0],['Black','#15171B',0],['Green','#1E8E5A',0],['Purple','#6A3FA0',0],
+  ['Gold','#E0B020',2],['Striped','#C8102E',4,'#F2F2F2'],['Royal Striped','#004AA0',6,'#E0B020']];
+var HAIRS=[['Black','#1B1B1F'],['Dark Brown','#3B2618'],['Brown','#6B4423'],['Auburn','#8A3A1E'],['Blonde','#D8B35A'],['Gray','#9AA0A6']];
+var STYLES=['Short','Buzz','Curly','Long','Bun'];
+var SKINS=[['Light','#F3D2B3'],['Fair','#E8B888'],['Medium','#C98E62'],['Tan','#A86F45'],['Brown','#7E4E2E'],['Deep','#5A3520']];
+function findOpt(list,name){for(var i=0;i<list.length;i++) if(list[i][0]===name) return list[i]; return list[0];}
+function lookOf(L){
+  var s=findOpt(SUITS,L.suit), t=findOpt(TIES,L.tie);
+  return {suitHex:s[1],pin:L.suit==='Pinstripe',tieHex:t[1],tie2:t[3]||null,hairHex:findOpt(HAIRS,L.hair)[1],
+    style:STYLES.indexOf(L.hairStyle)>=0?L.hairStyle:'Short',skinHex:findOpt(SKINS,L.skin)[1]};
+}
+var MGR_LOOK={suitHex:'#1E5FB8',tieHex:'#ffcc33',hairHex:'#9AA0A6',style:'Buzz',skinHex:'#E8B888'};
+var MUG_LOOK={suitHex:'#C8102E',casual:true,pants:'#8C7A5B',hairHex:'#3B2618',style:'Curly',skinHex:'#A86F45',mug:true};
+
+function drawIntern(ctx,ox,oy,sc,L,facing,walking,phase){
+  facing=facing||'down';
+  function blk(x,y,w,h,c){drawShadedRect(ctx,ox+x*sc,oy+y*sc,w*sc,h*sc,c);}
+  function flat(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(ox+x*sc,oy+y*sc,w*sc,h*sc);}
+  var suit=L.suitHex, pants=L.casual?L.pants:suit, skin=L.skinHex, hair=L.hairHex, st=L.style, shirt='#F4F6F8';
+  var lL=walking&&phase===0, lR=walking&&phase===1;
+  if(st==='Long'&&facing!=='up'){blk(4,2,1,7,hair);blk(11,2,1,7,hair);}
+  blk(5,lL?12:13,3,lL?4:5,pants); blk(8,lR?12:13,3,lR?4:5,pants);
+  blk(5,lL?16:18,3,1,'#14181C'); blk(8,lR?16:18,3,1,'#14181C');
+  if(facing!=='left'){blk(13,7,2,6,suit);blk(13,12,2,1,skin);}
+  if(facing!=='right'){blk(1,7,2,6,suit);blk(1,12,2,1,skin);}
+  blk(3,7,10,6,suit);
+  if(L.pin){ctx.fillStyle='rgba(255,255,255,.3)';for(var x=4;x<=12;x+=2) ctx.fillRect(ox+x*sc,oy+7.4*sc,Math.max(1,sc*0.2),5.3*sc);}
+  if(!L.casual){
+    var sh=shadeColor(suit,0.32);
+    if(facing==='down'){
+      flat(6,7,4,1,shirt); flat(6.8,8,2.4,2,shirt);
+      flat(5.9,7.5,0.9,3.3,sh); flat(9.2,7.5,0.9,3.3,sh);
+      blk(7.4,7,1.2,1,L.tieHex); blk(7.5,8,1,3.4,L.tieHex); flat(7.7,11.4,0.6,0.5,L.tieHex);
+      if(L.tie2){flat(7.5,8.7,1,0.35,L.tie2);flat(7.5,9.7,1,0.35,L.tie2);flat(7.5,10.7,1,0.35,L.tie2);}
+    }else if(facing==='left'){
+      flat(3.4,7,2.4,2,shirt); blk(4,7.6,1,3.6,L.tieHex); if(L.tie2){flat(4,8.6,1,.35,L.tie2);flat(4,9.8,1,.35,L.tie2);}
+    }else if(facing==='right'){
+      flat(10.2,7,2.4,2,shirt); blk(11,7.6,1,3.6,L.tieHex); if(L.tie2){flat(11,8.6,1,.35,L.tie2);flat(11,9.8,1,.35,L.tie2);}
+    }else{ flat(7.8,9.6,0.4,3.3,sh); }
+  }else if(facing==='down'){ flat(6,7,4,1,shadeColor(suit,0.25)); }
+  if(L.mug&&facing!=='left'){blk(13.3,10.6,1.8,1.8,'#F2F2F2');flat(13.5,10.7,1.4,.4,'#6B4423');}
+  blk(5,1,6,6,skin);
+  if(facing==='down'){blk(6,4,1,1,'#14181C');blk(9,4,1,1,'#14181C');}
+  else if(facing==='left'){blk(6,4,1,1,'#14181C');}
+  else if(facing==='right'){blk(9,4,1,1,'#14181C');}
+  if(facing==='up'){
+    blk(5,1,6,st==='Buzz'?3.5:5,hair);
+    if(st==='Long') blk(4,2,8,6,hair);
+    if(st==='Bun') blk(7,-0.6,2,1.6,hair);
+    if(st==='Curly') blk(4.5,0,7,3,hair);
+  }else{
+    if(st==='Buzz') blk(5,1,6,1,hair);
+    else if(st==='Curly'){blk(4.5,0,7,2.4,hair);flat(4.6,-0.5,1.5,.7,hair);flat(7.2,-0.6,1.6,.7,hair);flat(9.9,-0.5,1.5,.7,hair);}
+    else {blk(5,1,6,1.7,hair); if(st==='Bun') blk(7,-0.6,2,1.6,hair);}
+    if(st==='Short'){ if(facing!=='right') flat(5,2.6,0.8,1.3,hair); if(facing!=='left') flat(10.2,2.6,0.8,1.3,hair); }
+    if(facing==='left') blk(9.6,1,1.4,st==='Long'?6:3.6,hair);
+    if(facing==='right') blk(5,1,1.4,st==='Long'?6:3.6,hair);
+  }
+}
+
+/* ---------- level data ---------- */
+/* ---------- NYSE hazard types ----------
+   RUSH  : a pack of traders sprints down one lane of the hall (the lane flashes red first)
+   SWEEP : a ticker boom swings around a trading post
+   TILES : the price board floor lights up red ('wave' = a band that rolls along, 'checker' = alternating tiles)
+   RING  : a bell sends out a shockwave ring (dash through it or stay out of its reach)
+   BEAR  : a bear that lumbers after you inside its room
+   BULL  : a bull that lines up with you, paws the floor, then charges
+*/
+function RUSH(v,per,off,dir,n){return {t:'rush',v:v,per:per,off:off||0,dir:dir||1,n:n||2};}
+function SWEEP(u,v,len,spd,ph){return {t:'sweep',u:u,v:v,len:len,spd:spd,ph:ph||0};}
+function TILES(u0,u1,v0,v1,mode,a,b,off){return {t:'tiles',u0:u0,u1:u1,v0:v0,v1:v1,mode:mode,a:a,b:b,off:off||0};}
+function RING(u,v,per,off,maxR){return {t:'ring',u:u,v:v,per:per,off:off||0,maxR:maxR||4};}
+function BEAR(u,v,ua,ub,sp){return {t:'bear',u:u,v:v,ua:ua,ub:ub,sp:sp||2.4};}
+function BULL(u,v,ua,ub){return {t:'bull',u:u,v:v,ua:ua,ub:ub};}
+function LANES3(per,off,dir,n){return [RUSH(0.9,per,off,dir,n),RUSH(2.5,per,off+per/3,dir,n),RUSH(4.1,per,off+per*2/3,dir,n)];}
+
+var OFFICE=[
+ {id:'floor',name:'The Trading Floor',ic:'📊',floor:'concrete',goal:'EXIT',mult:1,par:32,cps:[2,4],
+  flavor:'Your first day as a floor runner. Cut through the crowded trading floor, from the big trading rooms to the narrow aisles, and reach the exit.',
+  hazards:['Packs of traders sprinting down the aisles (the lane flashes red first, so step into another lane)','Ticker booms swinging around the trading posts (time it or hug the wall)','Dash makes you untouchable for a split second'],
+  segs:[
+   {L:14,W:9,clips:[[3,2],[3,7],[9,1],[9,8],[12,4.5]],hz:[SWEEP(6,4,3.4,1.6,0)]},
+   {L:8,W:5,turn:false,off:2,clips:[[4,2.5],[6.5,0.9]],hz:LANES3(3.6,0,-1,2)},
+   {L:16,W:11,turn:false,off:-3,props:[[14,2,'post'],[14,8,'post']],clips:[[2,1],[2,9.5],[7,5.5],[12,1],[12,9.5],[15,5.5]],donuts:[[8,10]],
+    hz:[SWEEP(4,3,3.2,1.8,0),SWEEP(4,7,3.2,-1.8,0.8),SWEEP(10,5,3.6,1.4,1.6)]},
+   {L:12,W:5,clips:[[3,2.5],[7,0.9],[10,4.1]],hz:LANES3(3.6,0.4,-1,3)},
+   {L:18,W:9,clips:[[2,2],[7,7],[9,1],[14,4.5],[16,7]],donuts:[[16,1.5]],
+    hz:[SWEEP(4,4,3.3,2.0,0),SWEEP(11,4,3.3,-2.0,1),RUSH(0.8,4.0,0,1,3),RUSH(8.2,4.0,2,-1,3)]},
+   {L:10,W:5,turn:false,off:2,clips:[[3,0.9],[5,2.5],[8,4.1]],hz:LANES3(3.0,1,1,2)},
+   {L:14,W:9,turn:false,off:-2,clips:[[2,1],[2,8],[7,4.5],[11,1],[11,8]],hz:[SWEEP(4,4,3.4,2.2,0),SWEEP(9,4,3.4,-2.2,0.5)]}
+  ]},
+ {id:'bond',name:'The Bond Room',ic:'📜',floor:'carpet',goal:'EXIT',mult:1.05,par:36,cps:[2,4],
+  flavor:'The floor of the Bond Room is one giant price board, and the bears have gotten loose. Read the board, keep moving, and do not let a bear market catch you.',
+  hazards:['Price board floors: orange means a red band is coming, red means get off it','Checkerboard floors that switch which squares are dangerous','Bears that lumber after you inside their rooms (you are faster, so keep moving)','A ticker boom guarding the vault room'],
+  segs:[
+   {L:12,W:7,clips:[[2,3.5],[6,1],[9,5.5]],hz:[TILES(3,11,0,7,'wave',3.0,6,0)]},
+   {L:16,W:7,clips:[[3,1.5],[6,5.5],[10,1.5],[13,5.5]],donuts:[[15,3.5]],hz:[TILES(1,15,0,3.5,'wave',-3.0,7,0),TILES(1,15,3.5,7,'wave',-3.0,7,3.5)]},
+   {L:10,W:11,props:[[5,1,'cabinet'],[5,9,'cabinet']],clips:[[3,5.5],[8,1],[8,10]],donuts:[[9,5.5]],hz:[BEAR(7,5.5,2,9.5,2.3)]},
+   {L:12,W:5,turn:false,off:3,clips:[[3,1],[6,3],[9,1]],hz:[TILES(1,11,0,5,'checker',1.6,0)]},
+   {L:14,W:11,turn:false,off:-3,props:[[2,1,'cabinet'],[2,9,'cabinet']],clips:[[4,1],[4,10],[10,1],[10,10],[12,5.5]],donuts:[[13,1]],
+    hz:[BEAR(5,2,1,13,2.4),BEAR(10,9,1,13,2.0),SWEEP(7,5,3.0,1.5,0)]},
+   {L:20,W:7,clips:[[3,1],[7,5.5],[11,1],[15,5.5],[18,3.5]],hz:[TILES(1,19,0,7,'wave',3.6,8,0),RUSH(3.5,3.4,0,-1,2)]},
+   {L:12,W:9,clips:[[2,1],[5,7.5],[9,1.5]],hz:[TILES(1,11,0,9,'checker',1.3,0.6),BEAR(8,4.5,1,11,2.6)]}
+  ]},
+ {id:'bell',name:'Race to the Opening Bell',ic:'🔔',floor:'wood',goal:'BELL',mult:1.1,par:42,cps:[2,4,6],
+  flavor:'The big leagues. Bulls are charging, bells are ringing, and the bear market is right behind you. Reach the podium and ring the Opening Bell.',
+  hazards:['Bulls that line up with you, paw the floor, then charge (step out of their line)','Bells that send out shockwave rings (dash through the ring or stay out of reach)','Price board floors and stampeding traders from the lower levels','THE BEAR MARKET: a red wall chasing you in the final stretch'],
+  deadline:{from:7,speed:3.3},
+  segs:[
+   {L:10,W:7,clips:[[2,1],[4,5.5],[8,1]],hz:[RING(6,3,2.6,0,4.5)]},
+   {L:14,W:9,turn:false,off:-1,clips:[[3,1],[7,7.5],[11,2],[12,7.5]],hz:[BULL(10,4.5,1,13)]},
+   {L:16,W:5,clips:[[3,2.5],[6,0.9],[11,4.1],[14,2.5]],donuts:[[13,0.9]],hz:[RUSH(0.9,3.4,0,1,2),RUSH(4.1,3.4,1.7,1,2),RING(8,2,3.0,1,3)]},
+   {L:12,W:11,clips:[[2,1],[2,10],[6,5.5],[10,1],[10,10]],hz:[BULL(4,3,1,11),BULL(8,8,1,11)]},
+   {L:10,W:5,turn:false,off:3,clips:[[2,0.9],[5,4.1],[8.5,0.9]],hz:[RING(3,2,2.2,0,3.5),RING(7,2,2.2,1.1,3.5)]},
+   {L:16,W:9,turn:false,off:-2,clips:[[3,1],[7,7.5],[11,1],[14,4.5]],donuts:[[14,1]],hz:[TILES(1,15,0,9,'checker',1.4,0),BEAR(10,4.5,2,15,2.4)]},
+   {L:14,W:7,clips:[[2,3.5],[7,1],[7,6],[12,3.5]],hz:[SWEEP(4,3,2.9,2.2,0),SWEEP(10,3,2.9,-2.2,0.7)]},
+   {L:22,W:7,clips:[[3,1],[6,5.5],[10,1],[14,5.5],[19,3.5]],hz:[RUSH(1.0,3.0,0,1,2),RUSH(6.0,3.0,1.5,1,2),BULL(12,3.5,1,21),SWEEP(17,3,2.4,2.4,0)]}
+  ]}
+];
+var RUN_LOOKS=[{suitHex:'#1E5FB8',tieHex:'#ffcc33',hairHex:'#1B1B1F',style:'Short',skinHex:'#C98E62'},
+  {suitHex:'#C8102E',tieHex:'#F2F2F2',hairHex:'#6B4423',style:'Curly',skinHex:'#E8B888'},
+  {suitHex:'#1F8E5A',tieHex:'#15171B',hairHex:'#D8B35A',style:'Bun',skinHex:'#7E4E2E'}];
+
+var PAL={
+ concrete:{bg:'#060b16',f1:'#3B4C6B',f2:'#364663',tex:'#2E3D58',wt:'#1C2740',wl:'#2A3A5E',wr:'#22304D',trim:'#C8102E'},
+ carpet:{bg:'#071510',f1:'#2E5A47',f2:'#2A5442',tex:'#244A3A',wt:'#D9D2BE',wl:'#A79E86',wr:'#8C846E',trim:'#C9A227'},
+ wood:{bg:'#110b09',f1:'#6E4E35',f2:'#674931',tex:'#58402B',wt:'#3A2B22',wl:'#5A4130',wr:'#47331F',trim:'#C9A227'}
+};
+
+/* ---------- geometry ---------- */
+function lg(s,u,v){return s.dir==='c'?{c:s.c0+u,r:s.r0+v}:{c:s.c0+v,r:s.r0+u};}
+function gl(s,c,r){return s.dir==='c'?{u:c-s.c0,v:r-s.r0}:{u:r-s.r0,v:c-s.c0};}
+function lv(s,du,dv){return s.dir==='c'?{c:du,r:dv}:{c:dv,r:du};}
+function screenToGrid(sx,sy){return {c:(sx/HW+sy/HH)/2,r:(sy/HH-sx/HW)/2};}
+
+/* ---------- build ---------- */
+var OF=null;
+function buildOffice(k){
+  var def=OFFICE[k], segs=[], S0=0, prev=null;
+  def.segs.forEach(function(sd,i){
+    var L=sd.L||20, W=sd.W||7, dir, c0, r0;
+    if(!prev){dir='c';c0=0;r0=0;}
+    else if(sd.turn===false){dir=prev.dir; var off=sd.off||0; if(dir==='c'){c0=prev.c0+prev.L;r0=prev.r0+off;}else{r0=prev.r0+prev.L;c0=prev.c0+off;}}
+    else if(prev.dir==='c'){dir='r';c0=prev.c0+prev.L-W;r0=prev.r0+prev.W;}
+    else{dir='c';c0=prev.c0+prev.W;r0=prev.r0+prev.L-W;}
+    var s={k:i,L:L,W:W,dir:dir,c0:c0,r0:r0,S:S0,def:sd,last:i===def.segs.length-1};
+    s.cw=dir==='c'?L:W; s.rh=dir==='c'?W:L; segs.push(s); S0+=L; prev=s;
+  });
+  var mc=0,mr=0; segs.forEach(function(s){mc=Math.min(mc,s.c0);mr=Math.min(mr,s.r0);});
+  segs.forEach(function(s){s.c0+=2-mc;s.r0+=2-mr;});
+  var gw=0,gh=0; segs.forEach(function(s){gw=Math.max(gw,s.c0+s.cw);gh=Math.max(gh,s.r0+s.rh);}); gw+=3; gh+=3;
+  var grid=new Uint8Array(gw*gh), segOf=new Int16Array(gw*gh).fill(-1), propAt={}, devAt={};
+  segs.forEach(function(s){
+    for(var u=0;u<s.L;u++) for(var v=0;v<s.W;v++){var g=lg(s,u,v),idx=g.r*gw+g.c;grid[idx]=1;segOf[idx]=s.k;}
+  });
+  segs.forEach(function(s){
+    (s.def.props||[]).forEach(function(p){var g=lg(s,p[0],p[1]),idx=g.r*gw+g.c;grid[idx]=2;propAt[idx]=p[2];});
+    (s.def.hz||[]).forEach(function(h){ if(h.t==='sweep'||h.t==='ring'){var g=lg(s,h.u,h.v),idx=g.r*gw+g.c;grid[idx]=2;propAt[idx]=h.t==='sweep'?'post':'bellpost';} });
+  });
+  var last=segs[segs.length-1], eg=lg(last,last.L,Math.floor(last.W/2)), elevIdx=eg.r*gw+eg.c;
+  var O={k:k,def:def,pal:PAL[def.floor],segs:segs,gw:gw,gh:gh,grid:grid,segOf:segOf,propAt:propAt,devAt:devAt,elev:{c:eg.c,r:eg.r,idx:elevIdx},
+    hz:[],papers:[],drops:[],dspills:[],parts:[],floats:[],trail:[],clipsList:[],donutList:[],
+    time:0,ht:0,hits:0,stuns:0,clips:0,clipsTotal:0,state:'intro',cpSeg:0,shake:0,acc:0,last:0,raf:null,camX:0,camY:0,warn:null,
+    wave:def.deadline?{on:false,w:0,from:def.deadline.from,sp:def.deadline.speed}:null};
+  segs.forEach(function(s){
+    (s.def.hz||[]).forEach(function(h0){
+      var h={}; for(var key in h0) h[key]=h0[key]; h.s=s;
+      if(h.t==='sweep'){var pg=lg(s,h.u+0.5,h.v+0.5);h.pc=pg.c;h.pr=pg.r;h.a=h.ph;}
+      if(h.t==='ring'){var rg=lg(s,h.u+0.5,h.v+0.5);h.cc=rg.c;h.cr=rg.r;h.rr=-1;}
+      if(h.t==='bear'){h.hu=h.u;h.hv=h.v;h.cool=0;h.walk=0;h.fdu=-1;h.fdv=0;h.moving=false;}
+      if(h.t==='bull'){h.hu=h.u;h.hv=h.v;h.st='idle';h.tm=0;h.cd=1;h.fu=-1;h.cu=-1;h.walk=0;}
+      if(h.t==='rush'){h.rs=[];h.warn=false;}
+      O.hz.push(h);
+    });
+    (s.def.clips||[]).forEach(function(p){var g=lg(s,p[0],p[1]);O.clipsList.push({c:g.c,r:g.r,got:false});});
+    (s.def.donuts||[]).forEach(function(p){var g=lg(s,p[0],p[1]);O.donutList.push({c:g.c,r:g.r,got:false});});
+  });
+  O.clipsTotal=O.clipsList.length;
+  var maxH=S.relaxed?5:3, st=lg(segs[0],1.5,segs[0].W/2);
+  O.p={c:st.c,r:st.r,vc:0,vr:0,kbc:0,kbr:0,face:'down',fc:0.707,fr:0.707,walk:0,hearts:maxH,max:maxH,inv:0,stun:0,dashT:0,dashCd:0,dvc:0,dvr:0,segK:0};
+  O.cp={c:st.c,r:st.r,seg:0};
+  var pp=proj(st.c,st.r); O.camX=pp.x; O.camY=pp.y+40;
+  return O;
+}
+function proj(c,r){return {x:(c-r)*HW,y:(c+r)*HH};}
+function tileAt(c,r){var i=Math.floor(c),j=Math.floor(r);if(i<0||j<0||i>=OF.gw||j>=OF.gh)return 0;return OF.grid[j*OF.gw+i];}
+function solidAt(c,r){return tileAt(c,r)!==1;}
+function freeAt(c,r,R){return !solidAt(c-R,r-R)&&!solidAt(c+R,r-R)&&!solidAt(c-R,r+R)&&!solidAt(c+R,r+R);}
+function segAt(c,r){var i=Math.floor(c),j=Math.floor(r);if(i<0||j<0||i>=OF.gw||j>=OF.gh)return -1;return OF.segOf[j*OF.gw+i];}
+
+/* ---------- input ---------- */
+var okeys={}, dashReq=false, joy={on:false,x:0,y:0,mag:0,id:null};
+var ISO_AXES=[[Math.atan2(HH,HW),1,0],[Math.atan2(HH,-HW),0,1],[Math.atan2(-HH,-HW),-1,0],[Math.atan2(-HH,HW),0,-1]];
+function inputVec(){
+  if(window.__botDir){var bd=window.__botDir(); if(bd) return bd;}
+  var up=okeys.arrowup||okeys.w, dn=okeys.arrowdown||okeys.s, lf=okeys.arrowleft||okeys.a, rt=okeys.arrowright||okeys.d, dc=0, dr=0, mag=1;
+  if(up&&rt&&!dn&&!lf) dr=-1; else if(up&&lf&&!dn&&!rt) dc=-1; else if(dn&&rt&&!up&&!lf) dc=1; else if(dn&&lf&&!up&&!rt) dr=1;
+  else{var sx=(rt?1:0)-(lf?1:0),sy=(dn?1:0)-(up?1:0); if(sx||sy){var g=screenToGrid(sx,sy);dc=g.c;dr=g.r;}}
+  if(!dc&&!dr&&joy.on&&joy.mag>0.2){
+    var a=Math.atan2(joy.y,joy.x), snapped=false;
+    for(var i=0;i<ISO_AXES.length;i++){var d=Math.abs(Math.atan2(Math.sin(a-ISO_AXES[i][0]),Math.cos(a-ISO_AXES[i][0])));
+      if(d<0.3){dc=ISO_AXES[i][1];dr=ISO_AXES[i][2];snapped=true;break;}}
+    if(!snapped){var g2=screenToGrid(Math.cos(a),Math.sin(a));dc=g2.c;dr=g2.r;}
+    mag=Math.min(1,(joy.mag-0.2)/0.45+0.35);
+  }
+  var l=Math.hypot(dc,dr); if(!l) return {c:0,r:0,mag:0};
+  return {c:dc/l,r:dr/l,mag:mag};
+}
+
+/* ---------- hazards helpers ---------- */
+function inEllipseLocal(h,s,c,r){var q=gl(s,c,r),a=(q.u-h.u)/h.rx,b=(q.v-h.v)/h.ry;return a*a+b*b<=1;}
+function onSpill(c,r){
+  for(var i=0;i<OF.hz.length;i++){var h=OF.hz[i];if(h.t==='spill'&&Math.abs(h.s.k-OF.p.segK)<=1&&inEllipseLocal(h,h.s,c,r))return true;}
+  for(var j=0;j<OF.dspills.length;j++){var d=OF.dspills[j];if(inEllipseLocal(d,d.s,c,r))return true;}
+  return false;
+}
+function beltPush(c,r){
+  var pc=0,pr=0;
+  OF.hz.forEach(function(h){ if(h.t!=='belt'||Math.abs(h.s.k-OF.p.segK)>1) return;
+    var q=gl(h.s,c,r); if(q.u>=h.u0&&q.u<=h.u1&&q.v>=0&&q.v<=h.s.W){var g=lv(h.s,h.du,h.dv);pc+=g.c;pr+=g.r;}});
+  return {c:pc,r:pr};
+}
+function hurt(fc,fr,txt){
+  var P=OF.p; if(P.inv>0||P.dashT>0||OF.state!=='play') return false;
+  P.hearts--; OF.hits++; P.inv=1.15;
+  var dx=P.c-fc,dy=P.r-fr,l=Math.hypot(dx,dy)||1; P.kbc=dx/l*7; P.kbr=dy/l*7;
+  OF.shake=0.3; SFX.ohit(); floatTxt(P.c,P.r,txt||'OUCH!','#ff6680'); burst(P.c,P.r,'#ff6680',10);
+  if(P.hearts<=0) officeDie();
+  return true;
+}
+function floatTxt(c,r,t,col){OF.floats.push({c:c,r:r,t:t,col:col,a:0});}
+function burst(c,r,col,n,up){for(var i=0;i<n;i++){var a=Math.random()*Math.PI*2,sp=1+Math.random()*2.5;OF.parts.push({c:c,r:r,z:up||20,vc:Math.cos(a)*sp,vr:Math.sin(a)*sp,vz:60+Math.random()*90,col:col,life:0.7});}}
+function near(h){return Math.abs(h.s.k-OF.p.segK)<=1;}
+
+function tileState(h,u,v){
+  var t=OF.ht;
+  if(h.mode==='wave'){var sp=Math.abs(h.a),pos=((t*sp+h.off)%h.b+h.b)%h.b,along=h.a>0?(u-h.u0):(h.u1-u),d=((pos-along)%h.b+h.b)%h.b;return d<1.5?2:(d>h.b-2.2?1:0);}
+  var per=h.a,x=((t+h.b)%(per*2)+per*2)%(per*2),act=x<per?0:1,f=(x%per)/per,par=(Math.floor(u)+Math.floor(v))&1;
+  if(par!==act) return 0; return f<0.3?0:(f<0.58?1:2);
+}
+function nyseUpdate(O,P,dt,hdt){
+  O.hz.forEach(function(h){
+    var s=h.s, W=s.W, q;
+    if(h.t==='rush'){
+      var ph=((O.ht+h.off)%h.per+h.per)%h.per; h.warn=ph<1.0; h.rs=[];
+      if(ph>=1.0){var x=(ph-1.0)*11; for(var k=0;k<h.n;k++){var ru=h.dir>0?(-1+x-k*1.2):(s.L+1-x+k*1.2); if(ru>-1.5&&ru<s.L+1.5) h.rs.push(ru);}}
+      if(h.rs.length&&!h.snd&&s.k===P.segK){h.snd=true;SFX.odash();} if(!h.rs.length) h.snd=false;
+      if(near(h)){q=gl(s,P.c,P.r); h.rs.forEach(function(ru){ if(Math.abs(q.u-ru)<0.4+P_RAD&&Math.abs(q.v-h.v)<0.4+P_RAD){var g=lg(s,ru,h.v);hurt(g.c,g.r,'TRAMPLED!');} });}
+    }else if(h.t==='sweep'){
+      h.a=h.ph+O.ht*h.spd; h.ec=h.pc+Math.cos(h.a)*h.len; h.er=h.pr+Math.sin(h.a)*h.len;
+      if(near(h)){var dx=h.ec-h.pc,dy=h.er-h.pr,L2=dx*dx+dy*dy,tq=((P.c-h.pc)*dx+(P.r-h.pr)*dy)/L2; tq=Math.max(0.18,Math.min(1,tq));
+        var hx=h.pc+dx*tq,hy=h.pr+dy*tq; if(Math.hypot(hx-P.c,hy-P.r)<0.16+P_RAD) hurt(hx,hy,'WHACK!');}
+    }else if(h.t==='tiles'){
+      if(near(h)){q=gl(s,P.c,P.r); if(q.u>=h.u0&&q.u<h.u1&&q.v>=h.v0&&q.v<h.v1&&tileState(h,Math.floor(q.u)+0.5,Math.floor(q.v)+0.5)===2) hurt(P.c+P.fc,P.r+P.fr,'CRASHED!');}
+    }else if(h.t==='ring'){
+      var tt=((O.ht+h.off)%h.per+h.per)%h.per; h.charge=tt>h.per-0.7;
+      if(h.lastT!==undefined&&tt<h.lastT&&near(h)&&s.k===P.segK) SFX.oslam(); h.lastT=tt;
+      h.rr=tt*5; if(h.rr>h.maxR) h.rr=-1;
+      if(h.rr>0.45&&near(h)){var dd=Math.hypot(P.c-h.cc,P.r-h.cr); if(Math.abs(dd-h.rr)<0.3) hurt(h.cc,h.cr,'SHOCKWAVE!');}
+    }else if(h.t==='bear'){
+      h.walk+=hdt; if(h.cool>0) h.cool-=hdt;
+      var same=P.segK===s.k, tu, tv; q=gl(s,P.c,P.r);
+      if(same&&h.cool<=0){tu=q.u;tv=q.v;} else {tu=h.hu;tv=h.hv;}
+      var du=tu-h.u, dv=tv-h.v, dl=Math.hypot(du,dv);
+      if(dl>0.08&&(h.cool<=0||!same)){
+        var stp=Math.min(dl,h.sp*hdt*(same?1:0.6)), nu=Math.max(h.ua,Math.min(h.ub,h.u+du/dl*stp)), nv=Math.max(0.5,Math.min(W-0.5,h.v+dv/dl*stp));
+        var g1=lg(s,nu,h.v); if(tileAt(g1.c,g1.r)===1) h.u=nu; var g2=lg(s,h.u,nv); if(tileAt(g2.c,g2.r)===1) h.v=nv;
+        h.fdu=du; h.fdv=dv; h.moving=true;
+      } else h.moving=false;
+      if(same&&Math.hypot(q.u-h.u,q.v-h.v)<0.5+P_RAD){var gb=lg(s,h.u,h.v); if(hurt(gb.c,gb.r,'MAULED!')) h.cool=1.3;}
+    }else if(h.t==='bull'){
+      h.walk+=hdt; q=gl(s,P.c,P.r); var same2=P.segK===s.k;
+      if(h.cd>0) h.cd-=hdt;
+      if(h.st==='idle'){
+        if(same2){var dv2=q.v-h.v; h.v=Math.max(0.6,Math.min(W-0.6,h.v+Math.max(-1,Math.min(1,dv2))*Math.min(Math.abs(dv2),1.7*hdt))); h.fu=q.u>h.u?1:-1;
+          if(Math.abs(dv2)<0.55&&Math.abs(q.u-h.u)<11&&h.cd<=0){h.st='paw';h.tm=0.8;h.cu=h.fu;SFX.ostun();}}
+      }else if(h.st==='paw'){h.tm-=hdt; if(h.tm<=0) h.st='charge';}
+      else if(h.st==='charge'){var nu2=h.u+h.cu*11*hdt, g3=lg(s,nu2+h.cu*0.4,h.v);
+        if(nu2<h.ua||nu2>h.ub||tileAt(g3.c,g3.r)!==1){h.st='daze';h.tm=1.1;if(same2){O.shake=0.2;SFX.oland();}} else h.u=nu2;}
+      else if(h.st==='daze'){h.tm-=hdt; if(h.tm<=0){h.st='idle';h.cd=0.6;}}
+      if(near(h)&&Math.hypot(q.u-h.u,q.v-h.v)<0.55+P_RAD){var gu=lg(s,h.u,h.v);hurt(gu.c,gu.r,h.st==='charge'?'GORED!':'BUMPED!');}
+    }
+  });
+}
+/* ---------- update ---------- */
+function oUpdate(dt){
+  var O=OF,P=O.p,mult=O.def.mult*(S.relaxed?0.85:1),hdt=dt*mult;
+  O.time+=dt; O.ht+=hdt;
+  var sk=segAt(P.c,P.r); if(sk>=0) P.segK=sk;
+  // player
+  if(P.inv>0)P.inv-=dt; if(P.dashCd>0)P.dashCd-=dt;
+  var iv={c:0,r:0,mag:0};
+  if(P.stun>0){P.stun-=dt;} else iv=inputVec();
+  if(dashReq){dashReq=false; if(P.dashCd<=0&&P.stun<=0){var dc=iv.mag?iv.c:P.fc,dr=iv.mag?iv.r:P.fr;P.dashT=0.17;P.dashCd=0.85;P.dvc=dc;P.dvr=dr;SFX.odash();burst(P.c,P.r,'#c6c8ce',6,2);}}
+  var slick=onSpill(P.c,P.r);
+  if(P.dashT>0){P.dashT-=dt;P.vc=P.dvc*DASH_SPEED;P.vr=P.dvr*DASH_SPEED;O.trail.push({c:P.c,r:P.r,a:0.45});}
+  else{var tc=iv.c*P_SPEED*iv.mag,tr=iv.r*P_SPEED*iv.mag,kk=slick?(1-Math.exp(-1.4*dt)):(1-Math.exp(-18*dt));
+    if(slick&&!iv.mag){kk=1-Math.exp(-0.5*dt);} P.vc+=(tc-P.vc)*kk;P.vr+=(tr-P.vr)*kk;
+    if(P.stun>0){P.vc*=0.85;P.vr*=0.85;}}
+  var bp=beltPush(P.c,P.r), mc=(P.vc+bp.c+P.kbc)*dt, mr=(P.vr+bp.r+P.kbr)*dt;
+  var nc=P.c+mc; if(freeAt(nc,P.r,P_RAD)) P.c=nc; else {P.vc*=slick?-0.4:0;P.kbc=0;}
+  var nr=P.r+mr; if(freeAt(P.c,nr,P_RAD)) P.r=nr; else {P.vr*=slick?-0.4:0;P.kbr=0;}
+  P.kbc*=Math.exp(-9*dt);P.kbr*=Math.exp(-9*dt);
+  var sp=Math.hypot(P.vc,P.vr);
+  if(sp>0.6){var svx=(P.vc-P.vr)*HW,svy=(P.vc+P.vr)*HH;P.face=Math.abs(svx)>Math.abs(svy)?(svx>0?'right':'left'):(svy>0?'down':'up');P.fc=P.vc/sp;P.fr=P.vr/sp;P.walk+=dt*(slick?3:9);}
+  else P.walk=0;
+  O.trail.forEach(function(t){t.a-=dt*2.2;}); O.trail=O.trail.filter(function(t){return t.a>0;});
+
+  // hazards
+  O.hz.forEach(function(h){
+    var s=h.s, W=s.W, q;
+    if(h.t==='cart'){
+      h.v+=h.dir*h.sp*hdt; if(h.v>W-0.6){h.v=W-0.6;h.dir=-1;} if(h.v<0.6){h.v=0.6;h.dir=1;}
+      if(near(h)){q=gl(s,P.c,P.r); if(Math.abs(q.u-h.u)<0.45+P_RAD&&Math.abs(q.v-h.v)<0.42+P_RAD){var g=lg(s,h.u,h.v);hurt(g.c,g.r,'BONK!');}}
+    }else if(h.t==='chair'){
+      var nu=h.u+h.du*hdt, nv=h.v+h.dv*hdt;
+      if(nu<h.ua||nu>h.ub){h.du=-h.du;nu=h.u;} if(nv<0.45||nv>W-0.45){h.dv=-h.dv;nv=h.v;}
+      var gg=lg(s,nu,nv); if(tileAt(gg.c,gg.r)!==1){h.du=-h.du;h.dv=-h.dv;nu=h.u;nv=h.v;}
+      h.u=nu;h.v=nv;
+      if(near(h)){q=gl(s,P.c,P.r); if(Math.hypot(q.u-h.u,q.v-h.v)<0.42+P_RAD){var g2=lg(s,h.u,h.v);hurt(g2.c,g2.r,'WHEEE!');}}
+    }else if(h.t==='copier'){
+      var tt=h.ht0=(O.ht+h.off), cyc=Math.floor(tt/h.per), ph=tt-cyc*h.per; h.tele=ph>h.per-0.7;
+      if(h.cyc!==cyc){h.cyc=cyc;h.n=0;}
+      if(near(h)) while(h.n<h.burst&&ph>=h.n*0.15){
+        var dv=h.side===0?1:-1, du=(Math.random()-0.5)*0.35, l=Math.hypot(du,dv);
+        O.papers.push({s:s,u:h.uc,v:h.side===0?0.05:W-0.05,du:du/l*6.2,dv:dv/l*6.2,rot:Math.random()*6,life:0});
+        h.n++; if(s.k===P.segK) SFX.oshoot();
+      }
+      if(!near(h)) h.n=h.burst;
+    }else if(h.t==='drawer'){
+      var t2=((O.ht+h.off)%h.per+h.per)%h.per, Pp=h.per, ext=0; h.rattle=false;
+      if(t2<Pp-1.9) ext=0; else if(t2<Pp-1.3){ext=0;h.rattle=true;} else if(t2<Pp-1.18) ext=(t2-(Pp-1.3))/0.12; else if(t2<Pp-0.4) ext=1; else ext=1-(t2-(Pp-0.4))/0.4;
+      var cyc2=Math.floor((O.ht+h.off)/h.per); if(t2>=Pp-1.3&&h.slam!==cyc2){h.slam=cyc2; if(s.k===P.segK) SFX.oslam();}
+      h.ext=ext;
+      if(ext>0.2&&near(h)){q=gl(s,P.c,P.r); var reach=ext*h.reach;
+        if(Math.abs(q.u-h.uc)<0.42+P_RAD){
+          var hit=h.side===0?(q.v<reach+P_RAD):(q.v>W-reach-P_RAD);
+          if(hit){var tip=lg(s,h.uc,h.side===0?reach-0.6:W-reach+0.6);hurt(tip.c,tip.r,'SLAM!');}
+        }}
+    }else if(h.t==='chute'){
+      if(!near(h)) return;
+      h.next-=hdt; if(h.next<=0){h.next=h.per*(0.8+Math.random()*0.4);
+        q=gl(s,P.c,P.r); var tu,tv;
+        if(q.u>h.u0-2&&q.u<h.u1+2&&Math.random()<0.7){tu=Math.max(h.u0,Math.min(h.u1,q.u+P.vc*0+(Math.random()-0.3)*1.6));tv=Math.max(0.6,Math.min(W-0.6,q.v+(Math.random()-0.5)*1.6));}
+        else{tu=h.u0+Math.random()*(h.u1-h.u0);tv=0.6+Math.random()*(W-1.2);}
+        var gd=lg(s,tu,tv); if(tileAt(gd.c,gd.r)===1) O.drops.push({c:gd.c,r:gd.r,t:0,dur:0.95});
+      }
+    }else if(h.t==='mgr'||h.t==='mug'){
+      h.walk+=hdt;
+      if(h.pause>0) h.pause-=hdt; else {h.u+=h.dir*h.sp*hdt; if(h.u>h.u1){h.u=h.u1;h.dir=-1;} if(h.u<h.u0){h.u=h.u0;h.dir=1;}}
+      if(h.cool>0)h.cool-=hdt; if(h.bubble>0)h.bubble-=dt;
+      if(!near(h)) return;
+      q=gl(s,P.c,P.r);
+      if(h.t==='mgr'){
+        var d=(q.u-h.u)*h.dir, lat=Math.abs(q.v-h.v);
+        if(h.cool<=0&&P.dashT<=0&&P.stun<=0&&d>0.2&&d<3.3&&lat<d*0.62+0.35&&O.state==='play'){
+          P.stun=1.0;h.pause=1.1;h.cool=2.6;h.bubble=1.4;O.stuns++;SFX.ostun();P.vc=P.vr=0;floatTxt(P.c,P.r,'FROZEN!','#ffcc33');}
+      }else{
+        if(Math.hypot(q.u-h.u,q.v-h.v)<0.45+P_RAD){var gm=lg(s,h.u,h.v);hurt(gm.c,gm.r,'SPLASH!');}
+        h.drop-=hdt; if(h.drop<=0){h.drop=1.8; O.dspills.push({s:s,u:h.u,v:h.v+(Math.random()-0.5)*0.8,rx:1.0,ry:0.8,life:8}); if(O.dspills.length>6) O.dspills.shift();}
+      }
+    }else if(h.t==='sprk'){
+      var t3=((O.ht+h.off)%h.per+h.per)%h.per; h.phase=t3<h.per-h.on-0.8?0:(t3<h.per-h.on?1:2);
+      if(h.phase===2&&near(h)){q=gl(s,P.c,P.r); if(Math.hypot(q.u-h.u,q.v-h.v)<h.r){var gs=lg(s,h.u,h.v);hurt(gs.c,gs.r,'CRASHED!');}}
+    }
+  });
+  nyseUpdate(O,P,dt,hdt);
+  // papers
+  O.papers=O.papers.filter(function(p){
+    p.u+=p.du*hdt;p.v+=p.dv*hdt;p.rot+=hdt*9;p.life+=hdt;
+    if(p.v<-0.3||p.v>p.s.W+0.3||p.life>2.2) return false;
+    var g=lg(p.s,p.u,p.v); if(tileAt(g.c,g.r)===2) return false;
+    if(Math.hypot(P.c-g.c,P.r-g.r)<0.22+P_RAD){ if(hurt(g.c,g.r,'TICKET CUT!')) return false; }
+    return true;
+  });
+  // drops
+  O.drops=O.drops.filter(function(d){d.t+=hdt; if(d.t>=d.dur){
+      SFX.oland(); burst(d.c,d.r,'#C79A5B',8,4);
+      if(Math.hypot(P.c-d.c,P.r-d.r)<0.62) hurt(d.c,d.r,'TAPE DROP!');
+      return false;} return true;});
+  O.dspills.forEach(function(d){d.life-=dt;}); O.dspills=O.dspills.filter(function(d){return d.life>0;});
+  // pickups
+  O.clipsList.forEach(function(k){ if(!k.got&&Math.hypot(P.c-k.c,P.r-k.r)<0.55){k.got=true;O.clips++;SFX.oclip();floatTxt(k.c,k.r,'+$100','#ffcc33');} });
+  O.donutList.forEach(function(k){ if(!k.got&&Math.hypot(P.c-k.c,P.r-k.r)<0.55){k.got=true; if(P.hearts<P.max){P.hearts++;floatTxt(k.c,k.r,'+1 HEART','#ff9ec4');} else {floatTxt(k.c,k.r,'CRUNCH','#ff9ec4');} SFX.oheal();} });
+  // checkpoints
+  O.def.cps.forEach(function(cs){ if(P.segK>=cs&&O.cp.seg<cs){var g=lg(O.segs[cs],1.5,O.segs[cs].W/2);O.cp={c:g.c,r:g.r,seg:cs};warnMsg('CHECKPOINT','#22d36b');SFX.ocp();} });
+  // deadline
+  var ps=playerS();
+  if(O.wave){ if(!O.wave.on&&P.segK>=O.wave.from){O.wave.on=true;O.wave.w=O.segs[O.wave.from].S-5;warnMsg('THE BEAR MARKET IS COMING. RUN!','#ff3355');SFX.ostun();}
+    if(O.wave.on){O.wave.w+=O.wave.sp*hdt; if(O.wave.w>ps-0.35){ var bg=pointAtS(ps-1); if(hurt(bg.c,bg.r,'BEAR MARKET!')) O.wave.w=ps-4; }}}
+  // goal
+  var last=O.segs[O.segs.length-1], lq=gl(last,P.c,P.r);
+  if(P.segK===last.k&&lq.u>=last.L-1.25) officeClear();
+  // particles
+  O.parts.forEach(function(p){p.c+=p.vc*dt*0.4;p.r+=p.vr*dt*0.4;p.z+=p.vz*dt;p.vz-=320*dt;if(p.z<0){p.z=0;p.vz=0;p.vc*=0.5;p.vr*=0.5;}p.life-=dt;});
+  O.parts=O.parts.filter(function(p){return p.life>0;});
+  O.floats.forEach(function(f){f.a+=dt;}); O.floats=O.floats.filter(function(f){return f.a<1;});
+  if(O.shake>0)O.shake-=dt;
+  if(O.warn){O.warn.t-=dt;if(O.warn.t<=0)O.warn=null;}
+}
+function playerS(){var s=OF.segs[OF.p.segK],q=gl(s,OF.p.c,OF.p.r);return s.S+Math.max(0,Math.min(s.L,q.u));}
+function pointAtS(w){
+  for(var i=0;i<OF.segs.length;i++){var s=OF.segs[i]; if(w<s.S+s.L||i===OF.segs.length-1){var u=Math.max(0,w-s.S);return lg(s,u,s.W/2);}}
+  return {c:0,r:0};
+}
+function warnMsg(t,col){OF.warn={t:2.2,txt:t,col:col};}
+
+/* ---------- rendering ---------- */
+var oc, octx, OW=800, OH=500, ODPR=1;
+function poly(ctx,pts,fill,stroke){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke!==false){ctx.strokeStyle=stroke||'rgba(8,12,20,.55)';ctx.lineWidth=1;ctx.stroke();}}
+function SX(c,r){return (c-r)*HW-OF.camX+OW/2+OF.sx;}
+function SY(c,r){return (c+r)*HH-OF.camY+OH/2+OF.sy;}
+function gridBox(ctx,c0,r0,c1,r1,h,lift,top,left,right){
+  lift=lift||0;
+  var A=[SX(c0,r0),SY(c0,r0)-lift],B=[SX(c1,r0),SY(c1,r0)-lift],C=[SX(c1,r1),SY(c1,r1)-lift],D=[SX(c0,r1),SY(c0,r1)-lift];
+  poly(ctx,[[D[0],D[1]-h],[C[0],C[1]-h],C,D],left);
+  poly(ctx,[[B[0],B[1]-h],[C[0],C[1]-h],C,B],right);
+  poly(ctx,[[A[0],A[1]-h],[B[0],B[1]-h],[C[0],C[1]-h],[D[0],D[1]-h]],top);
+}
+function tileBox(ctx,i,j,s,h,lift,top,left,right){var m=(1-s)/2;gridBox(ctx,i+m,j+m,i+1-m,j+1-m,h,lift,top,left,right);}
+function groundPolyLocal(ctx,s,cu,cv,rx,ry,fill,stroke){
+  var pts=[];for(var a=0;a<Math.PI*2;a+=Math.PI/10){var g=lg(s,cu+Math.cos(a)*rx,cv+Math.sin(a)*ry);pts.push([SX(g.c,g.r),SY(g.c,g.r)]);}
+  poly(ctx,pts,fill,stroke||false);
+}
+function th(i,j,n){var x=Math.sin(i*12.9898+j*78.233+n*37.719)*43758.5453;return x-Math.floor(x);}
+
+function drawBeast(ctx,x,y,kind,right,walk,h){
+  var d=right?1:-1, bob=walk?Math.sin(walk*14)*1.5:0, bear=kind==='bear';
+  var body=bear?'#5B3A24':'#7A3A1F', head=bear?'#4A2E1C':'#5E2A15';
+  ctx.fillStyle='rgba(0,0,0,.32)';ctx.beginPath();ctx.ellipse(x,y,18,7,0,0,7);ctx.fill();
+  ctx.fillStyle=shadeColor(body,0.25);[-11,-4,4,10].forEach(function(lx,i){ctx.fillRect(x+lx-2,y-9+(i%2?bob:-bob),5,9);});
+  ctx.fillStyle=body;ctx.beginPath();ctx.ellipse(x,y-16+bob*0.3,bear?17:19,bear?12:10,0,0,7);ctx.fill();
+  ctx.strokeStyle='#14181C';ctx.lineWidth=1.5;ctx.stroke();
+  var hx=x+d*(bear?14:17), hy=y-(bear?22:19);
+  if(bear){ctx.fillStyle=head;[[-4,-8],[4,-8]].forEach(function(e){ctx.beginPath();ctx.arc(hx+e[0]*d*0.6-d*2,hy+e[1],3.5,0,7);ctx.fill();});}
+  ctx.fillStyle=head;ctx.beginPath();ctx.arc(hx,hy,bear?8.5:8,0,7);ctx.fill();ctx.stroke();
+  if(!bear){ctx.strokeStyle='#F2EEE2';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(hx-5,hy-5);ctx.quadraticCurveTo(hx-10,hy-12,hx-6,hy-16);ctx.moveTo(hx+5,hy-5);ctx.quadraticCurveTo(hx+10,hy-12,hx+6,hy-16);ctx.stroke();
+    ctx.strokeStyle='#E0B020';ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx+d*6,hy+5,3,0,Math.PI);ctx.stroke();}
+  ctx.fillStyle=bear?'#C9A27A':'#9C5A3C';ctx.beginPath();ctx.arc(hx+d*6,hy+2,bear?3.5:4,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(hx+d*2,hy-2,2.2,0,7);ctx.fill();ctx.fillStyle='#14181C';ctx.beginPath();ctx.arc(hx+d*2.6,hy-2,1.2,0,7);ctx.fill();
+  ctx.font='bold 10px "Press Start 2P",monospace';ctx.textAlign='center';
+  ctx.fillStyle=bear?'#ff3355':'#22d36b';ctx.fillText(bear?'▼':'▲',x,y-36);
+  var t=performance.now()/1000;
+  if(!bear&&h.st==='paw'){ctx.fillStyle='#ff3355';ctx.font='bold 18px "Press Start 2P",monospace';ctx.fillText('!',x,y-50);
+    ctx.fillStyle='rgba(230,230,230,.7)';for(var n=0;n<3;n++){var k=(t*3+n/3)%1;ctx.beginPath();ctx.arc(hx+d*(10+k*10),hy+4-k*6,2+k*3,0,7);ctx.fill();}}
+  if(!bear&&h.st==='daze'){ctx.fillStyle='#ffcc33';ctx.font='bold 12px "Press Start 2P",monospace';for(var m=0;m<3;m++){var a=t*6+m*2.1;ctx.fillText('★',hx+Math.cos(a)*12,hy-16+Math.sin(a)*4);}}
+}
+function drawProp(ctx,i,j,kind,pal){
+  if(kind==='post') kind='desk';
+  if(kind==='bellpost'){var bx=SX(i+0.5,j+0.5),byy=SY(i+0.5,j+0.5);tileBox(ctx,i,j,0.5,16,0,'#004AA0','#003B80','#002F66');
+    ctx.fillStyle='#E0B020';ctx.beginPath();ctx.moveTo(bx-9,byy-18);ctx.quadraticCurveTo(bx-9,byy-34,bx,byy-36);ctx.quadraticCurveTo(bx+9,byy-34,bx+9,byy-18);ctx.closePath();ctx.fill();ctx.strokeStyle='#7a5c10';ctx.lineWidth=1.5;ctx.stroke();return;}
+  var cx=SX(i+0.5,j+0.5), cy=SY(i+0.5,j+0.5);
+  if(kind==='desk'){tileBox(ctx,i,j,0.94,18,0,'#20345C','#162644','#101D36');
+    gridBox(ctx,i+0.2,j+0.25,i+0.8,j+0.4,16,18,'#0B0F16','#1A2230','#121822');
+    var up=th(i,j,3)>0.5;ctx.fillStyle=up?'#22d36b':'#ff3355';ctx.fillRect(cx-12,cy-40,10,3);ctx.fillRect(cx+1,cy-35,8,3);
+    ctx.fillStyle='#ffcc33';ctx.font='bold 7px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText(up?'▲':'▼',cx+12,cy-36);}
+  else if(kind==='plant'){tileBox(ctx,i,j,0.42,11,0,'#B5643A','#94502D','#7A4224');
+    ctx.fillStyle='#2F7D3E';[[0,-26,9],[-7,-20,7],[7,-21,7],[0,-34,6]].forEach(function(l){ctx.beginPath();ctx.arc(cx+l[0],cy+l[1],l[2],0,7);ctx.fill();});
+    ctx.fillStyle='#3FA055';ctx.beginPath();ctx.arc(cx-2,cy-30,4,0,7);ctx.fill();}
+  else if(kind==='box'){tileBox(ctx,i,j,0.72,15,0,'#F2F4F7','#CCD3DD','#AEB7C4');ctx.strokeStyle='#C8102E';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx-10,cy-20);ctx.lineTo(cx+10,cy-10);ctx.stroke();}
+  else if(kind==='shelf'){tileBox(ctx,i,j,0.9,34,0,'#141A26','#1F2838','#171E2B');ctx.fillStyle='#22d36b';ctx.fillRect(cx-20,cy-30,9,3);ctx.fillRect(cx-8,cy-24,9,3);ctx.fillStyle='#ff3355';ctx.fillRect(cx+4,cy-30,9,3);ctx.fillStyle='#2a7bff';ctx.fillRect(cx-14,cy-18,14,2);}
+  else if(kind==='cabinet'){tileBox(ctx,i,j,0.8,28,0,'#AEB6C1','#8D96A3','#737C89');}
+  else if(kind==='couch'){tileBox(ctx,i,j,0.9,10,0,'#7A2333','#5E1A27','#4B141F');tileBox(ctx,i,j,0.9,6,10,'#8C2B3D','#6A1E2D','#561825');}
+}
+function drawWall(ctx,i,j,pal,alpha){
+  ctx.globalAlpha=alpha; tileBox(ctx,i,j,1,WALL_H,0,pal.wt,pal.wl,pal.wr);
+  var a=[SX(i,j+1),SY(i,j+1)-WALL_H+4],b=[SX(i+1,j+1),SY(i+1,j+1)-WALL_H+4],c=[SX(i+1,j),SY(i+1,j)-WALL_H+4];
+  ctx.strokeStyle=pal.trim;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.stroke();
+  ctx.globalAlpha=1;
+}
+function drawElevator(ctx,i,j,alpha){
+  ctx.globalAlpha=alpha; var t=performance.now()/1000;
+  var bell=OF.def.goal==='BELL';
+  tileBox(ctx,i,j,1,48,0,bell?'#004AA0':'#2B2F36',bell?'#C8102E':'#B8962E',bell?'#8f0b21':'#9A7B22');
+  var x=SX(i+0.5,j+0.5),y=SY(i+0.5,j+0.5);
+  ctx.globalAlpha=1;
+  if(bell){var by=y-58-Math.sin(t*4)*2;ctx.fillStyle='#E0B020';ctx.beginPath();ctx.moveTo(x-12,by+10);ctx.quadraticCurveTo(x-12,by-10,x,by-12);ctx.quadraticCurveTo(x+12,by-10,x+12,by+10);ctx.closePath();ctx.fill();ctx.strokeStyle='#7a5c10';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#7a5c10';ctx.beginPath();ctx.arc(x,by+12,3,0,7);ctx.fill();}
+  ctx.font='bold 11px "Press Start 2P",monospace';ctx.textAlign='center';
+  ctx.fillStyle='#ffcc33';ctx.fillText(bell?'RING THE BELL':'EXIT',x,y-(bell?80:66)-Math.sin(t*4)*3);
+  if(!bell) ctx.fillText('▼',x,y-52-Math.sin(t*4)*3);
+}
+function drawDevice(ctx,h,alpha){
+  var s=h.s, W=s.W, side=h.side, dvT=side===0?-1:W, g=lg(s,h.u,dvT), i=g.c, j=g.r;
+  if(h.t==='copier'){
+    ctx.globalAlpha=alpha; tileBox(ctx,i,j,0.86,30,0,'#E9EDF2','#C3CAD3','#A9B1BC');
+    var x=SX(i+0.5,j+0.5),y=SY(i+0.5,j+0.5)-30, on=h.tele&&Math.floor(performance.now()/90)%2===0;
+    ctx.globalAlpha=1; ctx.fillStyle=on?'#ff3355':'#22d36b';ctx.beginPath();ctx.arc(x,y,on?6:4,0,7);ctx.fill();
+    if(h.tele){ctx.strokeStyle='rgba(255,51,85,.85)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,10+Math.sin(performance.now()/60)*2,0,7);ctx.stroke();}
+  }else{
+    var jig=h.rattle?(Math.random()-0.5)*3:0;
+    ctx.globalAlpha=alpha; ctx.save();ctx.translate(jig,0); tileBox(ctx,i,j,0.84,30,0,'#AEB6C1','#8D96A3','#737C89'); ctx.restore(); ctx.globalAlpha=1;
+  }
+}
+function drawDrawerSlab(ctx,h){
+  if(!h.ext||h.ext<=0.02) return; var s=h.s,W=s.W,reach=h.ext*h.reach,v0,v1;
+  if(h.side===0){v0=-0.5;v1=reach;}else{v0=W-reach;v1=W+0.5;}
+  var a=lg(s,h.uc-0.38,v0),b=lg(s,h.uc+0.38,v1);
+  gridBox(ctx,Math.min(a.c,b.c),Math.min(a.r,b.r),Math.max(a.c,b.c),Math.max(a.r,b.r),12,8,'#C4CCD6','#9AA3AE','#7F8894');
+}
+function drawCart(ctx,h){
+  var s=h.s,a=lg(s,h.u-0.42,h.v-0.36),b=lg(s,h.u+0.42,h.v+0.36),c0=Math.min(a.c,b.c),r0=Math.min(a.r,b.r),c1=Math.max(a.c,b.c),r1=Math.max(a.r,b.r);
+  var g=lg(s,h.u,h.v); ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(SX(g.c,g.r),SY(g.c,g.r),22,10,0,0,7);ctx.fill();
+  gridBox(ctx,c0,r0,c1,r1,10,6,'#3D6FB6','#2C548C','#234573');
+  gridBox(ctx,g.c-0.22,g.r-0.22,g.c+0.18,g.r+0.18,12,16,'#F2F4F7','#CCD3DD','#AEB7C4');
+  gridBox(ctx,g.c+0.02,g.r-0.05,g.c+0.3,g.r+0.25,9,16,'#FFE28A','#E0B020','#B88A00');
+}
+function drawChair(ctx,h){
+  var g=lg(h.s,h.u,h.v),x=SX(g.c,g.r),y=SY(g.c,g.r);
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y,16,7,0,0,7);ctx.fill();
+  ctx.strokeStyle='#14181C';ctx.lineWidth=2;for(var k=0;k<5;k++){var a=k*1.257+h.u;ctx.beginPath();ctx.moveTo(x,y-3);ctx.lineTo(x+Math.cos(a)*12,y-3+Math.sin(a)*5);ctx.stroke();}
+  ctx.fillStyle='#555b66';ctx.fillRect(x-1.5,y-12,3,10);
+  gridBox(ctx,g.c-0.26,g.r-0.26,g.c+0.26,g.r+0.26,5,12,'#2A2F38','#1F232A','#181B21');
+  gridBox(ctx,g.c-0.26,g.r-0.26,g.c+0.26,g.r-0.12,16,17,'#004AA0','#003B80','#002F66');
+}
+function drawPerson(ctx,c,r,look,face,walking,ph,sc){
+  var x=SX(c,r),y=SY(c,r); sc=sc||2.2;
+  ctx.fillStyle='rgba(0,0,0,.32)';ctx.beginPath();ctx.ellipse(x,y,12,5,0,0,7);ctx.fill();
+  drawIntern(ctx,x-7.5*sc,y-19*sc,sc,look,face,walking,ph);
+}
+function faceOfGrid(dc,dr){var svx=(dc-dr),svy=(dc+dr)*0.5;return Math.abs(svx)>Math.abs(svy)?(svx>0?'right':'left'):(svy>0?'down':'up');}
+
+function oRender(){
+  var O=OF, ctx=octx, P=O.p, now=performance.now()/1000;
+  ctx.setTransform(ODPR,0,0,ODPR,0,0);
+  var pp=proj(P.c,P.r), tx=pp.x, ty=pp.y+40;
+  O.camX+=(tx-O.camX)*0.14; O.camY+=(ty-O.camY)*0.14;
+  O.sx=O.shake>0?(Math.random()-0.5)*10*O.shake/0.3:0; O.sy=O.shake>0?(Math.random()-0.5)*8*O.shake/0.3:0;
+  var pal=O.pal;
+  var bg=ctx.createLinearGradient(0,0,0,OH); bg.addColorStop(0,pal.bg); bg.addColorStop(1,'#000'); ctx.fillStyle=bg; ctx.fillRect(0,0,OW,OH);
+  var pi=Math.floor(P.c), pj=Math.floor(P.r), R=17, gw=O.gw, grid=O.grid;
+  var lastSeg=O.segs[O.segs.length-1];
+  // floor
+  for(var j=Math.max(0,pj-R);j<Math.min(O.gh,pj+R);j++) for(var i=Math.max(0,pi-R);i<Math.min(gw,pi+R);i++){
+    var t=grid[j*gw+i]; if(t===0) continue;
+    var x=SX(i+0.5,j+0.5),y=SY(i+0.5,j+0.5); if(x<-HW||x>OW+HW||y<-HH*2||y>OH+HH*3) continue;
+    var pts=[[x,y-HH],[x+HW,y],[x,y+HH],[x-HW,y]];
+    poly(ctx,pts,((i+j)&1)?pal.f1:pal.f2,'rgba(0,0,0,.12)');
+    if(O.def.floor==='concrete'){ctx.fillStyle=pal.tex;for(var n=0;n<3;n++){ctx.fillRect(x+(th(i,j,n)-0.5)*HW,y+(th(i,j,n+5)-0.5)*HH,2,2);}}
+    else if(O.def.floor==='carpet'){ctx.strokeStyle=pal.tex;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-HW*0.5,y);ctx.lineTo(x,y-HH*0.5);ctx.moveTo(x,y+HH*0.5);ctx.lineTo(x+HW*0.5,y);ctx.stroke();}
+    else {ctx.strokeStyle=pal.tex;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-HW*0.5,y-HH*0.5);ctx.lineTo(x+HW*0.5,y+HH*0.5);ctx.stroke();}
+    if(O.segOf[j*gw+i]===lastSeg.k){var q=gl(lastSeg,i+0.5,j+0.5); if(q.u>=lastSeg.L-1.5){ctx.globalAlpha=0.35+Math.sin(now*4)*0.15;poly(ctx,pts,'#ffcc33',false);ctx.globalAlpha=1;}}
+  }
+  // ground layer
+  O.hz.forEach(function(h){
+    if(Math.abs(h.s.k-P.segK)>2) return; var s=h.s;
+    if(h.t==='belt'){
+      var a=lg(s,h.u0,0),b=lg(s,h.u1,s.W),c0=Math.min(a.c,b.c),r0=Math.min(a.r,b.r),c1=Math.max(a.c,b.c),r1=Math.max(a.r,b.r);
+      poly(ctx,[[SX(c0,r0),SY(c0,r0)],[SX(c1,r0),SY(c1,r0)],[SX(c1,r1),SY(c1,r1)],[SX(c0,r1),SY(c0,r1)]],'rgba(30,34,42,.85)',false);
+      ctx.strokeStyle='rgba(255,204,51,.55)';ctx.lineWidth=3;
+      var along=h.du!==0, spd=along?h.du:h.dv, len=along?(h.u1-h.u0):s.W;
+      for(var k=0;k<len;k+=1.1){var off=((k+now*spd)%len+len)%len, p1,p2,p3;
+        if(along){var uu=h.u0+off,dd=spd>0?-0.35:0.35;p1=lg(s,uu+dd,1.2);p2=lg(s,uu,s.W/2);p3=lg(s,uu+dd,s.W-1.2);}
+        else{var vv=off,dd2=spd>0?-0.35:0.35;p1=lg(s,h.u0+0.6,vv+dd2);p2=lg(s,(h.u0+h.u1)/2,vv);p3=lg(s,h.u1-0.6,vv+dd2);}
+        ctx.beginPath();ctx.moveTo(SX(p1.c,p1.r),SY(p1.c,p1.r));ctx.lineTo(SX(p2.c,p2.r),SY(p2.c,p2.r));ctx.lineTo(SX(p3.c,p3.r),SY(p3.c,p3.r));ctx.stroke();}
+    }else if(h.t==='spill'){groundPolyLocal(ctx,s,h.u,h.v,h.rx,h.ry,'rgba(92,56,30,.88)');groundPolyLocal(ctx,s,h.u-h.rx*0.25,h.v-h.ry*0.2,h.rx*0.3,h.ry*0.22,'rgba(255,255,255,.18)');}
+    else if(h.t==='sprk'){
+      var g=lg(s,h.u,h.v),x=SX(g.c,g.r),y=SY(g.c,g.r),rx=h.r*1.414*HW,ry=h.r*1.414*HH;
+      ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);
+      if(h.phase===0){ctx.strokeStyle='rgba(255,80,100,.3)';ctx.lineWidth=1.5;ctx.setLineDash([4,6]);ctx.stroke();ctx.setLineDash([]);}
+      else if(h.phase===1){ctx.fillStyle='rgba(255,51,85,'+(0.15+0.15*Math.sin(now*20))+')';ctx.fill();ctx.strokeStyle='rgba(255,140,160,.95)';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);}
+      else{ctx.fillStyle='rgba(200,16,46,.55)';ctx.fill();ctx.strokeStyle='#ff3355';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 12px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('▼▼',x,y+4);}
+    }else if(h.t==='mgr'){
+      var d=3.3,w=d*0.62+0.35,ap=lg(s,h.u,h.v),e1=lg(s,h.u+h.dir*d,h.v-w),e2=lg(s,h.u+h.dir*d,h.v+w);
+      poly(ctx,[[SX(ap.c,ap.r),SY(ap.c,ap.r)],[SX(e1.c,e1.r),SY(e1.c,e1.r)],[SX(e2.c,e2.r),SY(e2.c,e2.r)]],h.bubble>0?'rgba(255,51,85,.3)':'rgba(255,204,51,.2)','rgba(255,204,51,.5)');
+    }
+  });
+
+  function quadLocal(s,u0,v0,u1,v1,fill,stroke){var a=lg(s,u0,v0),b=lg(s,u1,v0),c=lg(s,u1,v1),d=lg(s,u0,v1);
+    poly(ctx,[[SX(a.c,a.r),SY(a.c,a.r)],[SX(b.c,b.r),SY(b.c,b.r)],[SX(c.c,c.r),SY(c.c,c.r)],[SX(d.c,d.r),SY(d.c,d.r)]],fill,stroke||false);}
+  O.hz.forEach(function(h){
+    if(Math.abs(h.s.k-P.segK)>2) return; var s=h.s;
+    if(h.t==='rush'){
+      quadLocal(s,0,h.v-0.45,s.L,h.v+0.45,h.warn?'rgba(255,51,85,'+(0.22+0.2*Math.sin(now*26))+')':'rgba(255,204,51,.07)',h.warn?'rgba(255,51,85,.8)':'rgba(255,204,51,.18)');
+      if(h.warn){ctx.fillStyle='#ff3355';ctx.font='bold 12px "Press Start 2P",monospace';ctx.textAlign='center';
+        for(var au=1.5;au<s.L;au+=3){var ag=lg(s,au,h.v);ctx.fillText(h.dir>0?'»':'«',SX(ag.c,ag.r),SY(ag.c,ag.r)+4);}}
+    }else if(h.t==='tiles'){
+      for(var tu=Math.floor(h.u0);tu<h.u1;tu++) for(var tv=Math.floor(h.v0);tv<h.v1;tv++){
+        var stt=tileState(h,tu+0.5,tv+0.5);
+        quadLocal(s,tu+0.06,tv+0.06,tu+0.94,tv+0.94,stt===2?'rgba(200,16,46,.8)':stt===1?'rgba(255,160,40,.5)':'rgba(34,211,107,.12)',stt===2?'#ff3355':'rgba(34,211,107,.25)');
+        if(stt===2){var tg=lg(s,tu+0.5,tv+0.5);ctx.fillStyle='#fff';ctx.font='bold 9px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('▼',SX(tg.c,tg.r),SY(tg.c,tg.r)+4);}
+      }
+    }else if(h.t==='ring'){
+      var rx0=SX(h.cc,h.cr), ry0=SY(h.cc,h.cr);
+      if(h.charge){ctx.strokeStyle='rgba(255,204,51,'+(0.4+0.4*Math.sin(now*30))+')';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(rx0,ry0,22,11,0,0,7);ctx.stroke();}
+      if(h.rr>0){var ex=h.rr*1.414*HW, ey=h.rr*1.414*HH;
+        ctx.strokeStyle='rgba(255,204,51,.95)';ctx.lineWidth=6;ctx.beginPath();ctx.ellipse(rx0,ry0,ex,ey,0,0,7);ctx.stroke();
+        ctx.strokeStyle='rgba(200,16,46,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(rx0,ry0,ex,ey,0,0,7);ctx.stroke();}
+    }else if(h.t==='sweep'&&h.ec!==undefined){
+      ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(SX(h.pc,h.pr),SY(h.pc,h.pr));ctx.lineTo(SX(h.ec,h.er),SY(h.ec,h.er));ctx.stroke();
+    }
+  });
+  O.dspills.forEach(function(d){ctx.globalAlpha=Math.min(1,d.life/1.5);groundPolyLocal(ctx,d.s,d.u,d.v,d.rx,d.ry,'rgba(92,56,30,.88)');ctx.globalAlpha=1;});
+  O.drops.forEach(function(d){var x=SX(d.c,d.r),y=SY(d.c,d.r),k=d.t/d.dur;
+    ctx.fillStyle='rgba(0,0,0,'+(0.15+k*0.35)+')';ctx.beginPath();ctx.ellipse(x,y,8+k*14,4+k*7,0,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(255,51,85,'+(0.4+k*0.5)+')';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(x,y,26,13,0,0,7);ctx.stroke();});
+  if(O.cp.seg>0){var cg=O.cp;ctx.fillStyle='rgba(34,211,107,.18)';ctx.beginPath();ctx.ellipse(SX(cg.c,cg.r),SY(cg.c,cg.r),26,13,0,0,7);ctx.fill();}
+
+  // entities
+  var E=[];
+  for(var j2=Math.max(0,pj-R);j2<Math.min(O.gh,pj+R);j2++) for(var i2=Math.max(0,pi-R);i2<Math.min(gw,pi+R);i2++){
+    var idx=j2*gw+i2, t2=grid[idx], dep=i2+j2+1;
+    if(t2===2) E.push({d:dep,f:drawProp.bind(null,ctx,i2,j2,O.propAt[idx],pal)});
+    else if(t2===0){
+      var adj=false; for(var dj=-1;dj<=1&&!adj;dj++) for(var di=-1;di<=1;di++){var ii=i2+di,jj=j2+dj; if(ii>=0&&jj>=0&&ii<gw&&jj<O.gh&&grid[jj*gw+ii]!==0){adj=true;break;}}
+      if(!adj) continue;
+      var x2=SX(i2+0.5,j2+0.5),y2=SY(i2+0.5,j2+0.5); if(x2<-HW*2||x2>OW+HW*2||y2<-60||y2>OH+80) continue;
+      var front=dep>P.c+P.r&&Math.abs(x2-SX(P.c,P.r))<46&&y2-SY(P.c,P.r)>-10&&y2-SY(P.c,P.r)<70, al=front?0.4:1;
+      if(idx===O.elev.idx) E.push({d:dep,f:drawElevator.bind(null,ctx,i2,j2,al)});
+      else if(O.devAt[idx]) E.push({d:dep,f:drawDevice.bind(null,ctx,O.devAt[idx],al)});
+      else E.push({d:dep,f:drawWall.bind(null,ctx,i2,j2,pal,al)});
+    }
+  }
+  O.hz.forEach(function(h){
+    if(Math.abs(h.s.k-P.segK)>2) return; var g;
+    if(h.t==='cart'){g=lg(h.s,h.u,h.v);E.push({d:g.c+g.r,f:drawCart.bind(null,ctx,h)});}
+    else if(h.t==='chair'){g=lg(h.s,h.u,h.v);E.push({d:g.c+g.r,f:drawChair.bind(null,ctx,h)});}
+    else if(h.t==='drawer'&&h.ext>0.02){g=lg(h.s,h.uc,h.side===0?h.ext*h.reach*0.5:h.s.W-h.ext*h.reach*0.5);E.push({d:g.c+g.r,f:drawDrawerSlab.bind(null,ctx,h)});}
+    else if(h.t==='mgr'||h.t==='mug'){g=lg(h.s,h.u,h.v);var dvec=lv(h.s,h.dir,0),fc=h.pause>0?'down':faceOfGrid(dvec.c,dvec.r);
+      E.push({d:g.c+g.r,f:(function(h,g,fc){return function(){
+        drawPerson(ctx,g.c,g.r,h.t==='mgr'?MGR_LOOK:MUG_LOOK,fc,h.pause<=0,Math.floor(h.walk*5)%2,2.2);
+        if(h.bubble>0){var x=SX(g.c,g.r),y=SY(g.c,g.r)-58;ctx.fillStyle='#fff';ctx.strokeStyle='#14181C';ctx.lineWidth=2;
+          ctx.beginPath();ctx.roundRect?ctx.roundRect(x-52,y-16,104,22,8):ctx.rect(x-52,y-16,104,22);ctx.fill();ctx.stroke();
+          ctx.fillStyle='#14181C';ctx.font='bold 9px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('HOT TIP!',x,y-1);}
+      };})(h,g,fc)});}
+  });
+  O.hz.forEach(function(h){
+    if(Math.abs(h.s.k-P.segK)>2) return; var s=h.s, g;
+    if(h.t==='rush'){ h.rs.forEach(function(ru,k){ var gg=lg(s,ru,h.v), dv=lv(s,h.dir,0), fc=faceOfGrid(dv.c,dv.r);
+        E.push({d:gg.c+gg.r,f:function(){drawPerson(ctx,gg.c,gg.r,RUN_LOOKS[k%3],fc,true,Math.floor(now*12+k)%2,2.2);}}); }); }
+    else if(h.t==='sweep'&&h.ec!==undefined){ E.push({d:h.pc+h.pr+0.7,f:function(){
+        var x0=SX(h.pc,h.pr),y0=SY(h.pc,h.pr)-30,x1=SX(h.ec,h.er),y1=SY(h.ec,h.er)-30;
+        ctx.lineCap='round';ctx.strokeStyle='#14181C';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();
+        ctx.strokeStyle='#E0B020';ctx.lineWidth=6;ctx.stroke();ctx.lineCap='butt';
+        for(var n=1;n<6;n++){var f=n/6;ctx.fillStyle=(n+Math.floor(now*6))%2?'#22d36b':'#ff3355';ctx.fillRect(x0+(x1-x0)*f-2,y0+(y1-y0)*f-2,4,4);}
+        ctx.fillStyle='#C8102E';ctx.beginPath();ctx.arc(x1,y1,6,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}}); }
+    else if(h.t==='bear'){ g=lg(s,h.u,h.v); var bv=lv(s,h.fdu,h.fdv), br=(bv.c-bv.r)>=0;
+      E.push({d:g.c+g.r,f:function(){drawBeast(ctx,SX(g.c,g.r),SY(g.c,g.r),'bear',br,h.moving?h.walk:0,h);}}); }
+    else if(h.t==='bull'){ g=lg(s,h.u,h.v); var uv=lv(s,h.st==='idle'?h.fu:h.cu,0), rr2=(uv.c-uv.r)>=0;
+      E.push({d:g.c+g.r,f:function(){drawBeast(ctx,SX(g.c,g.r),SY(g.c,g.r),'bull',rr2,h.st==='charge'?h.walk*2.5:(h.st==='idle'?h.walk*0.6:0),h);}}); }
+  });
+  O.clipsList.forEach(function(k){ if(k.got) return; E.push({d:k.c+k.r,f:function(){var x=SX(k.c,k.r),y=SY(k.c,k.r)-14-Math.sin(now*4+k.c)*3,w=Math.abs(Math.cos(now*3+k.c))*7+1.5;
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,SY(k.c,k.r),6,3,0,0,7);ctx.fill();
+    ctx.fillStyle='#E0B020';ctx.beginPath();ctx.ellipse(x,y,w,8,0,0,7);ctx.fill();ctx.strokeStyle='#8a6a10';ctx.lineWidth=1.5;ctx.stroke();
+    if(w>4){ctx.fillStyle='#7a5c10';ctx.font='bold 9px Trebuchet MS';ctx.textAlign='center';ctx.fillText('$',x,y+3);}}}); });
+  O.donutList.forEach(function(k){ if(k.got) return; E.push({d:k.c+k.r,f:function(){var x=SX(k.c,k.r),y=SY(k.c,k.r)-14-Math.sin(now*4)*3;
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,SY(k.c,k.r),8,4,0,0,7);ctx.fill();
+    ctx.strokeStyle='#9A5B23';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.arc(x-4,y-1,5,0,7);ctx.stroke();ctx.beginPath();ctx.arc(x+4,y-1,5,0,7);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x-8,y+6);ctx.quadraticCurveTo(x,y-6,x+8,y+6);ctx.stroke();ctx.lineCap='butt';
+    ctx.fillStyle='#fff';[[-5,-4],[3,-5],[6,1],[-7,2]].forEach(function(p){ctx.fillRect(x+p[0],y+p[1],1.5,1.5);});}}); });
+  O.papers.forEach(function(p){var g=lg(p.s,p.u,p.v);E.push({d:g.c+g.r,f:function(){var x=SX(g.c,g.r),y=SY(g.c,g.r);
+    ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(x,y,6,3,0,0,7);ctx.fill();
+    ctx.save();ctx.translate(x,y-18);ctx.rotate(p.rot);ctx.fillStyle='#fff';ctx.strokeStyle='#8a95a6';ctx.lineWidth=1;ctx.fillRect(-6,-4,12,8);ctx.strokeRect(-6,-4,12,8);
+    ctx.fillStyle='#b9c2cf';ctx.fillRect(-4,-2,8,1);ctx.fillRect(-4,1,6,1);ctx.restore();}});});
+  O.drops.forEach(function(d){var k=d.t/d.dur;E.push({d:d.c+d.r+0.01,f:function(){var x=SX(d.c,d.r),y=SY(d.c,d.r)-(1-k)*(1-k)*260;
+    var m=0.36; gridBox(ctx,d.c-m,d.r-m,d.c+m,d.r+m,16,(1-k)*(1-k)*260,'#F2F4F7','#CCD3DD','#AEB7C4');}});});
+  if(O.wave&&O.wave.on){
+    for(var s2=0;s2<O.segs.length;s2++){var sg=O.segs[s2]; var u=O.wave.w-sg.S; if(u<0||u>sg.L) continue;
+      for(var vv=0.5;vv<sg.W;vv+=1){(function(sg,u,vv){var g=lg(sg,u,vv);E.push({d:g.c+g.r,f:function(){
+        gridBox(ctx,g.c-0.42,g.r-0.42,g.c+0.42,g.r+0.42,34+Math.sin(now*8+vv)*4,0,'#ff3355','#C8102E','#8f0b21');
+        var x=SX(g.c,g.r),y=SY(g.c,g.r)-24;ctx.fillStyle='#fff';ctx.font='bold 10px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('▼',x,y);}});})(sg,u,vv);}
+      break;}
+  }
+  O.trail.forEach(function(t){E.push({d:t.c+t.r-0.01,f:function(){ctx.globalAlpha=t.a*0.6;drawPerson(ctx,t.c,t.r,O.look,P.face,false,0,2.3);ctx.globalAlpha=1;}});});
+  E.push({d:P.c+P.r,f:function(){
+    var blink=P.inv>0&&Math.floor(now*16)%2===0; if(blink) ctx.globalAlpha=0.35;
+    drawPerson(ctx,P.c,P.r,O.look,P.face,P.walk>0,Math.floor(P.walk*1.6)%2,2.3); ctx.globalAlpha=1;
+    if(P.stun>0){var x=SX(P.c,P.r),y=SY(P.c,P.r)-52;ctx.fillStyle='#ffcc33';ctx.font='bold 14px "Press Start 2P",monospace';ctx.textAlign='center';
+      for(var n=0;n<3;n++){var a=now*6+n*2.1;ctx.fillText('★',x+Math.cos(a)*14,y+Math.sin(a)*5);}}
+  }});
+  E.sort(function(a,b){return a.d-b.d;});
+  E.forEach(function(e){e.f();});
+  // particles + floats
+  O.parts.forEach(function(p){ctx.globalAlpha=Math.max(0,p.life/0.7);ctx.fillStyle=p.col;ctx.fillRect(SX(p.c,p.r)-2,SY(p.c,p.r)-p.z-2,4,4);});
+  ctx.globalAlpha=1; ctx.textAlign='center'; ctx.font='bold 11px "Press Start 2P",monospace';
+  O.floats.forEach(function(f){ctx.globalAlpha=1-f.a;var x=SX(f.c,f.r),y=SY(f.c,f.r)-60-f.a*30;ctx.fillStyle='#000';ctx.fillText(f.t,x+2,y+2);ctx.fillStyle=f.col;ctx.fillText(f.t,x,y);});
+  ctx.globalAlpha=1;
+  if(O.wave&&O.wave.on){var gap=playerS()-O.wave.w; if(gap<7){ctx.fillStyle='rgba(200,16,46,'+(0.25*(1-gap/7))+')';ctx.fillRect(0,0,OW,OH);}}
+  if(O.warn){ctx.globalAlpha=Math.min(1,O.warn.t*2);ctx.font='bold 18px "Press Start 2P",monospace';ctx.fillStyle='#000';ctx.fillText(O.warn.txt,OW/2+3,64+3);ctx.fillStyle=O.warn.col;ctx.fillText(O.warn.txt,OW/2,64);ctx.globalAlpha=1;}
+  // dash meter
+  var dm=$('oDash'); if(dm){var rdy=P.dashCd<=0;dm.classList.toggle('cool',!rdy);}
+}
+
+/* ---------- HUD ---------- */
+var hudCache={};
+function setTxt(id,t){if(hudCache[id]!==t){hudCache[id]=t;$(id).textContent=t;}}
+function fmtTime(t){var m=Math.floor(t/60),s=t-m*60;return m+':'+(s<10?'0':'')+s.toFixed(1);}
+function oHud(){
+  var P=OF.p,h='';for(var i=0;i<P.max;i++) h+=i<P.hearts?'❤️':'🖤';
+  setTxt('oHearts',h); setTxt('oTime',fmtTime(OF.time)); setTxt('oClips',OF.clips+'/'+OF.clipsTotal);
+  var dl=OF.wave&&OF.wave.on?Math.max(0,playerS()-OF.wave.w):null;
+  setTxt('oDead',dl===null?'':'BEAR MARKET '+dl.toFixed(1)+'m');
+}
+
+/* ---------- loop / flow ---------- */
+function oFrame(ts){
+  if(!OF||!$('scrOffice').classList.contains('on')){if(OF)OF.raf=null;return;}
+  var dt=Math.min(0.05,(ts-(OF.last||ts))/1000); OF.last=ts;
+  if(OF.state==='play'){OF.acc+=dt; var n=0; while(OF.acc>=STEP&&n<5){oUpdate(STEP);OF.acc-=STEP;n++;} if(n>=5)OF.acc=0;}
+  oRender(); oHud();
+  OF.raf=requestAnimationFrame(oFrame);
+}
+function oStartLoop(){if(!OF.raf){OF.last=0;OF.raf=requestAnimationFrame(oFrame);}}
+function oSize(){ODPR=Math.min(2,window.devicePixelRatio||1);oc.width=OW*ODPR;oc.height=OH*ODPR;}
+var pendingOffice=null;
+function openOffice(k){
+  if(!S.lookSet){pendingOffice=k;openWardrobe();return;}
+  OF=buildOffice(k); OF.look=lookOf(S.look);
+  $('oLvl').textContent=OFFICE[k].ic+' '+OFFICE[k].name.toUpperCase();
+  show('scrOffice'); oSize(); oStartLoop(); oOverlay('intro');
+}
+function oBegin(){
+  oOverlay(null); OF.state='count';
+  countdown(3,function(){ if(!OF) return; OF.state='play'; okeys={}; dashReq=false; });
+}
+function officeDie(){
+  OF.state='dead'; SFX.over(); var rec=S.office[OF.def.id]; rec.fails++; persist();
+  setTimeout(function(){ if(OF&&OF.state==='dead') oOverlay('dead'); },800);
+}
+function oRespawn(){
+  OF.hz.forEach(function(h){ if(h.t==='bear'){h.u=h.hu;h.v=h.hv;h.cool=1.2;} if(h.t==='bull'){h.u=h.hu;h.v=h.hv;h.st='idle';h.cd=1.2;} });
+  var P=OF.p; P.c=OF.cp.c;P.r=OF.cp.r;P.vc=P.vr=P.kbc=P.kbr=0;P.hearts=P.max;P.inv=2.2;P.stun=0;P.dashT=0;P.segK=OF.cp.seg;
+  OF.papers=[];OF.drops=[];
+  if(OF.wave){ if(OF.cp.seg>=OF.wave.from){OF.wave.on=true;OF.wave.w=OF.segs[OF.cp.seg].S-6;} else OF.wave.on=false; }
+  oOverlay(null); OF.state='play'; okeys={};
+}
+function oPause(){ if(!OF||OF.state!=='play') return; OF.state='pause'; oOverlay('pause'); }
+function officeClear(){
+  var O=OF; O.state='clear'; var d=O.def, rec=S.office[d.id];
+  var stars=1+(O.time<=d.par?1:0)+(O.hits<=1?1:0);
+  var first=!rec.cleared, xp=120+60*stars+8*O.clips+(first?250:0);
+  var oldRank=rankIndex(S.xp);
+  rec.cleared=true; rec.stars=Math.max(rec.stars,stars); if(!rec.best||O.time<rec.best) rec.best=O.time; rec.clipsBest=Math.max(rec.clipsBest,O.clips);
+  S.xp+=xp;
+  award('ofirst'); if(O.hits===0) award('oclean'); if(stars===3) award('ofast'); if(O.clips===O.clipsTotal) award('oclips');
+  if(OFFICE.every(function(o){return S.office[o.id].cleared;})) award('oall');
+  var newRank=rankIndex(S.xp); if(S.xp>=RANKS[3].xp) award('economist'); if(newRank===RANKS.length-1) award('chair');
+  persist(); if(d.goal==='BELL') SFX.bell(); else SFX.troph(); confetti(80);
+  O.result={stars:stars,xp:xp,first:first,promo:newRank>oldRank?RANKS[newRank]:null,unlocks:newRank>oldRank?unlocksAt(newRank):[]};
+  setTimeout(function(){ if(OF&&OF.state==='clear') oOverlay('clear'); },700);
+}
+function oSkip(){
+  var k=OF?OF.k:pendingOffice; S.office[OFFICE[k].id].skipped=true; persist();
+  OF.state='quit'; OF=null; renderHub(); show('scrHub');
+  modalMsg('Level skipped','<p>Stage '+(k+2)+': '+esc(SECTIONS[k+1].name)+' is unlocked.</p><p>You can come back and clear '+esc(OFFICE[k].name)+' any time for XP and trophies.</p>',true);
+}
+function oQuit(){ if(OF){OF.state='quit';} OF=null; renderHub(); show('scrHub'); }
+function starsLine(n){var h='';for(var i=0;i<3;i++)h+='<span class="star'+(i<n?' on':'')+'">★</span>';return h;}
+function oOverlay(kind){
+  var el=$('oOver'); if(!kind){el.classList.remove('on');el.innerHTML='';return;}
+  var d=OF.def, rec=S.office[d.id], k=OF.k, touch=document.body.classList.contains('touch'), h='';
+  var canSkip=rec.fails>=3&&!rec.cleared&&!rec.skipped;
+  if(kind==='intro'){
+    h='<div class="ocard"><div class="otag">NYSE LEVEL '+(k+1)+' OF 3</div><h2>'+d.ic+' '+esc(d.name)+'</h2><p>'+esc(d.flavor)+'</p>'+
+      '<ul>'+d.hazards.map(function(z){return '<li>'+esc(z)+'</li>';}).join('')+'</ul>'+
+      '<p class="ofine">'+(touch?'Drag the left side of the screen to move. Tap DASH to dash through danger.':'Move: arrow keys or WASD. Dash: Space. Pause: Esc.')+
+      ' Dashing makes you untouchable for a split second. Grab gold coins for XP and pretzels to heal.</p>'+
+      '<p class="ofine">Stars: ★ clear it · ★ finish under '+fmtTime(d.par)+' · ★ take 1 hit or fewer'+(S.relaxed?' · Relaxed Timer: 5 hearts, slower hazards':'')+'</p>'+
+      (rec.cleared?'<p class="ofine">Your best: '+starsLine(rec.stars)+' '+fmtTime(rec.best)+'</p>':'')+
+      '<div class="btnrow"><button type="button" class="big" id="oGo">HIT THE FLOOR</button><button type="button" class="big gray" id="oBack">BACK TO MAP</button>'+
+      (canSkip?'<button type="button" class="big gray" id="oSkipB">SKIP LEVEL</button>':'')+'</div></div>';
+  }else if(kind==='pause'){
+    h='<div class="ocard"><h2>PAUSED</h2><div class="btnrow"><button type="button" class="big" id="oRes">RESUME</button><button type="button" class="big blue" id="oRestart">RESTART LEVEL</button><button type="button" class="big gray" id="oBack">QUIT TO MAP</button></div></div>';
+  }else if(kind==='dead'){
+    h='<div class="ocard"><div class="otag">MARGIN CALL</div><h2>OUT OF HEARTS</h2><p>Failed attempts on this level: <b>'+rec.fails+'</b>'+(rec.fails<3&&!rec.cleared&&!rec.skipped?' · Skip unlocks after 3.':'')+'</p>'+
+      '<div class="btnrow"><button type="button" class="big" id="oRetry">RETRY FROM CHECKPOINT</button><button type="button" class="big blue" id="oRestart">RESTART LEVEL</button><button type="button" class="big gray" id="oBack">BACK TO MAP</button>'+
+      (canSkip?'<button type="button" class="big gray" id="oSkipB">SKIP LEVEL</button>':'')+'</div></div>';
+  }else if(kind==='clear'){
+    var r=OF.result, nextSec=SECTIONS[k+1];
+    h='<div class="ocard"><div class="otag">CLOSING BELL</div><h2>LEVEL CLEAR!</h2><div class="bigstars sm">'+starsLine(r.stars)+'</div>'+
+      '<div class="statgrid"><div class="stat"><span>Time</span><b>'+fmtTime(OF.time)+'</b></div><div class="stat"><span>Hits</span><b>'+OF.hits+'</b></div>'+
+      '<div class="stat"><span>Coins</span><b>'+OF.clips+'/'+OF.clipsTotal+'</b></div><div class="stat"><span>XP</span><b>+'+r.xp+'</b></div></div>'+
+      (r.first?'<p class="ofine">Includes a 250 XP first-clear bonus.</p>':'')+
+      (r.promo?'<div class="banner rank">PROMOTED! YOU ARE NOW: '+esc(r.promo.name.toUpperCase())+' '+r.promo.ic+'</div>':'')+
+      (r.unlocks.length?'<div class="banner troph">NEW WARDROBE: '+esc(r.unlocks.join(', '))+'</div>':'')+
+      '<div class="btnrow"><button type="button" class="big" id="oNext">NEXT: STAGE '+(k+2)+' '+esc(nextSec.name.toUpperCase())+'</button><button type="button" class="big blue" id="oRestart">PLAY AGAIN</button><button type="button" class="big gray" id="oBack">BACK TO MAP</button></div></div>';
+  }
+  el.innerHTML=h; el.classList.add('on');
+  function on(id,fn){var b=$(id); if(b) b.onclick=function(){SFX.click();fn();};}
+  on('oGo',oBegin); on('oBack',oQuit); on('oSkipB',oSkip); on('oRes',function(){oOverlay(null);OF.state='play';okeys={};});
+  on('oRestart',function(){var kk=OF.k;OF.state='quit';OF.raf&&cancelAnimationFrame(OF.raf);OF=buildOffice(kk);OF.look=lookOf(S.look);oStartLoop();oBegin();});
+  on('oRetry',oRespawn);
+  on('oNext',function(){var kk=OF.k;OF.state='quit';OF=null;startRound('stage',SECTIONS[kk+1].id);});
+}
+function unlocksAt(rank){var out=[];SUITS.forEach(function(s){if(s[2]===rank)out.push(s[0]+' jacket');});TIES.forEach(function(t){if(t[2]===rank)out.push(t[0]+' tie');});return out;}
+
+/* ---------- office input wiring ---------- */
+function initOfficeInput(){
+  oc=$('offCanvas'); octx=oc.getContext('2d'); oSize();
+  if(window.matchMedia&&window.matchMedia('(pointer: coarse)').matches) document.body.classList.add('touch');
+  document.addEventListener('keydown',function(e){
+    if(!$('scrOffice').classList.contains('on')) return;
+    var k=e.key.toLowerCase();
+    if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' ','shift'].indexOf(k)>=0){ e.preventDefault(); if(!e.repeat&&(k===' '||k==='shift')) dashReq=true; okeys[k]=true; }
+    if(k==='escape'||k==='p'){ if(OF&&OF.state==='play') oPause(); else if(OF&&OF.state==='pause'){oOverlay(null);OF.state='play';} }
+  });
+  document.addEventListener('keyup',function(e){okeys[e.key.toLowerCase()]=false;});
+  window.addEventListener('blur',function(){okeys={};joyReset();oPause();});
+  document.addEventListener('visibilitychange',function(){if(document.hidden) oPause();});
+  $('oPause').onclick=function(){SFX.click();oPause();};
+  var zone=$('oTouch'), base=$('oJoy'), knob=$('oKnob');
+  function joyReset(){joy.on=false;joy.x=joy.y=joy.mag=0;joy.id=null;knob.style.transform='translate(-50%,-50%)';base.classList.remove('live');}
+  window.joyReset=joyReset;
+  zone.addEventListener('pointerdown',function(e){e.preventDefault();if(joy.on)return;joy.on=true;joy.id=e.pointerId;
+    var r=zone.getBoundingClientRect();joy.ox=e.clientX;joy.oy=e.clientY;base.style.left=(e.clientX-r.left)+'px';base.style.top=(e.clientY-r.top)+'px';base.classList.add('live');
+    try{zone.setPointerCapture(e.pointerId);}catch(x){} });
+  zone.addEventListener('pointermove',function(e){if(!joy.on||e.pointerId!==joy.id)return;e.preventDefault();
+    var dx=e.clientX-joy.ox,dy=e.clientY-joy.oy,l=Math.hypot(dx,dy),R=48,cl=Math.min(l,R);
+    joy.x=l?dx/l:0;joy.y=l?dy/l:0;joy.mag=cl/R;knob.style.transform='translate(calc(-50% + '+(joy.x*cl)+'px), calc(-50% + '+(joy.y*cl)+'px))';});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(ev){zone.addEventListener(ev,function(e){if(e.pointerId===joy.id)joyReset();});});
+  $('oDash').addEventListener('pointerdown',function(e){e.preventDefault();dashReq=true;});
+}
+
+/* ---------- wardrobe ---------- */
+var wardAnim=null;
+function openWardrobe(){
+  show('scrWardrobe'); renderWardrobe();
+  if(wardAnim) cancelAnimationFrame(wardAnim);
+  var faces=['down','right','up','left'],t0=performance.now();
+  (function spin(ts){ if(!$('scrWardrobe').classList.contains('on')){wardAnim=null;return;}
+    var cv=$('wardCanvas'),cx=cv.getContext('2d'),f=faces[Math.floor((ts-t0)/1400)%4],ph=Math.floor((ts-t0)/260)%2;
+    cx.clearRect(0,0,cv.width,cv.height); cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.ellipse(cv.width/2,cv.height-14,52,12,0,0,7);cx.fill();
+    drawIntern(cx,(cv.width-15*11)/2,cv.height-19*11-14,11,lookOf(S.look),f,true,ph);
+    wardAnim=requestAnimationFrame(spin); })(t0);
+}
+function renderWardrobe(){
+  var ri=rankIndex(S.xp);
+  function row(title,list,key,isColor){
+    return '<div class="wrow"><div class="wlab">'+title+'</div><div class="wsw">'+list.map(function(o){
+      var name=typeof o==='string'?o:o[0], lock=(typeof o!=='string'&&o[2]!=null&&o[2]>ri), sel=S.look[key]===name;
+      var bgc=isColor?('background:'+(o[3]?'repeating-linear-gradient(135deg,'+o[1]+' 0 6px,'+o[3]+' 6px 10px)':o[1])):'';
+      return '<button class="sw'+(isColor?'':' txt')+(sel?' sel':'')+(lock?' lock':'')+'" data-k="'+key+'" data-v="'+esc(name)+'" '+(lock?'data-r="'+o[2]+'"':'')+' title="'+esc(name)+(lock?' (unlocks at '+RANKS[o[2]].name+')':'')+'" style="'+bgc+'">'+(isColor?'':esc(name))+(lock?'<i>🔒</i>':'')+'</button>';
+    }).join('')+'</div></div>';
+  }
+  $('wardRows').innerHTML=row('Trading jacket',SUITS,'suit',true)+row('Tie',TIES,'tie',true)+row('Hair color',HAIRS,'hair',true)+row('Hair style',STYLES,'hairStyle',false)+row('Skin tone',SKINS,'skin',true)+
+    '<p class="muted" style="font-size:12px;margin:10px 0 0">🔒 items unlock as you get promoted. Selected: '+esc(S.look.suit)+' jacket, '+esc(S.look.tie)+' tie.</p>';
+  Array.prototype.forEach.call(document.querySelectorAll('#wardRows .sw'),function(b){b.onclick=function(){
+    if(b.classList.contains('lock')){SFX.wrong();modalMsg('Locked','Reach the rank of '+RANKS[+b.getAttribute('data-r')].name+' to unlock '+b.getAttribute('data-v')+'.');return;}
+    S.look[b.getAttribute('data-k')]=b.getAttribute('data-v');persist();SFX.click();renderWardrobe();};});
+}
+
+
+/* ---------------- BOOT ---------------- */
+initOfficeInput();
+syncToggles();
+startTitle();
+window.__u6ob={MC:MC,POL:POL,WB:WB,state:function(){return S;},game:function(){return G;},cur:function(){return cur;},office:function(){return OF;},officeDefs:OFFICE,openOffice:openOffice,startRound:startRound,persist:persist};
+})();
+</script>
+</body>
+</html>
