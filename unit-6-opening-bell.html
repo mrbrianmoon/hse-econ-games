@@ -241,6 +241,7 @@ body.touch .ohelp{display:none}
 .ticker b{color:#ff6680;font-weight:normal}
 @keyframes tick{to{transform:translateX(-100%)}}
 .modes{grid-template-columns:repeat(2,1fr)}
+#modeGrid .mode:last-child{grid-column:1/-1}
 .mode.test{background:linear-gradient(160deg,#071a3a,#0c2f66);border-color:var(--blue-hi)}
 .mode.pol{background:linear-gradient(160deg,#0b2a1a,#0f4a2c);border-color:var(--good)}
 .mode .big2{font-size:24px;float:right}
@@ -501,6 +502,59 @@ var MC=[
  [3,'Stock prices have climbed steadily for two years, and investors feel confident. What kind of market is this?','a bull market',['a bear market','a bank run','a recession'],'A <b>bull market</b> is a long stretch of rising stock prices. A <b>bear market</b> is a long stretch of falling or flat prices.']
 ];
 
+
+/* Practice Test B: a second set of 40, same exam topics, all new situations.
+   [stage index, question, correct answer, [wrong answers], why] */
+var MCB=[
+ /* ---------- Day 33 ---------- */
+ [0,'Kiara uses her $50 birthday money to buy concert tickets. Which use of money is she relying on?','medium of exchange',['unit of account','store of value','limited supply'],'Money is a <b>medium of exchange</b> when you trade it for goods and services.'],
+ [0,'Which situation shows money working as a store of value?','Marcus saves $20 from each paycheck so he can buy a bike next spring.',['Ana compares a $300 phone with a $450 phone before picking one.','Leo hands the cashier $6 for a sandwich at lunch today.','Jae trades his skateboard for a friend\'s pair of headphones.'],'Saving money now to spend later is <b>store of value</b>. Comparing prices is unit of account, paying is medium of exchange, and trading goods is barter.'],
+ [0,'Inflation runs 10 percent a year, but Rosa keeps all her savings in a shoebox at home. What happens to her savings?','The same dollars buy less each year, so her savings lose purchasing power.',['Her savings grow by 10 percent each year because prices are rising.','Nothing changes, because she still has the same number of dollars.','Her savings turn into commodity money because they are not in a bank.'],'Inflation shrinks what each dollar can buy. Money held as a <b>store of value</b> loses ground when prices rise.'],
+ [0,'Which statement best explains why a U.S. dollar has value today?','People accept it because the government declares it legal tender and everyone trusts that others will take it.',['It can be exchanged for a set amount of gold at any bank in the country, so it is backed by real metal.','The special cotton paper it is printed on is valuable all by itself.','Each bill is backed by a share of stock in a large U.S. company.'],'The dollar is <b>fiat money</b>. It is not backed by gold. Its value comes from government decree and public trust.'],
+ [0,'Some ancient fishing villages used fresh fish as money, but it never worked for long. Which characteristic of money was the biggest problem?','durable',['divisible','uniform','acceptable'],'Fish spoil in days. Good money must be <b>durable</b> so it holds up to being used again and again.'],
+ [0,'The island of Yap once used giant stone wheels, some taller than a person, as money. Which characteristic of money did the stones lack the most?','portable',['durable','limited supply','acceptable'],'The stones lasted for centuries and people accepted them, but you could not carry them. Good money is <b>portable</b>.'],
+ [0,'Every $5 bill buys exactly the same amount as any other $5 bill, whether it is brand new or worn out. Which characteristic of money is this?','uniform',['divisible','portable','durable'],'Money is <b>uniform</b> when every unit of the same amount is worth the same.'],
+ [0,'Colonists in Virginia paid for goods with tobacco leaves, which could also be smoked or sold. What type of money was tobacco?','commodity money',['representative money','fiat money','demand deposits'],'<b>Commodity money</b> has value by itself and is also used as money, like salt, cattle, or tobacco.'],
+ [0,'A country on the gold standard wants to print $1 billion in new paper money. What must it have first?','enough gold in reserve to back the new money',['permission from every state bank to print it','a rising stock market that year','a new tax on every household'],'Under the <b>gold standard</b>, new paper money had to be backed by gold the government held.'],
+ [0,'Why did Congress create the Federal Reserve in 1913?','After the Panic of 1907, people wanted a central bank that could stop bank panics and keep money stable.',['The Civil War had just started, and the government needed money to pay soldiers.','Congress wanted to end the gold standard that same year and switch the whole country over to fiat money.','The New York Stock Exchange needed a government agency to run its trading floor.'],'Repeated bank panics, especially the <b>Panic of 1907</b>, convinced Congress the country needed a <b>central bank</b>.'],
+
+ /* ---------- Day 34 ---------- */
+ [1,'Using the textbook definitions, which of these is part of M1?','money in a checking account',['money in a savings account','a 2-year certificate of deposit','money in a money market fund'],'<b>M1</b> is cash plus checking accounts (demand deposits). Savings, small CDs, and money market funds are added in <b>M2</b>.'],
+ [1,'You need to pay a bill in the next hour. Which asset can you use with almost no delay and no loss in value?','money in your checking account',['a used car you could try to sell','a 5-year certificate of deposit','a collection of rare coins'],'Checking deposits are highly <b>liquid</b>. The car and coins need a buyer, and the CD charges a penalty for early withdrawal.'],
+ [1,'What does FDIC insurance protect?','money in a bank account if the bank fails',['the value of your stocks if the market crashes','bondholders if a company goes bankrupt','banks from having to keep any reserves'],'The <b>FDIC</b> insures bank <b>deposits</b>. It does not protect stocks or bonds, which carry investment risk.'],
+ [1,'A bank keeps 10 percent of a $1,000 deposit as reserves. How much of the deposit can it lend out?','$900',['$100','$1,000','$10,000'],'With <b>fractional reserve banking</b>, the bank keeps $100 (10 percent) and can lend the other <b>$900</b>. That lending is how banks create money.'],
+ [1,'Why does a bank charge more interest on its loans than it pays on savings accounts?','The difference pays the bank\'s costs and earns it a profit.',['The law requires banks to lose money on every savings account.','The extra interest is sent to the FDIC to pay for insurance.','The Federal Reserve collects all of the interest paid on loans.'],'The <b>spread</b> between loan rates and savings rates is how banks stay in business.'],
+ [1,'Which of these is a job of the Federal Reserve?','lending to banks that run short of cash, as the lender of last resort',['collecting income taxes from every household','insuring each depositor\'s money up to $250,000 when a bank fails','buying and selling shares for investors on Wall Street'],'The Fed is the <b>banks\' bank</b>. Taxes are collected by the IRS, deposits are insured by the FDIC, and stock trades happen on exchanges.'],
+ [1,'Why can a rumor alone cause a healthy bank to fail?','Banks lend out most deposits, so if everyone withdraws at once the bank cannot pay them all.',['Any rumor automatically doubles the bank\'s reserve requirement, so it runs out of money to lend.','The FDIC must close any bank that is the subject of a rumor.','Banks are required to sell all of their stock when rumors spread.'],'A <b>bank run</b> feeds on <b>consumer expectations</b>. Because of fractional reserve banking, no bank keeps enough cash for every depositor at once.'],
+ [1,'Who chooses the members of the Fed\'s Board of Governors?','The President appoints them, and the Senate confirms them.',['Voters elect them in every presidential election, every 4 years.','The 12 district banks elect them each year.','The Supreme Court picks them for life.'],'Governors are <b>appointed by the President and confirmed by the Senate</b> to 14-year staggered terms.'],
+ [1,'Why might it be a problem if elected politicians made the Fed\'s interest rate decisions?','They might lower rates before an election to look good, even if it causes inflation later.',['Elected politicians are not allowed to talk about the economy or vote on anything related to money.','Interest rates can only be set by the banks themselves.','Elections would have to be held every single year.'],'That is why the Fed is designed to be <b>independent</b>, with long, staggered terms for its governors.'],
+ [1,'Why do banks charge higher interest rates to borrowers with poor credit?','Those borrowers are more likely to not pay back, so the bank wants more reward for the risk.',['The FDIC requires higher rates for anyone who has ever had a credit card, no matter their history.','Borrowers with poor credit always borrow smaller amounts.','Higher interest rates make it impossible for borrowers to default.'],'Riskier loans carry a higher chance of <b>default</b>. Higher rates are the bank\'s reward for taking that risk.'],
+
+ /* ---------- Day 35 ---------- */
+ [2,'Interest rates fall from 6 percent to 1 percent. What happens to how much money people want to hold as cash?','It rises, because they give up very little interest by holding cash.',['It falls, because people want to save even more when rates are low.','It stays the same, because interest rates do not affect money.','It falls, because banks stop making loans when rates are low.'],'When rates are low, holding cash costs you almost nothing in lost interest, so the <b>demand for money rises</b>. People also borrow and spend more.'],
+ [2,'A bond certificate says: "$5,000 face value, 4 percent, due in 2036." What is the $5,000?','the par value',['the coupon rate','the yield','the maturity'],'<b>Par value</b> (face value) is paid back at maturity. The 4 percent is the coupon rate, and 2036 is the maturity.'],
+ [2,'You buy a $2,000 bond with a 5 percent coupon rate and a 4-year maturity. How much interest will it pay you in total?','$400',['$100','$2,400','$40'],'$2,000 × 0.05 = $100 a year. $100 × 4 years = <b>$400</b> in interest, plus your $2,000 par value back at maturity.'],
+ [2,'You own an older bond paying 3 percent. The FOMC raises rates, and new bonds now pay 6 percent. What happens to the price you could sell your bond for?','It falls, because buyers can get a higher rate from new bonds.',['It rises, because older bonds are rarer than new ones.','It stays exactly at par value no matter what happens.','The issuer must raise your coupon rate to 6 percent.'],'Rates up, old bond prices <b>down</b>. They move like a seesaw.'],
+ [2,'Which list puts bonds in order from SAFEST to RISKIEST?','Treasury bonds, municipal bonds, corporate bonds, junk bonds',['junk bonds, corporate bonds, municipal bonds, Treasury bonds','corporate bonds, Treasury bonds, junk bonds, municipal bonds','municipal bonds, junk bonds, Treasury bonds, corporate bonds'],'The U.S. government is the safest borrower, then state and local governments, then companies. <b>Junk bonds</b> are the riskiest and pay the most.'],
+ [2,'First Hoosier Bank borrows money overnight from another bank. What is the interest rate on that loan called?','the federal funds rate',['the discount rate','the coupon rate','the reserve requirement'],'Banks lending to <b>each other</b> = federal funds rate. Banks borrowing from <b>the Fed</b> = discount rate.'],
+ [2,'Prices are rising fast. Which action should the FOMC take?','sell government bonds to pull money out of the economy',['buy government bonds to add money to the banks','lower the discount rate so banks borrow more','lower the reserve requirement so banks lend more'],'To fight inflation the Fed uses <b>tight (contractionary)</b> policy. Selling bonds shrinks the money supply. The other three choices are all expansionary.'],
+ [2,'The Fed buys $50 billion of government bonds from banks. What is the most likely result?','Banks have more to lend, interest rates fall, and spending picks up.',['Banks have less to lend, interest rates rise, and spending slows.','The government must raise taxes to pay the Fed back.','Stock prices must fall because money leaves the economy.'],'When the Fed <b>buys</b> bonds it pays banks cash, which is <b>loose (expansionary)</b> monetary policy.'],
+ [2,'Why can monetary policy usually be put in place faster than fiscal policy?','The FOMC can decide in one meeting, while fiscal policy has to pass Congress as a law.',['Fiscal policy is set by the Fed, which only meets once a year to vote on new taxes.','Monetary policy is written directly into the Constitution.','Congress is not allowed to change taxes during a recession.'],'<b>Monetary</b> policy: the Fed, decided quickly. <b>Fiscal</b> policy: Congress and the President, slowed down by the lawmaking process.'],
+ [2,'The economy is booming and inflation is high. Which action by Congress would be contractionary fiscal policy?','raising taxes or cutting government spending',['cutting taxes and sending rebate checks','raising the discount rate charged to banks','selling government bonds on the open market'],'Fiscal = Congress taxing and spending. Contractionary = taking money out. The last two choices are monetary tools the Fed uses.'],
+
+ /* ---------- Day 36 ---------- */
+ [3,'A friend says an investment pays very high returns with "zero risk." Why should you be suspicious?','Higher possible returns almost always come with higher risk.',['High-return investments are always insured by the FDIC.','The safest investments always pay the highest returns.','Risk and return have nothing to do with each other.'],'<b>Risk and return go together.</b> A promise of big returns with no risk is a warning sign.'],
+ [3,'When you buy a share of stock, you become...','a part owner of the company',['a lender to the company','an employee of the company','a voting member of Congress'],'Stocks = <b>ownership</b>. Bonds = lending.'],
+ [3,'Over long periods, why have stocks usually earned more than bonds?','Stockholders accept more risk, since bondholders are paid first and stock prices can fall.',['Stocks are guaranteed by the federal government.','Companies must pay stockholders the same dividend every year, even when the company loses money.','Bondholders own the company, so they keep all of the profits.'],'Stockholders are <b>last in line</b> if a company fails. That extra risk is why they expect higher returns.'],
+ [3,'Which portfolio is the MOST diversified?','a stock mutual fund, a bond fund, and a savings account',['all of your money in one large, famous tech company','shares of three different video game companies','one corporate bond from a single company'],'<b>Diversification</b> spreads money across different kinds of assets, so one bad investment cannot sink you. Three video game companies are still all in one industry.'],
+ [3,'Why is a mutual fund a good choice for a beginner with only $100 to invest?','It pools money from many people, so even $100 buys a small piece of many companies.',['It guarantees that the $100 will double in a year, no matter what the stock market does.','It is insured by the FDIC against any loss.','It makes the beginner the manager of the whole fund.'],'A <b>mutual fund</b> makes diversification easy and affordable.'],
+ [3,'Which saver should be MOST willing to take the risk of investing in stocks?','a 20-year-old saving for a retirement about 45 years away',['a family saving for a house down payment next spring','a retiree who pays monthly bills from savings','a student saving for a new laptop next month'],'With decades to wait, a young investor has <b>time to recover</b> from bad years. Money needed soon belongs somewhere safe and liquid.'],
+ [3,'Which choice gives up the MOST liquidity?','putting $1,000 in a 5-year certificate of deposit',['keeping $1,000 in a checking account','keeping $1,000 in a savings account','keeping $1,000 in cash in your wallet'],'A 5-year CD locks your money up and charges a penalty for early withdrawal, so it is the <b>least liquid</b>. In exchange, it usually pays more interest.'],
+ [3,'A company has a great year and sends every stockholder $2 for each share they own. What is this payment?','a dividend',['a capital gain','a coupon rate','a par value'],'A <b>dividend</b> is a portion of company profits paid to stockholders. A capital gain comes from selling a share for more than you paid.'],
+ [3,'Stock prices have been falling for months, and investors are nervous. What is this called?','a bear market',['a bull market','a bank run','diversification'],'A <b>bear market</b> is a long stretch of falling or flat stock prices. Bulls charge up, bears swipe down.'],
+ [3,'The FOMC raises interest rates sharply. Why might stock prices fall?','Borrowing costs rise and can shrink company profits, while safer bonds and CDs now pay more.',['The law requires every company to stop paying dividends to stockholders as soon as rates rise.','The FDIC stops insuring stocks whenever interest rates go up.','Rising interest rates always cause a bull market right away.'],'Higher rates make borrowing costly for companies and make savings and bonds more attractive, so some investors move money out of stocks.']
+];
+
 /* Policy Desk: [type A=classify the action, S=pick the policy, text, answer index, who, direction] */
 var POL_OPTS=['Expansionary Fiscal Policy','Contractionary Fiscal Policy','Expansionary Monetary Policy','Contractionary Monetary Policy'];
 var POL=[
@@ -614,9 +668,10 @@ var TROPHIES=[
   {id:'perfect',ic:'💯',n:'Flawless Trade',h:'Get every question right on the first try in a stage.'},
   {id:'streak10',ic:'🐂',n:'Bull Run',h:'Get 10 questions in a row right on the first try.'},
   {id:'streak25',ic:'🚀',n:'Raging Bull',h:'Get 25 questions in a row right on the first try.'},
-  {id:'testdone',ic:'📝',n:'Full Session',h:'Finish the 40-question Practice Test.'},
-  {id:'test80',ic:'✅',n:'Market Ready',h:'Score 80% or better on the Practice Test.'},
-  {id:'test95',ic:'🏆',n:'Fed Chair Material',h:'Score 95% or better on the Practice Test.'},
+  {id:'testdone',ic:'📝',n:'Full Session',h:'Finish a 40-question Practice Test.'},
+  {id:'bothtests',ic:'📚',n:'Double Checked',h:'Finish both Practice Test A and Practice Test B.'},
+  {id:'test80',ic:'✅',n:'Market Ready',h:'Score 80% or better on either Practice Test.'},
+  {id:'test95',ic:'🏆',n:'Fed Chair Material',h:'Score 95% or better on either Practice Test.'},
   {id:'policy10',ic:'🎛️',n:'Policy Pro',h:'Get 10 of 12 right on the first try at the Policy Desk.'},
   {id:'policy12',ic:'🧊',n:'Steady Hand',h:'Get all 12 right on the first try at the Policy Desk.'},
   {id:'match',ic:'🔤',n:'Word Bank Wizard',h:'Get every Word Bank Blitz clue right on the first try.'},
@@ -637,7 +692,7 @@ var STORE_KEY='hse-u6-opening-bell-v1';
 /* ---------------- SAVE ---------------- */
 var mem=null;
 function blankSave(){
-  var s={v:1,name:'',xp:0,rounds:0,mute:false,relaxed:false,stages:{},test:{best:-1,last:null,bestRec:null},pol:{best:-1},wb:{best:-1},
+  var s={v:1,name:'',xp:0,rounds:0,mute:false,relaxed:false,stages:{},test:{best:-1,last:null,bestRec:null},testB:{best:-1,last:null,bestRec:null},pol:{best:-1},wb:{best:-1},
     qs:{},trophies:{},bestStreak:0,totalFirst:0,totalAnswered:0,
     office:{floor:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0},bond:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0},bell:{cleared:false,skipped:false,stars:0,best:0,fails:0,clipsBest:0}},
     look:{suit:'Navy',tie:'HSE Red',hair:'Dark Brown',hairStyle:'Short',skin:'Medium'},lookSet:false};
@@ -723,9 +778,9 @@ function trophyCount(){return Object.keys(S.trophies).length;}
 function stripTags(h){var d=document.createElement('div');d.innerHTML=h;return (d.textContent||'').replace(/\s+/g,' ').trim();}
 
 /* ---------------- QUESTION BUILDERS ---------------- */
-function mcQ(i){
-  var r=MC[i], st=STAGES[r[0]];
-  return {key:'m'+i,sec:st.id,secName:st.name,tag:'PRACTICE TEST',html:'<div class="q">'+esc(r[1])+'</div>',txt:r[1],
+function mcQ(i,bank){
+  var B=bank==='B'?MCB:MC, r=B[i], st=STAGES[r[0]];
+  return {key:(bank==='B'?'b':'m')+i,sec:st.id,secName:st.name,tag:bank==='B'?'PRACTICE TEST B':'PRACTICE TEST A',html:'<div class="q">'+esc(r[1])+'</div>',txt:r[1],
     opts:shuffle([r[2]].concat(r[3])),ans:r[2],why:r[4],layout:'list'};
 }
 function polQ(i){
@@ -745,6 +800,7 @@ function wbQ(g,j){
 function defOf(t){for(var i=0;i<GLOSS.length;i++) for(var j=0;j<GLOSS[i][1].length;j++) if(GLOSS[i][1][j][0]===t) return GLOSS[i][1][j][1]; return '';}
 function qFromKey(k){
   if(k.charAt(0)==='m') return mcQ(+k.slice(1));
+  if(k.charAt(0)==='b') return mcQ(+k.slice(1),'B');
   if(k.charAt(0)==='p') return polQ(+k.slice(1));
   var p=k.slice(1).split('_'); return wbQ(+p[0],+p[1]);
 }
@@ -758,6 +814,7 @@ function makeQueue(mode,sec){
     return shuffle(out);
   }
   if(mode==='test'){ MC.forEach(function(r,i){out.push(mcQ(i));}); return shuffle(out); }
+  if(mode==='testb'){ MCB.forEach(function(r,i){out.push(mcQ(i,'B'));}); return shuffle(out); }
   if(mode==='policy'){
     var a=shuffle(POL.map(function(r,i){return i;}).filter(function(i){return POL[i][0]==='A';})).slice(0,6);
     var b=shuffle(POL.map(function(r,i){return i;}).filter(function(i){return POL[i][0]==='S';})).slice(0,6);
@@ -843,7 +900,7 @@ function renderHub(){
     $('hubXpNums').textContent=fmt(S.xp)+' XP · '+fmt(next.xp-S.xp)+' XP to '+next.name;}
   else{$('hubXpBar').style.width='100%';$('hubXpNums').textContent=fmt(S.xp)+' XP · Top rank reached';}
   $('hubStars').textContent=totalStars()+'/12';
-  $('hubTest').textContent=S.test.best>=0?S.test.best+'%':'--';
+  var tb=Math.max(S.test.best,S.testB.best); $('hubTest').textContent=tb>=0?tb+'%':'--';
   $('hubTroph').textContent=trophyCount()+'/'+TROPHIES.length;
   var g=$('stageGrid'); g.innerHTML='';
   STAGES.forEach(function(sec,i){
@@ -870,8 +927,10 @@ function renderHub(){
   var mg=$('modeGrid'); mg.innerHTML='';
   var weak=weakKeys();
   var modes=[
-    {k:'test',cls:'test',ic:'📝',t:'FULL PRACTICE TEST',p:'All 40 practice questions in one sitting, mixed like the real exam. You get a score for each lesson so you know what to study.',
+    {k:'test',cls:'test',ic:'📝',t:'PRACTICE TEST A',p:'All 40 stage questions in one sitting, mixed like the real exam. No timer. You get a score for each lesson so you know what to study.',
       un:true,req:S.test.best>=0?('Best: '+S.test.best+'% first try'):'Not taken yet'},
+    {k:'testb',cls:'test',ic:'🗒️',t:'PRACTICE TEST B',p:'40 brand-new questions on the same exam topics, in new situations. No timer. Take it after Test A to see if you really know it.',
+      un:true,req:S.testB.best>=0?('Best: '+S.testB.best+'% first try'):'Not taken yet'},
     {k:'policy',cls:'pol',ic:'🎛️',t:'POLICY DESK',p:'Fiscal or monetary? Expansionary or contractionary? 12 scenarios just like Parts 3 and 4 of the exam.',
       un:true,req:S.pol.best>=0?('Best: '+S.pol.best+' of 12 first try'):'Not played yet'},
     {k:'match',cls:'',ic:'🔤',t:'WORD BANK BLITZ',p:'5 word bank groups, 20 clues. Same setup as the vocabulary matching on Part 1 of the exam.',
@@ -895,7 +954,7 @@ Array.prototype.forEach.call(document.querySelectorAll('[data-go="hub"]'),functi
 $('btnHelp').onclick=function(){
   modalMsg('How it works',
    '<p><b>Two chances:</b> miss a question and the screen flashes red. Take another look and try again. Miss it twice and the correct answer is shown with an explanation.</p>'+
-   '<p><b>Points:</b> right on the first try = 100 points plus a speed bonus, times your multiplier. Right on the second try = 40 points. There is no time limit.</p>'+
+   '<p><b>Points:</b> right on the first try = 100 points plus a speed bonus, times your multiplier. Right on the second try = 40 points. There is no time limit, and the Practice Tests have no speed bonus at all.</p>'+
    '<p><b>Multiplier:</b> every 3 first-try answers in a row raises it, up to x3. A miss resets it.</p>'+
    '<p><b>Stars:</b> 60% first try = ★, 80% = ★★, 90% = ★★★.</p>'+
    '<p><b>NYSE levels:</b> after each stage, survive a level inside the New York Stock Exchange to unlock the next stage. Fail a level 3 times and a Skip button appears. The Practice Test, Policy Desk, and Word Bank Blitz are always open.</p>'+
@@ -919,13 +978,14 @@ $('modal').addEventListener('click',function(e){ if(e.target===$('modal')&&$('mo
 
 /* ---------------- ROUND ENGINE ---------------- */
 var G=null, bonusRaf=null;
-var MODE_LABEL={test:'PRACTICE TEST',policy:'POLICY DESK',match:'WORD BANK BLITZ',weak:'MISSED QUESTIONS'};
+var MODE_LABEL={test:'PRACTICE TEST A',testb:'PRACTICE TEST B',policy:'POLICY DESK',match:'WORD BANK BLITZ',weak:'MISSED QUESTIONS'};
 function startRound(mode,sec){
   ac();
   var q=makeQueue(mode,sec); if(!q.length){renderHub();show('scrHub');return;}
-  G={active:false,mode:mode,sec:sec||null,q:q,idx:0,score:0,streak:0,bestStreak:0,first:0,answered:0,times:[],missed:[],bySec:{},paused:false};
+  G={active:false,noTimer:(mode==='test'||mode==='testb'),mode:mode,sec:sec||null,q:q,idx:0,score:0,streak:0,bestStreak:0,first:0,answered:0,times:[],missed:[],bySec:{},paused:false};
   var st=STAGES.filter(function(s){return s.id===sec;})[0];
   $('hudMode').textContent=mode==='stage'?('STAGE '+(STAGES.indexOf(st)+1)+' · '+st.name.toUpperCase()):MODE_LABEL[mode];
+  $('timer').style.display=G.noTimer?'none':''; document.querySelector('.bonuslbl').style.display=G.noTimer?'none':'';
   show('scrPlay'); $('prompt').innerHTML=''; $('opts').innerHTML=''; $('fbArea').innerHTML=''; $('nextRow').style.display='none'; updHud();
   countdown(3,function(){ if(!G) return; G.active=true; ask(); });
 }
@@ -965,7 +1025,7 @@ function ask(){
     op.appendChild(b);
   });
   $('fbArea').innerHTML=''; $('nextRow').style.display='none';
-  qStart=performance.now(); cancelAnimationFrame(bonusRaf); bonusRaf=requestAnimationFrame(bonusLoop);
+  qStart=performance.now(); cancelAnimationFrame(bonusRaf); if(!G.noTimer) bonusRaf=requestAnimationFrame(bonusLoop);
   updHud();
 }
 function track(q,firstTry){
@@ -987,7 +1047,7 @@ function answer(k){
     if(firstTry){
       G.first++; S.totalFirst++; G.streak++; G.times.push(el);
       if(G.streak>G.bestStreak) G.bestStreak=G.streak; if(G.streak>S.bestStreak) S.bestStreak=G.streak;
-      var speed=Math.round(100*Math.max(0,1-el/BONUS_MS)); pts=Math.round((100+speed)*multFor(G.streak));
+      var speed=G.noTimer?0:Math.round(100*Math.max(0,1-el/BONUS_MS)); pts=Math.round((100+speed)*multFor(G.streak));
       SFX.right(G.streak); if(G.streak%3===0) setTimeout(SFX.streak,120);
       if(G.streak>=10) award('streak10'); if(G.streak>=25) award('streak25');
     } else { pts=40; SFX.right(1); }
@@ -1050,11 +1110,13 @@ function finish(){
     if(pct===100) award('perfect');
     if(allStagesAtLeast(1)) award('stars4'); if(allStagesAtLeast(3)) award('three4');
     title=stars===3?'TRIPLE STAR!':stars>0?'STAGE CLEARED':'TRY AGAIN';
-  } else if(m==='test'){
-    var rec={pct:pct,bySec:G.bySec,at:Date.now(),first:G.first,n:n};
-    if(pct>S.test.best){ if(S.test.best>=0) banners.push('<div class="banner info">NEW BEST PRACTICE TEST: '+pct+'%</div>'); S.test.best=pct; S.test.bestRec=rec; bonus=200; }
-    S.test.last=rec; award('testdone'); if(pct>=80) award('test80'); if(pct>=95) award('test95');
-    title='PRACTICE TEST: '+pct+'%';
+  } else if(m==='test'||m==='testb'){
+    var T=m==='test'?S.test:S.testB, ver=m==='test'?'A':'B', rec={pct:pct,bySec:G.bySec,at:Date.now(),first:G.first,n:n};
+    if(pct>T.best){ if(T.best>=0) banners.push('<div class="banner info">NEW BEST ON PRACTICE TEST '+ver+': '+pct+'%</div>'); T.best=pct; T.bestRec=rec; bonus=200; }
+    T.last=rec; award('testdone'); if(pct>=80) award('test80'); if(pct>=95) award('test95');
+    if(S.test.best>=0&&S.testB.best>=0) award('bothtests');
+    if(m==='test'&&S.testB.best<0) banners.push('<div class="banner info">NEXT UP: TRY PRACTICE TEST B. SAME TOPICS, ALL NEW QUESTIONS.</div>');
+    title='PRACTICE TEST '+ver+': '+pct+'%';
   } else if(m==='policy'){
     if(G.first>S.pol.best){S.pol.best=G.first;} if(G.first>=10) award('policy10'); if(G.first>=12) award('policy12');
     title='POLICY DESK: '+G.first+' OF 12';
@@ -1077,7 +1139,7 @@ function finish(){
     for(var i=0;i<ss.length;i++)(function(k){setTimeout(function(){ss[k].classList.add('show'); if(k<stars) SFX.star(k);},300+k*350);})(i);
     if(stars===3) setTimeout(function(){confetti(70);},1300);
   } else {
-    $('resStars').innerHTML=''; $('resCrit').textContent=m==='test'?(pct>=80?'You are on track for the exam. Keep it sharp.':'Use the lesson scores below to decide what to study before the exam.'):'';
+    $('resStars').innerHTML=''; $('resCrit').textContent=(m==='test'||m==='testb')?(pct>=80?'You are on track for the exam. Keep it sharp.':'Use the lesson scores below to decide what to study before the exam.'):'';
     if(pct>=90) confetti(70);
   }
   $('resStats').innerHTML=[['Score',fmt(G.score)],['First try',G.first+'/'+n],['Best streak',G.bestStreak],['Missed twice',G.missed.length]].map(function(s){return '<div class="stat"><span>'+s[0]+'</span><b>'+s[1]+'</b></div>';}).join('');
@@ -1089,9 +1151,9 @@ function finish(){
   if(newRank>oldRank){ banners.push('<div class="banner rank">PROMOTED! YOU ARE NOW: '+r.name.toUpperCase()+' '+r.ic+'</div>'); setTimeout(SFX.rank,900);
     var ul=[]; for(var rr=oldRank+1;rr<=newRank;rr++) ul=ul.concat(unlocksAt(rr)); if(ul.length) banners.push('<div class="banner troph">NEW WARDROBE: '+esc(ul.join(', '))+'</div>'); }
   var secHTML='';
-  if(m==='test'||m==='policy'||m==='weak'){
+  if(m==='test'||m==='testb'||m==='policy'||m==='weak'){
     secHTML='<div class="review"><h4>SCORE BY '+(m==='policy'?'QUESTION TYPE':'SECTION')+'</h4></div>'+secBars(G.bySec);
-    var w=weakestSec(G.bySec); if(w&&m==='test') secHTML+='<div class="banner info">STUDY TIP: YOUR LOWEST LESSON WAS '+esc(w.toUpperCase())+'. REPLAY THAT STAGE BEFORE THE EXAM.</div>';
+    var w=weakestSec(G.bySec); if(w&&(m==='test'||m==='testb')) secHTML+='<div class="banner info">STUDY TIP: YOUR LOWEST LESSON WAS '+esc(w.toUpperCase())+'. REPLAY THAT STAGE BEFORE THE EXAM.</div>';
   }
   $('resSecs').innerHTML=secHTML;
   $('resBanners').innerHTML=banners.join('');
@@ -1106,7 +1168,7 @@ function finish(){
   if(m==='stage'&&stars>=1&&ki>=0){
     if(ki<OFFICE.length&&!officeDone(ki)){nb.style.display='';nb.textContent='NEXT: '+OFFICE[ki].name.toUpperCase();nb.onclick=function(){SFX.click();openOffice(ki);};}
     else if(ki<OFFICE.length&&stageUnlocked(ki+1)){nb.style.display='';nb.textContent='NEXT: STAGE '+(ki+2);nb.onclick=function(){SFX.click();startRound('stage',STAGES[ki+1].id);};}
-    else if(ki===STAGES.length-1){nb.style.display='';nb.textContent='TAKE THE PRACTICE TEST';nb.onclick=function(){SFX.click();startRound('test');};}
+    else if(ki===STAGES.length-1){nb.style.display='';nb.textContent='TAKE PRACTICE TEST A';nb.onclick=function(){SFX.click();startRound('test');};}
   }
   show('scrResults');
 }
@@ -1123,7 +1185,7 @@ function renderTrophies(){
 }
 function stampTime(ms){var d=ms?new Date(ms):new Date();return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear()+' at '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
 function renderReport(){
-  var r=rankFor(S.xp), done=S.test.best>=0;
+  var r=rankFor(S.xp), done=S.test.best>=0||S.testB.best>=0;
   var h='<div style="font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#003B80">'+esc(S.name||'Student')+'</div>';
   h+=done?'<div class="stamp">PRACTICE TEST COMPLETE</div>':'<div class="stamp pend">IN PROGRESS</div>';
   h+='<div class="rowx"><span>Rank</span><span>'+r.ic+' '+esc(r.name)+' · '+fmt(S.xp)+' XP</span></div>';
@@ -1133,10 +1195,11 @@ function renderReport(){
   h+='<h3>Practice test stages (best first-try score)</h3>';
   STAGES.forEach(function(s,i){var st=S.stages[s.id];h+='<div class="rowx"><span>Stage '+(i+1)+': '+esc(s.name)+'</span><span>'+(st.pct>=0?'★'.repeat(st.stars)+'☆'.repeat(3-st.stars)+'  '+st.pct+'%':'Not played')+'</span></div>';});
   h+='<h3>Test prep modes</h3>';
-  h+='<div class="rowx"><span>Full Practice Test (40 questions)</span><span>'+(done?'Best '+S.test.best+'% · Last '+S.test.last.pct+'% on '+stampTime(S.test.last.at):'Not taken')+'</span></div>';
+  [['Practice Test A (40 questions)',S.test],['Practice Test B (40 questions)',S.testB]].forEach(function(x){var T=x[1];
+    h+='<div class="rowx"><span>'+x[0]+'</span><span>'+(T.best>=0?'Best '+T.best+'% · Last '+T.last.pct+'% on '+stampTime(T.last.at):'Not taken')+'</span></div>';});
   h+='<div class="rowx"><span>Policy Desk</span><span>'+(S.pol.best>=0?'Best '+S.pol.best+' of 12':'Not played')+'</span></div>';
   h+='<div class="rowx"><span>Word Bank Blitz</span><span>'+(S.wb.best>=0?'Best '+S.wb.best+'%':'Not played')+'</span></div>';
-  if(done&&S.test.bestRec){ h+='<p style="margin:10px 0 0;font-weight:bold">Best practice test by lesson:</p>'+secBars(S.test.bestRec.bySec); var w=weakestSec(S.test.bestRec.bySec); if(w) h+='<p><b>Study before the exam:</b> '+esc(w)+'</p>'; }
+  [['A',S.test],['B',S.testB]].forEach(function(x){var T=x[1]; if(T.bestRec){ h+='<p style="margin:10px 0 0;font-weight:bold">Best Practice Test '+x[0]+' by lesson:</p>'+secBars(T.bestRec.bySec); var w=weakestSec(T.bestRec.bySec); if(w) h+='<p><b>Study before the exam:</b> '+esc(w)+'</p>'; }});
   h+='<h3>NYSE levels</h3>';
   OFFICE.forEach(function(o){var rc=S.office[o.id];h+='<div class="rowx"><span>'+esc(o.name)+'</span><span>'+(rc.cleared?('★'.repeat(rc.stars)+'☆'.repeat(3-rc.stars)+'  best '+fmtTime(rc.best)):(rc.skipped?'Skipped':'Not cleared'))+'</span></div>';});
   var acc=S.totalAnswered?Math.round(S.totalFirst/S.totalAnswered*100):0;
@@ -2016,7 +2079,7 @@ function renderWardrobe(){
 initOfficeInput();
 syncToggles();
 startTitle();
-window.__u6ob={MC:MC,POL:POL,WB:WB,state:function(){return S;},game:function(){return G;},cur:function(){return cur;},office:function(){return OF;},officeDefs:OFFICE,openOffice:openOffice,startRound:startRound,persist:persist};
+window.__u6ob={MC:MC,MCB:MCB,POL:POL,WB:WB,state:function(){return S;},game:function(){return G;},cur:function(){return cur;},office:function(){return OF;},officeDefs:OFFICE,openOffice:openOffice,startRound:startRound,persist:persist};
 })();
 </script>
 </body>
